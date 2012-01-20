@@ -293,9 +293,9 @@ function validatenews(action)
 	 }
 	 if(newscontent == '')
 	 {  
-		 jQuery('#editorcontainer').css('border-color', '#f00');		 
+		 jQuery('#'+desc_content_id+'_ifr').css('border', ' 1px solid #f00');
 	 }else {
-		 jQuery('#editorcontainer').css('border-color', '#CCCCCC');
+		 jQuery('#'+desc_content_id+'_ifr').css('border-color', 'none');
 	 }
 	 
 	 if(newstitle == '' || newscontent == '')
@@ -1002,15 +1002,6 @@ function isValidURL(url){
     //function to get all news from apptivo
     function getAllNews(){
             $response=getAllNews();
-           
-            /*
-             //Error Method response
-            if(isset($response->return->methodResponse) && $response->return->methodResponse->responseCode != '1000')
-            {
-            	echo '<div class="message" id="newsmessage" style="margin: 5px 0pt 15px; background-color: rgb(255, 255, 224); border: 1px solid rgb(230, 219, 85);width:80%;">
-      	         <p style="margin: 0.5em; padding: 2px;"><span style="color: rgb(255, 0, 0);">'.$response->return->methodResponse->responseMessage.'</span></p></div>';
-            }
-            */
             $all_awp_news = awp_convertObjToArray($response->return->newsList);
             $allnews=array();
             $currentdate = gmdate(DATE_ATOM,mktime());
@@ -1039,10 +1030,8 @@ function getAllNews()
                 "arg0" => APPTIVO_SITE_KEY,
 	            "arg1" => APPTIVO_ACCESS_KEY
                 );
-          //Memcache  
-          $response = getAllItemsWithMemcache(APPTIVO_BUSINESS_SERVICES,'-news-publisheddate','-news-data','getSiteLasteUpdateDate','fetchAllNews',$pubdate_params,$plugin_params);
-          // Without Memcache.
-          // $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchAllNews',$plugin_params); 
+          
+           $response = get_data(APPTIVO_BUSINESS_SERVICES,'-news-publisheddate','-news-data','getSiteLasteUpdateDate','fetchAllNews',$pubdate_params,$plugin_params);
            return $response;
 }
 

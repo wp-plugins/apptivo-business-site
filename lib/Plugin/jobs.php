@@ -710,8 +710,7 @@ if(strlen(trim($plugin_data['Apptivo Template Name'])) != 0 )
 	
 	function createJobsoptions()
 	{  
-
-		if(isset($_POST['job_delete_form']))
+	if(isset($_POST['job_delete_form']))
 		{
 			
 			if(strlen(trim($_POST['job_delete_form'])) != 0)
@@ -1002,9 +1001,9 @@ function validatecreatejobs()
 	 if(jobcontent == '')
 	 {  
 		
-		 jQuery('#editorcontainer').css('border-color', '#f00');		 
+		 jQuery('#content_ifr').css('border', '1px solid #f00');
 	 }else {
-		 jQuery('#editorcontainer').css('border-color', '#CCCCCC');
+		 jQuery('#content_ifr').css('border', 'none');
 	 }
 	 if(jobtitle != '' && jobcontent != '')
 	 {    jQuery('#message').remove();
@@ -1175,9 +1174,9 @@ function validatecreatejobs()
 	 if(jobcontent == '')
 	 {  
 		
-		 jQuery('#editorcontainer').css('border-color', '#f00');		 
+		 jQuery('#editcontent_ifr').css('border', '1px solid #f00');
 	 }else {
-		 jQuery('#editorcontainer').css('border-color', '#CCCCCC');
+		 jQuery('#editcontent_ifr').css('border', 'none');
 	 }
 	 if(jobtitle != '' && jobcontent != '')
 	 {    jQuery('#message').remove();
@@ -3089,7 +3088,7 @@ function getAllIndustries()
            $data_key = APPTIVO_SITE_KEY.'-industries';
                  if(class_exists('Memcache'))
           	{
-                    $mcache_obj = new AWP_Mcache_Util(); //Create Object in AWP_DataCache clss
+                    $mcache_obj = new AWP_Cache_Util(); //Create Object in AWP_DataCache clss
 		    $mcacheconnect = $mcache_obj->connectmcache();
           	}
           	else {

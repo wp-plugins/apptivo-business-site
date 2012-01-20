@@ -68,13 +68,7 @@ class AWP_Testimonials_Widget extends WP_Widget {
 			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title', 'genesis'); ?>:</label>
 			<input type="text" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php echo esc_attr( $instance['title'] ); ?>" class="widefat" />
 		</p>
-<!--                    <p>
-              <label for="<?php echo $this->get_field_id('style'); ?>"><?php _e('Style:'); ?></label>
-              <select id="<?php echo $this->get_field_id('style'); ?>" name="<?php echo $this->get_field_name('style'); ?>">
-                            <option value="alignleft" <?php selected('Default', $instance['style']); ?>><?php _e('Default'); ?></option>
-                            <option value="alignright" <?php selected('Custom', $instance['style']); ?>><?php _e('Custom'); ?></option>
-                    </select>
-            </p>-->
+
             <p>
               <label for="<?php echo $this->get_field_id('custom_css'); ?>"><?php _e('Custom CSS:'); ?></label>
               <textarea id="<?php echo $this->get_field_id('custom_css'); ?>" name="<?php echo $this->get_field_name('custom_css'); ?>" class="widefat" rows="6" cols="4"><?php echo $instance['custom_css']; ?></textarea>

@@ -48,7 +48,8 @@ class AWP_ContactForms extends AWP_Base
     function run()
     {
 	    if($this->_plugin_activated){    
-			// perform the check when the_posts() function is called
+			// perform the check when the_posts() function is called]
+		    session_start();
 			add_action('the_posts', array( &$this, 'check_for_shortcode'));
 			add_shortcode('apptivocontactform', array(&$this,'showcontactform'));
 			add_action( 'contextual_help', array(&$this,'inlinedocument'), 10, 2 );
@@ -95,7 +96,6 @@ class AWP_ContactForms extends AWP_Base
 	 * Contact Form shortcode handler
 	 */
 	function showcontactform($atts){
-        session_start();
         $value_present = false;
         extract(shortcode_atts(array('name'=>  ''), $atts));
 		$formname=trim($name);
@@ -243,6 +243,9 @@ class AWP_ContactForms extends AWP_Base
                         $parent1details = nl2br($noteDetails);
                         $noteDetails = notes('Custom Fields',$parent1details,$parent1NoteId);
                         }
+                        if(strlen(trim($firstName)) == 0 ) :
+                        $firstName = null;
+                        endif;
                         if(!empty($emailId)){
                         $response = saveLeadDetails($firstName , $lastName, $emailId, $jobTitle, $company, $address1, $address2, $city, $state, $zipCode, $bestWayToContact, $country, $leadSource, $phoneNumber, $comments, $noteDetails,$targetlistid);
                         $response_msg = $response->return->responseMessage;
@@ -909,7 +912,7 @@ function get_plugin_templates()
                                  <select id="awp_contactform_targetlist" name="awp_contactform_targetlist" onchange="contactform_selectCategory('awp_contactform_targetlist');" >
                                  <option value="" > None </option>
                                 <?php foreach($newsletter_categories as $category){?>
-                                     <option value="<?php echo  $category->targetListId; ?>" <?php selected($category->targetListId, $formproperties[targetlist]) ?>><?php echo  $category->targetListValue; ?></option>
+                                     <option value="<?php echo  $category->targetListId; ?>" <?php selected($category->targetListId, $formproperties[targetlist]) ?>><?php echo  $category->targetListName; ?></option>
                                  <?php } ?>
                                  </select>
 				</td>
@@ -1405,7 +1408,7 @@ function get_plugin_templates()
         
     function getNewsletterCategory(){
     	$category = getTargetListcategory();
-     	return awp_convertObjToArray($category->return);
+     	return awp_convertObjToArray($category->return->targetList);
     	}
 }
 
@@ -1430,13 +1433,12 @@ function getAllCountries()
  */
 function getTargetListcategory()
 {
-
 	$params = array ( 
-                "arg0" => APPTIVO_SITE_KEY               
+                "arg0" => APPTIVO_SITE_KEY,
+                "arg1" => APPTIVO_ACCESS_KEY
                 );
-    $response = getsoapCall(APPTIVO_USER_SERVICES,'getAllTargetLists',$params);     
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchAllTargetLists',$params);
     return $response;
-
 }
 /**
  * To SaveContact Lead details.
@@ -1462,11 +1464,12 @@ function getTargetListcategory()
 function saveLeadDetails($firstName, $lastName, $emailId, $jobTitle, $company, $address1, $address2, $city, $state, $zipCode, $bestWayToContact, $country, $leadSource, $phoneNumber, $comments, $noteDetails,$targetlistid)
 {
 	$leads = new AWP_LeadDetails(APPTIVO_SITE_KEY,$firstName, $lastName, $emailId, $jobTitle, $company, $address1, $address2, $city, $state, $zipCode, $bestWayToContact, $country, $leadSource, $phoneNumber, $comments, $noteDetails,$targetlistid);
-    $params = array ( 
+        $params = array (
                 "arg0" => APPTIVO_SITE_KEY,
-                "arg1" => $leads
+                "arg1" => APPTIVO_ACCESS_KEY,
+                "arg2" => $leads
                 );
-  	$response = getsoapCall(APPTIVO_CONTACTUS_SERVICES,'createLeadWithLeadSource',$params);      
+  	$response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'addLeadWithLeadSource',$params);
     return $response;
 }
 /**

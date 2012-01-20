@@ -104,7 +104,7 @@ function save_newsletter($formname){
                 $comments = $submittedformvalues[newsletter_comments];
                 if(!empty($email)){
                         $response = createTargetList($category, $firstname, $lastname,$email,$phoneNumber,$comments);
-                        $confmsg = $response->return;
+                        $confmsg = $response->return->responseMessage;
                 }
                 if($response == 'E_100')
                 { 
@@ -233,7 +233,6 @@ function get_master_newsletterform_fields()
 }
 
 function options(){
-	
 // Delete form Name:	
 if($_POST['delformname'])
 		{
@@ -656,7 +655,7 @@ arsort($plugintemplates_newsletter);
 				<td valign="top">
                                  <select id="awp_newsletterform_category" name="awp_newsletterform_category">
                                 <?php foreach($newsletter_categories as $category){?>
-                                     <option value="<?php echo  $category->targetListValue; ?>" <?php selected($category->targetListValue, $newsletter_formproperties[category]) ?>><?php echo  $category->targetListValue; ?></option>
+                                     <option value="<?php echo  $category->targetListName; ?>" <?php selected($category->targetListName, $newsletter_formproperties[category]) ?>><?php echo  $category->targetListName; ?></option>
                                  <?php } ?>
                                  </select>
 				</td>
@@ -857,7 +856,7 @@ arsort($plugintemplates_newsletter);
      */
     function getNewsletterCategory(){
      $category = getAllTargetListcategory();
-     return awp_convertObjToArray($category->return);
+     return awp_convertObjToArray($category->return->targetList);
     }
     function createformfield_array($fieldid,$showtext,$required,$type,$validation,$options,$displayorder){
 		if(trim($displayorder)=="")
@@ -902,10 +901,12 @@ arsort($plugintemplates_newsletter);
  */
 function getAllTargetListcategory()
 {
-	$params = array ( 
-                "arg0" => APPTIVO_SITE_KEY
-                 );
-    $response = getsoapCall(APPTIVO_USER_SERVICES,'getAllTargetLists',$params);      
+
+	$params = array (
+                "arg0" => APPTIVO_SITE_KEY,
+                "arg1" => APPTIVO_ACCESS_KEY
+                );
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchAllTargetLists',$params);
     return $response;
 }
 /**
@@ -923,16 +924,16 @@ function createTargetList($category,$fname,$lname,$email,$phoneNumber,$comments,
 	$appParam = new AWP_appParam('PHONE',$phoneNumber);	
 	$params = array ( 
                 "arg0" => APPTIVO_SITE_KEY,
-	            "arg1" => $category,
-	            "arg2" => $fname,
-	            "arg3" => $lname,
-	            "arg4" => $email,
-	            "arg5" => $comments,
-	            "arg6" => $userId,
-				"arg7" => $appParam
-                 ); 
-    $response = getsoapCall(APPTIVO_USER_SERVICES,'createTargetWithCommunicationDetailsAndAddToTargetList',$params);
+                "arg1" => APPTIVO_ACCESS_KEY,
+	            "arg2" => $category,
+	            "arg3" => $fname,
+	            "arg4" => $lname,
+	            "arg5" => $email,
+	            "arg6" => $comments,
+	            "arg7" => $userId,
+		    "arg8" => $appParam
+                 );
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'addTargetWithCommunicationDetailsAndAddToTargetList',$params);
     return $response;
 }
-
 ?>

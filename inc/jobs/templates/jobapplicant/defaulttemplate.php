@@ -189,7 +189,7 @@ foreach($formfields as $field)
 				{
 					if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 					{
-					$html.='<div class="awp_custom_fields"><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_jobapplicant_input_checkbox '.$validateclass.'"/>&nbsp&nbsp<label class="awp_custom_lbl" for="'.$fieldid.'">ss'.$optionvalue.'</label></div>';
+					$html.='<div class="awp_custom_fields"><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_jobapplicant_input_checkbox '.$validateclass.'"/>&nbsp&nbsp<label class="awp_custom_lbl" for="'.$fieldid.'">'.$optionvalue.'</label></div>';
 					}
 				}
 			break;

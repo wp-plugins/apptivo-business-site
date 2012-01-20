@@ -40,15 +40,15 @@ class JobList_Widget extends WP_Widget {
          $listofJobs = awp_convertObjToArray($listofJobs);
           echo $before_widget;
                ?>
-               <?php 
-        if( $instance['custom_css'] != '' )
-         {
-           $css='<style type="text/css">'.$instance['custom_css'].'</style>';
-           echo $css;
-         }
-         ?>
+				<?php 
+        		if($instance['custom_css'] != '')
+         		{
+           		$css='<style type="text/css">'.$instance['custom_css'].'</style>';
+           		echo $css;
+         		}
+         		?>
+         		<?php if ($instance['title']) echo $before_title . apply_filters('widget_title', $instance['title']) . $after_title; ?>
                <div class="widget_apptivo_jobs widget-container" id="widget_apptivo_job_lists">
-               <?php if ($instance['title']) echo $before_title . apply_filters('widget_title', $instance['title']) . $after_title; ?>
                <ul>
                <?php 
                if(strlen(trim($listofJobs[0]->jobTitle)) != 0)

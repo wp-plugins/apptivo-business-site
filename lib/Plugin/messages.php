@@ -100,6 +100,4 @@ function awp_flow_diagram($key='')
 	);
 	return $flow_diagrams[$key];
 }
-
-
 ?>

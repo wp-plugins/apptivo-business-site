@@ -283,9 +283,9 @@ function validatetestimonialsforms()
 	 }
 	 if(testimonialscontent == '')
 	 {  
-		 jQuery('#editorcontainer').css('border-color', '#f00');		 
+		 jQuery('#awp_testimonials_cnt_ifr').css('border', '1px solid #f00');
 	 }else {
-		 jQuery('#editorcontainer').css('border-color', '#CCCCCC');
+		 jQuery('#awp_testimonials_cnt_ifr').css('border', 'none');
 	 }
 	 		
 	 if(testimonilasname == '' || testimonialscontent == '')
@@ -1068,7 +1068,7 @@ function getAllTestimonials()
                 "arg2" => null
                 );
           //Memcache  
-          $response = getAllItemsWithMemcache(APPTIVO_BUSINESS_SERVICES,'-news-publisheddate','-news-data','getSiteLasteUpdateDate','fetchAllTestimonials',$pubdate_params,$plugin_params);
+          $response = get_data(APPTIVO_BUSINESS_SERVICES,'-news-publisheddate','-news-data','getSiteLasteUpdateDate','fetchAllTestimonials',$pubdate_params,$plugin_params);
          // Without Memcache.     
          //$response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchAllTestimonials',$plugin_params);
     return $response->return;

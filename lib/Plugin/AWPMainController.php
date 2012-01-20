@@ -665,7 +665,7 @@ class AWP_MainController extends AWP_Base
 	{       
 		    if(class_exists('Memcache'))
 		    { 
-		    $awp_datacache = new AWP_Mcache_Util(); //Create Object in AWP_DataCache clss]
+		    $awp_datacache = new AWP_Cache_Util(); //Create Object in AWP_DataCache clss]
 		    }
 		    else { 
 		    	echo '<span style="color:#f00;">PHP Memcache is not detected in this system. Install PHP Memcache and configure for better performance.</span>';
@@ -697,7 +697,7 @@ class AWP_MainController extends AWP_Base
 		{   
 		  if(class_exists('Memcache'))
 		    { 
-		    $awp_datacache = new AWP_Mcache_Util(); //Create Object in AWP_DataCache clss]
+		    $awp_datacache = new AWP_Cache_Util(); //Create Object in AWP_DataCache clss]
 		    $memcachesettings = array();
 	        $memcachesettings['memcache_enable']= AWP_Request::get_boolean("memcache_enable");
 	        $memcachesettings['hostname_portno']= AWP_Request::get_string("hostname_portno");  

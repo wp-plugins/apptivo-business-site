@@ -16,14 +16,13 @@ margin-top:10px;
 
 <?php if(!isset($JobSearchResults))
 { ?>
+<?php if ($instance['title']) echo $before_title . apply_filters('widget_title', $instance['title']) . $after_title; ?>
 <div class="search_main">
 <div class="jobsearch_main">
 <form id="<?php echo $jobsearchform[name].'_jobsearchforms '; ?>" name="<?php echo $jobsearchform[name].'_jobsearchforms '; ?>" action="/?page_id=<? echo $action; ?>" method="post">
 <input type="hidden" value="<?php echo $jobsearchform[name]; ?>" name="job_seachformname_widget" id="job_seachformname_widget">
 <input type="hidden" value="<?php echo $maxcnt; ?>" name="maxcnt" id="maxcnt">
-<div class="search_form_title">
-<?php if ($instance['title']) echo $before_title . apply_filters('widget_title', $instance['title']) . $after_title; ?>
-</div>
+
 
 <?php 
 foreach( $form_Fields as $formFields)

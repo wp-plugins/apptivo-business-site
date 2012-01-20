@@ -4,7 +4,8 @@
  *
  */
 require_once 'common-util.php';
-class AWP_Mcache_Util extends AWP_Common_Util
+require_once 'File.php';
+class AWP_Cache_Util extends AWP_Common_Util
 {
 	
    /**
@@ -26,6 +27,7 @@ class AWP_Mcache_Util extends AWP_Common_Util
     	{
     		trigger_error("PHP Class 'Memcache' does not exist!", E_USER_ERROR);
     	}
+          $this->_disccache = & new Plugin_Cache_File();
     }
     
 	/**
@@ -40,7 +42,7 @@ class AWP_Mcache_Util extends AWP_Common_Util
 	{
 		$host_port = explode(":",$hostname_portno);
 		$hostname = trim($host_port[0]);
-		$port = trim($host_port[1]);
+		$portno = trim($host_port[1]);
 		$awp_memcache_connect = $this->_memcache->connect($hostname,$portno);
 	}else {
 		
@@ -49,14 +51,18 @@ class AWP_Mcache_Util extends AWP_Common_Util
 		$mcache = $this->mcacheinfo();
 		$host_port = explode(":",$mcache);
 		$hostname = trim($host_port[0]);
-		$port = trim($host_port[1]);		
-		$awp_memcache_connect = $this->_memcache->connect($hostname,$port);
+		$port = trim($host_port[1]);
+		if(!empty($hostname) && !empty($port)) :		
+			$awp_memcache_connect = $this->_memcache->connect($hostname,$port);
+		else:
+			return false;
+		endif;
 		}
 		else { 
 			$awp_memcache_connect = $this->_memcache->connect(AWP_MEMCACHED_HOST,AWP_MEMCACHED_PORT);
 		}
 	}
-    return  $awp_memcache_connect;
+        return  $awp_memcache_connect;
 	}
 	/**
 	 * Test MemCache connect.
@@ -129,6 +135,139 @@ class AWP_Mcache_Util extends AWP_Common_Util
     function flush()
     {
         return @$this->_memcache->flush();
+    }
+    /**
+     * check memcahce enable
+     * @return <type> 
+     */
+    function check_memcache_enable(){
+         if(class_exists('Memcache'))
+           if($this->connectmcache())
+             return 1;
+         return 0;
+    }
+    /**
+     *
+     * @param <type> $plugincall_function
+     * @param <type> $plugincall_params
+     * @param <type> $publishdate_function
+     * @param <type> $publishdate_params
+     * @param <type> $plugincall_key
+     * @param <type> $publishdate_key
+     * @return <type>
+     */
+    function get_memache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key){
+                        $awp_cache_publishdate = $this->getdata($publishdate_key);
+                      	if(empty($awp_cache_publishdate)) //Check the published date key value is set in memcahe or not.
+		    	{ 
+                            $response = $this->set_memcache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key);
+		    	}
+                        else {
+                               $publish_date = getsoapCall(APPTIVO_SITE_SERVICES,$publishdate_function,$publishdate_params);
+                                $publish_prevDate =   $publish_date->return;
+                                if($publish_date!="E_100")
+                                {
+		    		if($publish_prevDate == $awp_cache_publishdate)
+		    		{   
+                                    $response = $this->getdata($plugincall_key);
+		   		}else {
+                                    $response = $this->set_memcache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key);
+		    		}
+                                }
+                                else{
+                                    $response = $this->getdata($plugincall_key);
+                                }
+		    	}
+                       return $response;
+    }
+    /**
+     *
+     * @param <type> $plugincall_function
+     * @param <type> $plugincall_params
+     * @param <type> $publishdate_function
+     * @param <type> $publishdate_params
+     * @param <type> $plugincall_key
+     * @param <type> $publishdate_key
+     * @return <type> 
+     */
+    function set_memcache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key){
+         // "Load Services."
+        $response = getsoapCall(APPTIVO_BUSINESS_SERVICES, $plugincall_function, $plugincall_params);
+        $publish_date = getsoapCall(APPTIVO_SITE_SERVICES, $publishdate_function, $publishdate_params);
+        $this->storedata($plugincall_key, $response);
+        $this->storedata($publishdate_key, $publish_date->return);
+       return $response;
+    }
+    /**
+     *
+     * @param <type> $wsdl
+     * @param string $publishdate_key
+     * @param string $plugincall_key
+     * @param <type> $publishdate_function
+     * @param <type> $plugincall_function
+     * @param <type> $publishdate_params
+     * @param <type> $plugincall_params
+     * @return <type> 
+     */
+    function get_data($wsdl,$publishdate_key,$plugincall_key,$publishdate_function,$plugincall_function,$publishdate_params,$plugincall_params)
+    {         $publishdate_key = APPTIVO_SITE_KEY.$publishdate_key;
+              $plugincall_key  = APPTIVO_SITE_KEY.$plugincall_key;
+               //check memcache enable
+                if($this->check_memcache_enable())
+          	{
+                 $response = $this->get_memache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key);
+          	}
+          	else {
+              	 $response = $this->get_diskcache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key);
+          	}
+               return $response;
+    }
+    /**
+     *
+     * @param <type> $plugincall_function
+     * @param <type> $plugincall_params
+     * @param <type> $publishdate_function
+     * @param <type> $publishdate_params
+     * @param <type> $plugincall_key
+     * @param <type> $publishdate_key
+     * @return <type> 
+     */
+    function get_diskcache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key){
+       $awp_cache_publishdate = $this->_disccache->get($publishdate_key);
+       if (empty($awp_cache_publishdate)) { //Check the published date key value is set in memcahe or not.
+            $response = $this->set_diskcache_data($plugincall_function, $plugincall_params, $publishdate_function, $publishdate_params, $plugincall_key, $publishdate_key);
+        }
+        else {
+            $publish_date = getsoapCall(APPTIVO_SITE_SERVICES, $publishdate_function, $publishdate_params);
+            $publish_prevDate = $publish_date->return;
+            if ($publish_date != "E_100") {
+                if ($publish_prevDate == $awp_cache_publishdate) {
+                    $response = $this->_disccache->get($plugincall_key);
+            } else {
+                    $response = $this->set_diskcache_data($plugincall_function, $plugincall_params, $publishdate_function, $publishdate_params, $plugincall_key, $publishdate_key);
+                }
+            } else {
+                $response = $this->_disccache->get($plugincall_key);
+            }
+        }
+        return $response;
+    }
+    /**
+     *
+     * @param <type> $plugincall_function
+     * @param <type> $plugincall_params
+     * @param <type> $publishdate_function
+     * @param <type> $publishdate_params
+     * @param <type> $plugincall_key
+     * @param <type> $publishdate_key
+     * @return <type> 
+     */
+     function set_diskcache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key){
+       $response = getsoapCall(APPTIVO_BUSINESS_SERVICES, $plugincall_function, $plugincall_params);
+       $publish_date = getsoapCall(APPTIVO_SITE_SERVICES, $publishdate_function, $publishdate_params);
+       $this->_disccache->set($plugincall_key, $response);
+       $this->_disccache->set($publishdate_key, $publish_date->return);
+       return $response;
     }
 }
 ?>

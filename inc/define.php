@@ -16,7 +16,7 @@ define('AWP_DEFAULT_MORE_TEXT','More..');
  Changing define statements below will make plugin to not work properly.
  * */
 //Plugin Version
-define('AWP_VERSION', '0.5');
+define('AWP_VERSION', '0.6');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
@@ -293,7 +293,6 @@ function getsoapCall($wsdl,$function,$params)
     	   return 'E_100'; // Exception echo $e->getMessage();
     }
    return $response;
-	
 }
 /**
  * LoadMemCache Methods.
@@ -307,52 +306,7 @@ function getsoapCall($wsdl,$function,$params)
  * @param unknown_type $plugincall_params
  * @return unknown
  */
-function getAllItemsWithMemcache($wsdl,$publishdate_key,$plugincall_key,$publishdate_function,$plugincall_function,$publishdate_params,$plugincall_params) 
-{
-          $publishdate_key = APPTIVO_SITE_KEY.$publishdate_key;
-          $plugincall_key  = APPTIVO_SITE_KEY.$plugincall_key;
-           if(class_exists('Memcache'))
-          	{
-            $mcache_obj = new AWP_Mcache_Util(); //Create Object in AWP_DataCache clss
-		    $mcacheconnect = $mcache_obj->connectmcache();
-          	}
-          	else {
-          	 $mcacheconnect = FALSE;
-          	}
-          	//To check if the MemCache is connected or not.
-		    if( $mcacheconnect )	
-		    {   //"connected MemCache.";
-		    	$awp_cache_publishdate = $mcache_obj->getdata($publishdate_key);    	
-		    	if( empty($awp_cache_publishdate)) //Check the published date key value is set in memcahe or not.
-		    	{   $load_news_service = TRUE;
-		    	} else {		    				    		
-		    		$publish_date = getsoapCall(APPTIVO_SITE_SERVICES,$publishdate_function,$publishdate_params);
-		    		$publish_prevDate =   $publish_date->return;  	
-		    		if($publish_prevDate == $awp_cache_publishdate)
-		    		{   
-		    			$response = $mcache_obj->getdata($plugincall_key);    			
-		    			$load_news_service = FALSE;   			
-		    		}else {
-		    			$load_news_service = TRUE;
-		    		}
-		    	}
-		    	if($load_news_service)
-		    	{      // "Load Services.";
-		    		    $response = getsoapCall($wsdl,$plugincall_function,$plugincall_params);
-		    		    $publish_date = getsoapCall(APPTIVO_SITE_SERVICES,$publishdate_function,$publishdate_params);
-		    		    $mcache_obj->storedata($plugincall_key,$response);
-		    			$mcache_obj->storedata($publishdate_key,$publish_date->return);
-		    			$awp_cache_publishdate = $mcache_obj->getdata($publishdate_key);
-		    	}
-		    }else { 
-		    	// "MemCache is not connected.."; 
-		        $response = getsoapCall($wsdl,$plugincall_function,$plugincall_params);
-		    }
-		  return $response;
-		  
-}
-
-    /**
+  /**
      * get ApptiovWordPress(awp) Templates
      *
      * @param unknown_type $dir
@@ -423,4 +377,132 @@ function awp_convertObjToArray($objectValue)
 	}
 	return $arrayValue;
         }
+}
+/**
+ *
+ * @param <type> $wsdl
+ * @param string $publishdate_key
+ * @param string $plugincall_key
+ * @param <type> $publishdate_function
+ * @param <type> $plugincall_function
+ * @param <type> $publishdate_params
+ * @param <type> $plugincall_params
+ * @return <type> 
+ */
+function get_data($wsdl,$publishdate_key,$plugincall_key,$publishdate_function,$plugincall_function,$publishdate_params,$plugincall_params)
+    {
+     $cache_obj = new AWP_Cache_Util(); //Create Object in AWP_DataCache class
+     $response = $cache_obj->get_data($wsdl, $publishdate_key, $plugincall_key, $publishdate_function, $plugincall_function, $publishdate_params, $plugincall_params);
+     return $response;
+    }
+/**
+ * Recursive creates directory
+ *
+ * @param string $path
+ * @param integer $mask
+ * @param string
+ * @return boolean
+ */
+function awp_mkdir($path, $mask = 0755, $curr_path = '')
+{
+    $path = awp_realpath($path);
+    $path = trim($path, '/');
+    $dirs = explode('/', $path);
+
+    foreach ($dirs as $dir) {
+        if ($dir == '') {
+            return false;
+        }
+
+        $curr_path .= ($curr_path == '' ? '' : '/') . $dir;
+
+        if (!@is_dir($curr_path)) {
+            if (@mkdir($curr_path, $mask)) {
+                @chmod($curr_path, $mask);
+            } else {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+/**
+ * Recursive remove dir
+ *
+ * @param string $path
+ * @param array $exclude
+ * @return void
+ */
+function awp_rmdir($path, $exclude = array(), $remove = true)
+{
+    $dir = @opendir($path);
+
+    if ($dir) {
+        while (($entry = @readdir($dir)) !== false) {
+            $full_path = $path . '/' . $entry;
+
+            if ($entry != '.' && $entry != '..' && !in_array($full_path, $exclude)) {
+                if (@is_dir($full_path)) {
+                    awp_rmdir($full_path, $exclude);
+                } else {
+                    @unlink($full_path);
+                }
+            }
+        }
+
+        @closedir($dir);
+
+        if ($remove) {
+            @rmdir($path);
+        }
+    }
+}
+/**
+ * Recursive empty dir
+ *
+ * @param string $path
+ * @param array $exclude
+ * @return void
+ */
+function awp_emptydir($path, $exclude = array())
+{
+    awp_rmdir($path, $exclude, false);
+}
+/**
+ * Returns realpath of given path
+ *
+ * @param string $path
+ */
+function awp_realpath($path)
+{
+    $path = awp_path($path);
+    $parts = explode('/', $path);
+    $absolutes = array();
+
+    foreach ($parts as $part) {
+        if ('.' == $part) {
+            continue;
+        }
+        if ('..' == $part) {
+            array_pop($absolutes);
+        } else {
+            $absolutes[] = $part;
+        }
+    }
+
+    return implode('/', $absolutes);
+}
+/**
+ * Converts win path to unix
+ *
+ * @param string $path
+ * @return string
+ */
+function awp_path($path)
+{
+    $path = preg_replace('~[/\\\]+~', '/', $path);
+    $path = rtrim($path, '/');
+
+    return $path;
 }

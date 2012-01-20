@@ -220,9 +220,9 @@ function validateevents(action)
 	 }
 	 if(event_content == '')
 	 {  
-		 jQuery('#editorcontainer').css('border-color', '#f00');		 
+		 jQuery('#'+desc_content_id+'_ifr').css('border', '1px solid #f00');
 	 }else {
-		 jQuery('#editorcontainer').css('border-color', '#CCCCCC');
+		 jQuery('#'+desc_content_id+'_ifr').css('border', 'none');
 	 }
 
 	 if(eventstitle == '' || event_content == '')
@@ -1040,7 +1040,7 @@ function getAllEvents()
 	            "arg1" => APPTIVO_ACCESS_KEY
                 );
   //Memcache              
-  $response = getAllItemsWithMemcache(APPTIVO_BUSINESS_SERVICES,'-events-publisheddate','-events-data','getSiteLasteUpdateDate','fetchAllEvents',$pubdate_params,$plugin_params);
+  $response = get_data(APPTIVO_BUSINESS_SERVICES,'-events-publisheddate','-events-data','getSiteLasteUpdateDate','fetchAllEvents',$pubdate_params,$plugin_params);
   //Without Memcache. 
   //$response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchAllEvents',$plugin_params); 
   return $response;

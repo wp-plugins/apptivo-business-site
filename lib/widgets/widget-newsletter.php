@@ -81,13 +81,17 @@ class AWP_Newsletter_Widget extends WP_Widget {
                         $comments = $submittedformvalues[newsletter_comments];
                          if(!empty($email)){
                         $response = createTargetList($category, $firstname, $lastname,$email,$phoneNumber,$comments);
-                        $successmsg = $response->return;
+                        $successmsg = $response->return->responseMessage;
                         }
-                        if(!empty($successmsg) && $successmsg != "Email already registered"){
-                        if(!empty($newsletterproperties[confmsg])){
-                        $successmsg = $newsletterproperties[confmsg];
-                        }
-                        }
+		               if($response == 'E_100')
+		                { 
+		                	$successmsg = awp_messagelist('newslettertarget-display-page'); 
+		                }else if(!empty($successmsg) && $successmsg != "Email already registered"){
+		                        if(!empty($newsletterproperties[confmsg])){
+		                        $successmsg = $newsletterproperties[confmsg];
+		                        }
+		                        }
+                        
                     }
                     }
               if(!empty($newsletter_forms) && !empty($newsletterformfields))
