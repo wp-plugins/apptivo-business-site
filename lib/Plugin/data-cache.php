@@ -20,14 +20,16 @@ class AWP_Cache_Util extends AWP_Common_Util
      */
     function __construct()
     {   
-    	if(class_exists('Memcache'))
+    	if(class_exists('Memcache')) 
     	{
-    	$this->_memcache = & new Memcache();
-    	} else 
-    	{
-    		trigger_error("PHP Class 'Memcache' does not exist!", E_USER_ERROR);
+    		$this->_memcache = & new Memcache();
     	}
-          $this->_disccache = & new Plugin_Cache_File();
+    	
+    	if(class_exists('Plugin_Cache_File'))
+    	{ 
+    		$this->_disccache = & new Plugin_Cache_File();
+    	}
+         
     }
     
 	/**
@@ -191,12 +193,11 @@ class AWP_Cache_Util extends AWP_Common_Util
      * @return <type> 
      */
     function set_memcache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key){
-         // "Load Services."
         $response = getsoapCall(APPTIVO_BUSINESS_SERVICES, $plugincall_function, $plugincall_params);
         $publish_date = getsoapCall(APPTIVO_SITE_SERVICES, $publishdate_function, $publishdate_params);
         $this->storedata($plugincall_key, $response);
         $this->storedata($publishdate_key, $publish_date->return);
-       return $response;
+        return $response;
     }
     /**
      *
@@ -212,8 +213,7 @@ class AWP_Cache_Util extends AWP_Common_Util
     function get_data($wsdl,$publishdate_key,$plugincall_key,$publishdate_function,$plugincall_function,$publishdate_params,$plugincall_params)
     {         $publishdate_key = APPTIVO_SITE_KEY.$publishdate_key;
               $plugincall_key  = APPTIVO_SITE_KEY.$plugincall_key;
-               //check memcache enable
-                if($this->check_memcache_enable())
+            if($this->check_memcache_enable())
           	{
                  $response = $this->get_memache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key);
           	}

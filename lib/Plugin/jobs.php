@@ -240,7 +240,7 @@ function jobsearchform($atts){
 		 	{
 		 		$imageSrc = 'src="'.$jobs_settings['submit_val'].'"';
 		 	} else {
-		 		$imageSrc = 'src="http://d5duwnm1arn0s.cloudfront.net/awp-content_1/11162wp10246/files/submit.jpeg"';
+		 		$imageSrc = 'src="'.awp_image('submit_button').'"';
 		 	}		 	
 		 } else {
 		    $imageSrc = '';
@@ -377,7 +377,6 @@ function save_applicantjobs($formname,$jobId,$jobNo){
 				}
 			}
 			
-			
                      	if(trim($customfields)!="")
 				        $submittedformvalues["notes"]=$customfields;
                         $firstName = $submittedformvalues['firstname'];
@@ -456,7 +455,7 @@ function save_applicantjobs($formname,$jobId,$jobNo){
 			if($hrjobsformproperties['tmpltype']=="awp_plugin_template") : 
 				$templatefile=AWP_JOBSFORM_TEMPLATEPATH."/".$hrjobsformproperties['layout']; //Job Applicant form plugin template	 
 			else :
-				$templatefile=TEMPLATEPATH."/jobs/jobapplicant".$hrjobsformproperties['layout']; //Job Applicant form theme template
+				$templatefile=TEMPLATEPATH."/jobs/jobapplicant/".$hrjobsformproperties['layout']; //Job Applicant form theme template
 			endif;		
 			
 			$hrjobsformdetails['templatefile']=$templatefile;
@@ -509,7 +508,7 @@ function save_applicantjobs($formname,$jobId,$jobNo){
             if($jobsearchformproperties['tmpltype']=="awp_plugin_template") :
 				$templatefile=AWP_JOBSEARCHFORM_TEMPLATEPATH."/".$jobsearchformproperties['layout']; //Job search form plugin templates	
 			else :
-				$templatefile=TEMPLATEPATH."/jobs/jobsearch".$jobsearchformproperties['layout'];	//Job search form theme templates
+				$templatefile=TEMPLATEPATH."/jobs/jobsearch/".$jobsearchformproperties['layout'];	//Job search form theme templates
 			endif;
 				
 			$jobsearchformdetails['templatefile']=$templatefile;
@@ -775,7 +774,7 @@ if(strlen(trim($plugin_data['Apptivo Template Name'])) != 0 )
 		 $jobTypeLists = array('Full Time' => 'Full Time','Part Time' => 'Part Time','Contract' => 'Contract');
 	     $jobTypeStatus = array('New' => 'New','Approved' => 'Approved','Closed' => 'Closed','Canceled' => 'Canceled');
 		$allIndustries = getAllIndustries();
-	    ?><div class="icon32" style="margin-top:10px;background: url('http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/11501wp10065/files/hrjobs.jpeg') " ><br></div> 
+	    ?><div class="icon32" style="margin-top:10px;background: url('<?php echo awp_image('jobs_icon'); ?>') " ><br></div> 
             <h2 class="nav-tab-wrapper">
             <a class="nav-tab nav-tab-active" href="/wp-admin/admin.php?page=awp_jobs"><?php _e('Jobs','apptvo-businesssite'); ?></a>
             <a class="nav-tab" href="/wp-admin/admin.php?page=awp_jobs&keys=configuration"><?php _e('Configuration','apptvo-businesssite'); ?></a>
@@ -1126,7 +1125,7 @@ function validatecreatejobs()
                                             <?php 
                                             if($this->_plugin_activated)
                                             { ?>
-                                            <a href="/wp-admin/admin.php?page=awp_jobs&keys=jobcreation&action=edit&id=<?php echo $jobs->id; ?>" ><img src="http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/11501wp10082/files/edit.jpeg"></a> 
+                                            <a href="/wp-admin/admin.php?page=awp_jobs&keys=jobcreation&action=edit&id=<?php echo $jobs->id; ?>" ><img src="<?php echo awp_image('edit_icon'); ?>"></a> 
                                             
                                             <?php } else { echo 'No Action'; } ?>
 									
@@ -1699,8 +1698,9 @@ function confirmation(jobid) {
 						//Not a custom field. Dont show any thing
 					}
 				   if($fieldData['fieldid'] == 'industry')
-					{ ?>
-					
+					{
+					$fieldData['options'] = ($fieldData['options']) ? $fieldData['options'] : array();
+					?>
 					<select id="<?php echo $fieldData['fieldid']?>_options" name="<?php echo $fieldData['fieldid']?>_options[]" size="4" multiple="multiple" style="height:75px;">
 					  <?php $allIndustries = getAllIndustries();
 					  foreach($allIndustries as $industries)
@@ -1884,7 +1884,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 	function jobs()
 	{
 		?>
-			<div class="icon32" style="margin-top:10px;background: url('http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/11501wp10065/files/hrjobs.jpeg') " ><br></div> 
+			<div class="icon32" style="margin-top:10px;background: url('<?php echo awp_image('jobs_icon'); ?>') " ><br></div> 
             <h2 class="nav-tab-wrapper">
             <a class="nav-tab nav-tab-active" href="/wp-admin/admin.php?page=awp_jobs"><?php _e('Jobs','apptivo-businesssite'); ?></a>
             <a class="nav-tab" href="/wp-admin/admin.php?page=awp_jobs&keys=configuration"><?php _e('Configuration','apptivo-businesssite'); ?></a>
@@ -1953,7 +1953,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 	function jobconfiguration()
 	{
 		?>
-		<div class="icon32" style="margin-top:10px;background: url('http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/11501wp10065/files/hrjobs.jpeg') " ><br></div> 
+		<div class="icon32" style="margin-top:10px;background: url('<?php echo awp_image('jobs_icon'); ?>') " ><br></div> 
             <h2 class="nav-tab-wrapper">          
             <a class="nav-tab" href="/wp-admin/admin.php?page=awp_jobs"><?php _e('Jobs','apptivo-businesssite'); ?></a>           
             <a class="nav-tab nav-tab-active" href="/wp-admin/admin.php?page=awp_jobs&keys=configuration"><?php _e('Configuration','apptivo-businesssite'); ?></a>
@@ -2250,7 +2250,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 	{
 		?>
 		
-	<div class="icon32" style="margin-top:10px;background: url('http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/11501wp10065/files/hrjobs.jpeg') " ><br></div> 
+	<div class="icon32" style="margin-top:10px;background: url('<?php echo awp_image('jobs_icon'); ?>') " ><br></div> 
             <h2 class="nav-tab-wrapper">
             <a class="nav-tab" href="/wp-admin/admin.php?page=awp_jobs"><?php _e('Jobs','apptivo-businesssite'); ?></a>
             <a class="nav-tab" href="/wp-admin/admin.php?page=awp_jobs&keys=configuration"><?php _e('Configuration','apptivo-businesssite'); ?></a>
@@ -2643,7 +2643,9 @@ function hrjobsform_showoptionstextarea(fieldid){
 						echo "n/a";
 						//Not a custom field. Dont show any thing
 					}if($fieldData['fieldid'] == 'customfield1')
-					{ ?>
+					{
+					 $fieldData['options'] = ($fieldData['options']) ? $fieldData['options'] : array();	 
+					?>
 					
 					<select id="<?php echo $fieldData['fieldid']?>_options" name="<?php echo $fieldData['fieldid']?>_options[]" size="4" multiple="multiple" style="height:75px;">
 					  <?php $allIndustries = getAllIndustries();
@@ -2656,7 +2658,8 @@ function hrjobsform_showoptionstextarea(fieldid){
 					</select>
 					<?php }
 					else if($fieldData['fieldid'] == 'customfield2')
-					{
+					{ 
+					   $fieldData['options'] = ($fieldData['options']) ? $fieldData['options'] : array();	 
 					   $jobTypeLists = array('Full time' => 'Full Time','Part Time' => 'Part Time','Contract' => 'Contract');
 					   ?>
 	                   <select id="<?php echo $fieldData['fieldid']?>_options" name="<?php echo $fieldData['fieldid']?>_options[]" size="4" multiple="multiple" style="height:60px;width:180px;">

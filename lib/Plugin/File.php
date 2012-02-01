@@ -1,14 +1,14 @@
 <?php
 
-if (!defined('W3_CACHE_FILE_EXPIRE_MAX')) {
-    define('W3_CACHE_FILE_EXPIRE_MAX', 2592000);
+if (!defined('PLUGIN_CACHE_FILE_EXPIRE_MAX')) {
+    define('PLUGIN_CACHE_FILE_EXPIRE_MAX', 2592000);
 }
 
 /**
  * File class
  */
 /**
- * Class W3_Cache_File
+ * Class Plugin_Cache_File
  */
 class Plugin_Cache_File
 {
@@ -130,7 +130,7 @@ class Plugin_Cache_File
 
                     if ($expires !== false) {
                         list(, $expire) = @unpack('L', $expires);
-                        $expire = ($expire && $expire <= W3_CACHE_FILE_EXPIRE_MAX ? $expire : W3_CACHE_FILE_EXPIRE_MAX);
+                        $expire = ($expire && $expire <= PLUGIN_CACHE_FILE_EXPIRE_MAX ? $expire : PLUGIN_CACHE_FILE_EXPIRE_MAX);
 
                         if ($ftime > time() - $expire) {
                             $data = '';

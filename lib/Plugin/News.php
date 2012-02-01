@@ -168,7 +168,7 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
  $inlineviewsettingClass = 'nav-tab';
 }
 ?>
-<div class="icon32" style="margin-top:10px;background: url('http://acwpcdnbucket1.s3.amazonaws.com/awp-content_1/11501wp10065/files/jk_News.gif') " ><br></div>             
+<div class="icon32" style="margin-top:10px;background: url('<?php echo awp_image('news_icon'); ?>') " ><br></div>             
 <h2 class="nav-tab-wrapper">
 <a class="<?php echo $generalClass; ?>" href="/wp-admin/admin.php?page=awp_news"><?php _e('News','apptivo-businesssite'); ?></a>
 <a class="<?php echo $fullviewsettingClass; ?>" href="/wp-admin/admin.php?page=awp_news&keys=fullviewsetting"><?php _e('Full View Settings','apptivo-businesssite'); ?></a>
@@ -473,8 +473,8 @@ function isValidURL(url){
                                             <td><?php echo $news->publishedAt; ?></td>
                                             <td><?php echo $news->publishedBy; ?></td>
                                             <td><?php echo $news->sequenceNumber; ?></td>
-                                            <td><a href="/wp-admin/admin.php?page=awp_news&amp;tstmode=edit&amp;tstid=<?php echo $news->newsId;?>&amp;pageno=<?php echo intval($_GET['pageno']);?>"><img src="http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/11501wp10082/files/edit.jpeg"/></a></td>
-                                            <td><a href="/wp-admin/admin.php?page=awp_news&amp;tstmode=delete&amp;tstid=<?php echo $news->newsId;?>" onclick="return delete_news('<?php echo $this->_plugin_activated; ?>')" ><img src="http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/11501wp10082/files/del.jpeg"/></a></td>
+                                            <td><a href="/wp-admin/admin.php?page=awp_news&amp;tstmode=edit&amp;tstid=<?php echo $news->newsId;?>&amp;pageno=<?php echo intval($_GET['pageno']);?>"><img src="<?php echo awp_image('edit_icon'); ?>"/></a></td>
+                                            <td><a href="/wp-admin/admin.php?page=awp_news&amp;tstmode=delete&amp;tstid=<?php echo $news->newsId;?>" onclick="return delete_news('<?php echo $this->_plugin_activated; ?>')" ><img src="<?php echo awp_image('delete_icon'); ?>"/></a></td>
                                     </tr>
                                     <?php
                                      }
@@ -624,6 +624,15 @@ function isValidURL(url){
 	        
             $show_news = ob_get_clean();
             return $show_news;
+    }
+    
+    function display_news()
+    {
+    	$awp_news = $this->getAllNewsForInline();
+    	$awp_news['allnews'] = array_slice($awp_news['allnews'],0,$awp_news['itemstoshow']);
+        unset($awp_news['templatefile']);
+        unset($awp_news['custom_css']);
+        return $awp_news;           
     }
 
     //Short code for inline view

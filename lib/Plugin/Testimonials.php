@@ -163,7 +163,7 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
  $inlineviewsettingClass = 'nav-tab';
 }
  ?> 
-<div class="icon32" style="margin-top:10px;background: url('http://acwpcdnbucket1.s3.amazonaws.com/awp-content_1/11501wp10065/files/3.gif') " ><br></div>             
+<div class="icon32" style="margin-top:10px;background: url('<?php echo awp_image('testimonials_icon'); ?>') " ><br></div>             
 <h2 class="nav-tab-wrapper">
 <a class="<?php echo $generalClass; ?>" href="/wp-admin/admin.php?page=awp_testimonials"><?php _e('Testimonials','apptivo-businesssite'); ?></a>
 <a class="<?php echo $fullviewsettingClass; ?>" href="/wp-admin/admin.php?page=awp_testimonials&keys=fullviewsetting"><?php _e('Full View Settings','apptivo-businesssite'); ?></a>
@@ -468,8 +468,8 @@ function isValidURL(url){
                                             ?>
                                             </td>
 	                                        <td><?php echo $awp_testimonial->sequenceNumber; ?></td>
-	                                        <td><a href="/wp-admin/admin.php?page=awp_testimonials&amp;tstmode=edit&amp;tstid=<?php echo $awp_testimonial->siteTestimonialId; ?>&amp;pageno=<?php echo intval($_GET['pageno']);?>"><img src="http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/11501wp10082/files/edit.jpeg"/></a></td>
-	                                        <td><a href="/wp-admin/admin.php?page=awp_testimonials&amp;tstmode=delete&amp;tstid=<?php echo $awp_testimonial->siteTestimonialId; ?>" onclick="return delete_testimonials('<?php echo $this->_plugin_activated; ?>');" ><img src="http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/11501wp10082/files/del.jpeg"/></a></td>
+	                                        <td><a href="/wp-admin/admin.php?page=awp_testimonials&amp;tstmode=edit&amp;tstid=<?php echo $awp_testimonial->siteTestimonialId; ?>&amp;pageno=<?php echo intval($_GET['pageno']);?>"><img src="<?php echo awp_image('edit_icon'); ?>"/></a></td>
+	                                        <td><a href="/wp-admin/admin.php?page=awp_testimonials&amp;tstmode=delete&amp;tstid=<?php echo $awp_testimonial->siteTestimonialId; ?>" onclick="return delete_testimonials('<?php echo $this->_plugin_activated; ?>');" ><img src="<?php echo awp_image('delete_icon'); ?>"/></a></td>
 	                                    </tr>
 	                                    <?php
 	                                        }
@@ -649,7 +649,15 @@ function isValidURL(url){
 	        $show_testimonials = ob_get_clean();
 	        return $show_testimonials;
 	}
-
+ 	
+ 	function display_testimonials()
+    {
+    	$awp_testimonials = $this->getAllTestimonialsForInline();
+    	$awp_testimonials['alltestimonials'] = array_slice($awp_testimonials['alltestimonials'],0,$awp_testimonials['itemstoshow']);
+        unset($awp_testimonials['templatefile']);
+        unset($awp_testimonials['custom_css']);
+        return $awp_testimonials;           
+    } 
 	//Short code for inline view
 	function show_testimonials_inline(){
             $awp_testimonials_inline_settings = get_option('awp_testimonials_inline_settings');   

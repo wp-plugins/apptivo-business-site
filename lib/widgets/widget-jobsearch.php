@@ -36,10 +36,14 @@ class JobSearch_Widget extends WP_Widget {
              {
              	$maxcnt = 1;
              }
+             $jobsearch_forms=get_option('awp_jobsearchforms');
              $jobsearchform=AWP_Jobs::get_jobsearch_field($formname);
-             if(!empty($jobsearchform))
+             if(!empty($jobsearch_forms[0]['fields']))
               {	 
             	include $_template_file;           
+              }else {
+              	if ($instance['title']) echo $before_title . apply_filters('widget_title', $instance['title']) . $after_title;
+              	echo awp_messagelist('jobsearch-form-display-page');
               }
             
             }

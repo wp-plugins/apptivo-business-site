@@ -3,14 +3,14 @@
  Plugin Name: Apptivo Business site Plugin
  Plugin URI: http://www.apptivo.com/apptivo-business-site-wordpress-plug-in/
  Description: Apptivo Business Site plugin provides News , Events , Testimonials, Jobs, Contact Forms and Newsletter sub plugins with <a href="http://www.apptivo.com" target="_blank">Apptivo ERP</a>.
- Version: 0.6
+ Version: 0.6.1
  Author: Rajkumar Mohanasundaram (rmohanasundaram@apptivo.com) 
  Author URI: http://www.apptivo.com/
  */
 
  if (!defined('AWP_PLUGIN_BASEPATH')) {
  	define('AWP_PLUGIN_BASEPATH',plugin_dir_path(__FILE__));
- 	define('AWP_PLUGIN_BASEURL',plugins_url(basename(__DIR__)));
+ 	define('AWP_PLUGIN_BASEURL',plugins_url(basename( dirname(__FILE__))));
  	//plugins_url(basename(dirname(__FILE__)))
     /**
      * Require plugin configuration

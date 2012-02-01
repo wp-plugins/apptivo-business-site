@@ -16,7 +16,7 @@ define('AWP_DEFAULT_MORE_TEXT','More..');
  Changing define statements below will make plugin to not work properly.
  * */
 //Plugin Version
-define('AWP_VERSION', '0.6');
+define('AWP_VERSION', '0.6.1');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
@@ -42,7 +42,7 @@ define('AWP_TESTIMONIALS_DEFAULT_TEMPLATE','default-testimonials.php');
 define('AWP_NEWSLETTER_WIDGET_DEFAULT_TEMPLATE','widget-default-template-usphone.php');
 //Apptivo API URL's
 //Dont change this unless specified, changing to incorrect values will make plugins to not work properly.
-define('APPTIVO_API_URL','https://www.apptivo.com/app/services/');
+define('APPTIVO_API_URL','https://api.apptivo.com/app/services/');
 define('APPTIVO_SITE_SERVICES', APPTIVO_API_URL.'SiteServices?wsdl');
 define('APPTIVO_USER_SERVICES', APPTIVO_API_URL.'UserServices?wsdl');
 define('APPTIVO_CONTACTUS_SERVICES', APPTIVO_API_URL.'ContactUsServices?wsdl');
@@ -90,7 +90,6 @@ function awp_load_plugins()
  */
 function awp_load_widgets()
 {
-	
 
  //include widget files 
    $widget_dir = @opendir(AWP_WIDGETS_DIR);
@@ -503,6 +502,316 @@ function awp_path($path)
 {
     $path = preg_replace('~[/\\\]+~', '/', $path);
     $path = rtrim($path, '/');
-
     return $path;
+}
+//Label Field
+function awp_labelfield($field,$class='contactform_field_label',$before='',$after='')
+{
+	$fieldid=$field['fieldid'];
+	$showtext=$field['showtext'];
+	return $before.'<label for="'.$fieldid.'" class="'.$class.'">'.$showtext.'</label>'.$after;
+	
+}
+
+function awp_jobsearch_textfield ($field,$class='',$before='',$after='')
+{
+	
+	$fieldid   = $field['fieldid'];
+	$showtext  = $field['showtext'];
+	$required  = $field['required'];
+	$fieldtype = $field['type'];
+	$options   = $field['options'];
+	
+	switch( $fieldid ) 
+	{
+		case "keywords" :
+			$html = '<input type="text" value="" class="absp_jobsearch_input_text '.$class.'"  name="'.$fieldid.'" id="'.$fieldid.'">';
+		break;
+
+		case "customfield1" :
+			if($fieldtype == 'select') :
+			     $html .= '<select class="absp_jobsearch_select '.$class.'" value="" name="'.$fieldid.'" id="'.$fieldid.'"  > ';
+                 $html .= '<option selected="selected" value="All" style="">Select  '.$showtext.'</option>';
+                 foreach($options as $opt_val)
+                   { 
+                   	$option_arr = explode('::',$opt_val);
+                    $html .= '<option value="'.$option_arr[0].'" >'.$option_arr[1].'</option>';
+                   }
+                 $html .= '</select>';
+            endif;
+        break;
+
+        case "customfield2" :
+        	
+			if($fieldtype == 'checkbox') :
+			   foreach($options as $opt_val)
+                   {   $opt_value = strtoupper(trim($opt_val)); 
+                       $opt_value = str_replace(" ","_",$opt_value);    
+                       $html .= '<input class="absp_jobsearch_input_checkbox '.$class.'" value="'.$opt_value.'" type="checkbox" name="'.$fieldid.'[]'.'" /> &nbsp;&nbsp;<label>'.$opt_val.'</label><br />';
+                    } 
+            endif;
+            
+            if($fieldtype == 'select') :
+	            $html .= '<select class="absp_jobsearch_select '.$class.'" value="" name="'.$fieldid.'" id="'.$fieldid.'"  >';
+	            $html .= '<option value="" style="">Select  '.$showtext.'</option>';
+	            foreach($optionvalues as $opt_val)
+	                   {   $opt_value = strtoupper(trim($opt_val)); 
+	                       $opt_value = str_replace(" ","_",$opt_value);
+	     				   $html .= '<option value="'.$opt_value.'" style="">'.$opt_val.'</option>';
+	                    } 
+	            $html .='</select>';
+            endif;
+            
+        break;
+        
+        
+       
+	}
+	 return $html;
+}
+
+
+function awp_textfield($forms,$field,$countries,$value_present,$before='',$after='')
+{
+	$fieldid=$field['fieldid'];
+	$showtext=$field['showtext'];
+	$validation=$field['validation'];
+	$required=$field['required'];
+	$fieldtype=$field['type'];
+	$options=$field['options'];
+	$optionvalues=array();
+	
+	    if($fieldtype=="select" || $fieldtype=="radio" || $fieldtype=="checkbox" ){
+	     
+	       if(trim($fieldid) == 'industry')
+				{
+				$optionvalues=$options;
+				$fieldtype = 'select';
+				} else if(trim($options)!=""){
+				$optionvalues=split("[\n]",trim($options));//Split the String line by line.	
+		   }
+		   
+		}
+		
+		
+		  if ($value_present) :
+		    $postValue = $_REQUEST[$fieldid];
+          else : 
+           	$postValue="";
+           endif;
+           
+                    
+		//Required Class	
+		if($required){
+			$mandate_property='"mandatory="true"';
+			$validateclass=" required";
+		}
+		else{
+			$mandate_property="";
+			$validateclass="";
+		}
+
+		//Field Validation Class
+		switch($validation)
+		{
+			case "email":
+				$validateclass .=" email";
+			break;
+			case "url":
+				$validateclass .=" url";
+			break;
+			case "number":
+				$validateclass .=" number";
+			break;
+		}
+		
+		//Captcha Class
+		if($fieldid=='captcha')
+         {
+         $captcha_class = 'captcha';
+         }
+         else{
+         $captcha_class = '';
+         }
+    switch($fieldtype)
+		{
+			case "text":
+                            $html = '<input type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value="'.$postValue.'"  class="absp_contact_input_text'.$validateclass.'">';
+			break;
+			case "textarea":
+				$html  =  '<textarea  name="'.$fieldid.'" id="'.$fieldid.'_id"   class="absp_contact_textarea'.$validateclass.'" size="50">'.$postValue.'</textarea>';
+			break;
+			case "select":
+                if($fieldid == 'country'){
+                 $html =  '<select  name="'.$fieldid.'" id="'.$fieldid.'"  class="absp_contact_select'.$validateclass.'">';
+				foreach($countries as $country)
+				{                   
+					$country_Code = ((trim($postValue)) == '')?'US':(trim($postValue));  
+                    if($country_Code == trim($country->countryCode)){
+                      $selected='selected="selected"';
+                     }
+                     else{
+                        $selected = "";
+                     }
+                  $html .=  '<option value="'.$country->countryCode.'" '.$selected.'>'.$country->countryName.'</option>';
+				}
+				$html .=  '</select>';
+                 } else  if($fieldid == 'industry')
+	                {
+		                if(!empty($optionvalues))
+		                {
+		                $html .=  '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_jobapplicant_select'.$validateclass.'">';
+		                	foreach( $optionvalues as $optionvalue )
+							{  if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
+								{
+									$options = explode("::",$optionvalue);
+									$html .=  '<option value="'.$options[0].'">'.$options[1].'</option>';
+								}
+							}
+						$html .=  '</select>';
+		                }else {
+		                	
+		                	 $html .=  '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_jobapplicant_select'.$validateclass.'">';
+		                	 $html .=  '<option value="0">Default</option>';
+							 $html .=  '</select>';
+		                }
+	                }
+               else{
+					$html =  '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_contact_select'.$validateclass.'">';
+					foreach( $optionvalues as $optionvalue )
+					{
+	                                    if(trim($postValue) == trim($optionvalue)){
+	
+	                                       $selected='selected="selected"';
+	                                     }
+	                                     else{
+	                                         $selected='';
+	                                     }
+						if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
+							{
+						$html .=  '<option value="'.$optionvalue.'" '.$selected.'>'.$optionvalue.'</option>';
+							}
+					}
+					$html .=  '</select>';
+                }
+			break;
+			case "radio":
+                                
+				$i=0;
+				foreach( $optionvalues as $optionvalue )
+				{                                      
+                                     if(trim($postValue) == trim($optionvalue)){
+                                      $selected='checked="checked"';
+                                     }
+                                     else{
+                                         $selected = "";
+                                     }
+                                    if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
+						{
+					if($i>0)
+						$html .='&nbsp;';
+					$html .='<label for="'.$fieldid.'">'.$optionvalue.'</label><input type="radio" name="'.$fieldid.'" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'" '.$selected.'>';
+						}
+				}
+			break;
+			case "checkbox":
+				$i=0;
+				foreach( $optionvalues as $optionvalue )
+				{
+                                     $selected ="";
+                                     foreach($postValue as $value){
+                                       if(trim($value) == trim($optionvalue)){
+                                           $selected='checked="checked"';
+                                       }
+                                       }
+					if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
+					{
+					if($i>0)
+					$html .='&nbsp';
+					$html.='<label for="'.$fieldid.'">'.$optionvalue.'</label><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_contact_input_checkbox '.$validateclass.'"  '.$selected.'>';
+					$i++;
+						}
+				}
+                        break;
+            case "captcha":
+                  $html ='<div class="captcha_image"><img src="'.$forms['captchaimagepath'].'" id="captchaimg" style="border:1px solid #000;"/></div>
+                          <div class="captcha_input"><input type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value=""  class="absp_contact_input_text'.$validateclass.'"/></div>';
+            break;
+            
+            case "file":
+			   $html ='<input type="file" id="file_upload" name="file_upload" />';
+			   $html.= '<input type="hidden" name="uploadfile_docid" id="uploadfile_docid" value="" class="absp_jobapplicant_input_text'.$validateclass.'"  />';
+			break;
+			   
+		} 
+		return $before.$html.$after;           
+}
+
+/**
+ * SubMit Button Type
+ *
+ * @param array $contactform
+ * @return html field(form submit type)
+ */
+
+function awp_submit_type($forms,$form_submitname,$class,$before='',$after='')
+{
+	$html ='<input type="hidden" name="'.$form_submitname.'"/>';
+      if($forms[submit_button_type]=="submit" &&($forms[submit_button_val])!=""){
+        $button_value = 'value="'.$forms[submit_button_val].'"';
+      }
+      else{
+      	if(strlen(trim($forms[submit_button_val])) == 0)
+      	{
+      		$imgSrc = awp_image('submit_button');
+      	}else {
+      		$imgSrc = $forms[submit_button_val];
+      	}
+         $button_value = 'src="'.$imgSrc.'"';
+      }
+      
+      $html .= '<input type="'.$forms[submit_button_type].'" class="'.$class.'" '.$button_value.' name="awp_contactform_submit_'.$forms[name].'"  id="awp_contactform_submit_'.$forms[name].'" />';
+      return $before.$html.$after;
+}
+
+/**
+ * Create Label Fields
+ *
+ * @param unknown_type $showtext
+ * @param unknown_type $customtext
+ * @param unknown_type $class
+ * @param unknown_type $before
+ * @param unknown_type $after
+ * @return unknown
+ */
+function awp_create_labelfield($showtext,$customtext='',$class='',$before='',$after='',$fieldid='')
+{
+    if($showtext == '' || strlen(trim($showtext)) == 0) :
+    	$showtext = $customtext;
+    endif;
+	return $before.'<label for="'.$fieldid.'" class="'.$class.'">'.$showtext.'</label>'.$after;
+	
+}
+
+function awp_create_textfiled($type,$fieldid,$class='',$before='',$after='')
+{
+	switch(strtolower($type))
+	{
+		case "checkbox" :
+		    	$html =  $before.'<input type="checkbox" class="'.$class.'" value="" id="'.$fieldid.'" name="'.$fieldid.'" >'.$after;
+	    break;
+	}
+	return $html;
+	
+}
+
+//Mandatory Field.
+function awp_mandatoryfield($field,$before='',$after='',$mandatory_symbol = '*')
+{
+	$required=$field['required'];
+	if($required):
+	 return $before.$mandatory_symbol.$after;
+	else :
+	 return 0; 
+	endif;    
 }

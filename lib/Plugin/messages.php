@@ -99,5 +99,21 @@ function awp_flow_diagram($key='')
 	
 	);
 	return $flow_diagrams[$key];
+
 }
+
+function awp_image($key='')
+{
+	 $images = array(
+	 "submit_button"       => AWP_PLUGIN_BASEURL."/assets/images/submit.jpeg",
+	 "news_icon"           => AWP_PLUGIN_BASEURL."/assets/images/news_icon.gif",
+	 "events_icon"         => AWP_PLUGIN_BASEURL."/assets/images/events_icon.gif",
+	 "testimonials_icon"   => AWP_PLUGIN_BASEURL."/assets/images/testimonials_icon.gif",
+	 "jobs_icon"           => AWP_PLUGIN_BASEURL."/assets/images/jobs_icon.jpeg",
+	 "edit_icon"           => AWP_PLUGIN_BASEURL."/assets/images/edit.jpeg",
+	 "delete_icon"         => AWP_PLUGIN_BASEURL."/assets/images/del.jpeg"
+	 );
+	 return $images[$key];	
+}
+
 ?>

@@ -88,7 +88,7 @@ class AWP_Events extends AWP_Base
              $inlineviewsettingClass = 'nav-tab';
             }
              ?>
-            <div class="icon32" style="margin-top:10px;background: url('http://acwpcdnbucket1.s3.amazonaws.com/awp-content_1/11501wp10065/files/1.gif') " ><br></div> 
+            <div class="icon32" style="margin-top:10px;background: url('<?php echo awp_image('events_icon'); ?>') " ><br></div> 
             <h2 class="nav-tab-wrapper">
             <a class="<?php echo $eventsClass; ?>" href="/wp-admin/admin.php?page=awp_events"><?php _e('Events','apptivo-businesssite');?></a>
             <a class="<?php echo $fullviewsettingClass; ?>" href="/wp-admin/admin.php?page=awp_events&keys=fullviewsetting"><?php _e('Full View Settings','apptivo-businesssite');?></a>
@@ -766,8 +766,8 @@ function isValidURL(url){
                                             <td><?php echo $events->publishedAt; ?></td>
                                             <td><?php echo $events->publishedBy; ?></td>
                                             <td><?php echo $events->sequenceNumber; ?></td>
-                                            <td><a href="/wp-admin/admin.php?page=awp_events&amp;tstmode=edit&amp;tstid=<?php echo $events->marketingEventId;?>&amp;pageno=<?php echo $currentpage;?>"><img src="http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/11501wp10082/files/edit.jpeg"/></a></td>
-                                            <td><a href="/wp-admin/admin.php?page=awp_events&amp;tstmode=delete&amp;tstid=<?php echo $events->marketingEventId;?>" onclick="return delete_events('<?php echo $this->_plugin_activated; ?>')" ><img src="http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/11501wp10082/files/del.jpeg"/></a></td>
+                                            <td><a href="/wp-admin/admin.php?page=awp_events&amp;tstmode=edit&amp;tstid=<?php echo $events->marketingEventId;?>&amp;pageno=<?php echo $currentpage;?>"><img src="<?php echo awp_image('edit_icon'); ?>"/></a></td>
+                                            <td><a href="/wp-admin/admin.php?page=awp_events&amp;tstmode=delete&amp;tstid=<?php echo $events->marketingEventId;?>" onclick="return delete_events('<?php echo $this->_plugin_activated; ?>')" ><img src="<?php echo awp_image('delete_icon'); ?>"/></a></td>
                                     </tr>
                                     <?php
                                      }
@@ -812,6 +812,15 @@ function isValidURL(url){
         return $show_events;
     }
 
+	 function display_events()
+	    {
+	    	$awp_events = $this->getAllEventsForInline();
+	    	$awp_events['allevents'] = array_slice($awp_events['allevents'],0,$awp_events['itemstoshow']);
+	        unset($awp_events['templatefile']);
+	        unset($awp_events['custom_css']);
+	        return $awp_events;           
+	    }
+     
     //Short code for inline view
     function show_events_inline(){
         $awp_events_inline_settings = get_option('awp_events_inline_settings');

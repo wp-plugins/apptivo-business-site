@@ -234,7 +234,7 @@ foreach($formfields as $field)
       else{
          if(strlen(trim($contactform[submit_button_val])) == 0)
       	{
-      		$imgSrc = 'http://d5duwnm1arn0s.cloudfront.net/awp-content_1/11162wp10246/files/submit.jpeg';
+      		$imgSrc = awp_image('submit_button');
       	}else {
       		$imgSrc = $contactform[submit_button_val];
       	}   

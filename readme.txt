@@ -51,8 +51,11 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 
 == Changelog ==
 
-= 0.5 =
-* Plugin released!
+= 0.6.1 =
+* Fixes
 
 = 0.6 =
 * Disk cache implementation
+
+= 0.5 =
+* Plugin released!

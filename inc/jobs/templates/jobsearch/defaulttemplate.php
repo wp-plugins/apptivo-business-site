@@ -112,6 +112,10 @@ foreach( $form_Fields as $formFields)
         $button_value = 'value="'.$jobsearchform[submit_button_val].'"';
       }
       else{
+      	if($hrjobsform[submit_button_val] == '' || empty($hrjobsform[submit_button_val])) :
+      		$hrjobsform[submit_button_val] = awp_image('submit_button');
+      	endif;
+      	
         $button_value = 'src="'.$jobsearchform[submit_button_val].'"';
       }
       $html = '<div class="jobsrch_submit"><input type="'.$jobsearchform[submit_button_type].'" class="absp_jobsearch_button_submit submit" '.$button_value.' name="awp_jobsearchform_submit_'.$jobsearchform[name].'"  id="awp_jobsearchform_submit_'.$jobsearchform[name].'" /></div>';

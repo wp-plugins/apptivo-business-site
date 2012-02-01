@@ -112,15 +112,14 @@ foreach($formfields as $field)
 				$optionvalues=$options;
 				$fieldtype = 'select';
 				} else if(trim($options)!=""){
-				$optionvalues=split(",", $options);				
 				$optionvalues=split("[\n]",trim($options));//Split the String line by line.	
 			}
 		}		
 		switch($fieldtype)
 		{
 			case "text":
-                                $html.='<input type="text" name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_jobapplicant_input_text'.$validateclass.'">';
-                                break;
+                $html.='<input type="text" name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_jobapplicant_input_text'.$validateclass.'">';
+            break;
 			case "textarea":
 				$html .=  '<textarea  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_jobapplicant_textarea'.$validateclass.' size="50"></textarea>';
 			break;
@@ -166,10 +165,8 @@ foreach($formfields as $field)
 			break;
 			case "file":
 				
-				$html.='<input type="file" id="file_upload" name="file_upload" />';
-				//$file_upload = '"file_upload"';
-               // $html.= "<div class='upload_file' id='upload_files'  ><a href='javascript:uploadfile(".$file_upload.");'>  Upload Files</a></div>"; 
-               $html.= '<input type="hidden" name="uploadfile_docid" id="uploadfile_docid" value="" class="absp_jobapplicant_input_text'.$validateclass.'"  />';
+			   $html.='<input type="file" id="file_upload" name="file_upload" />';
+			   $html.= '<input type="hidden" name="uploadfile_docid" id="uploadfile_docid" value="" class="absp_jobapplicant_input_text'.$validateclass.'"  />';
 				
                break;
 			case "radio":
@@ -189,7 +186,7 @@ foreach($formfields as $field)
 				{
 					if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 					{
-					$html.='<div class="awp_custom_fields"><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_jobapplicant_input_checkbox '.$validateclass.'"/>&nbsp&nbsp<label class="awp_custom_lbl" for="'.$fieldid.'">'.$optionvalue.'</label></div>';
+					$html.='<div class="awp_custom_fields"><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_jobapplicant_input_checkbox '.$validateclass.'"/>&nbsp&nbsp<label class="awp_custom_lbl" for="'.$fieldid.'">'.trim($optionvalue).'</label></div>';
 					}
 				}
 			break;
@@ -204,6 +201,9 @@ foreach($formfields as $field)
         $button_value = 'value="'.$hrjobsform[submit_button_val].'"';
       }
       else{
+      	if($hrjobsform[submit_button_val] == '' || empty($hrjobsform[submit_button_val])) :
+      		$hrjobsform[submit_button_val] = awp_image('submit_button');
+      	endif;
          $button_value = 'src="'.$hrjobsform[submit_button_val].'"';
       }
       $html .= '<input type="'.$hrjobsform[submit_button_type].'" class="absp_jobapplicant_button_submit awp_hrjobsform_submit_'.$hrjobsform[name].'" '.$button_value.' name="awp_jobsform_submit" id="awp_jobsform_submit" />';
