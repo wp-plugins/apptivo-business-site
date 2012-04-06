@@ -15,7 +15,7 @@ define('AWP_DEFAULT_MORE_TEXT','More..');
  Changing define statements below will make plugin to not work properly.
  * */
 //Plugin Version
-define('AWP_VERSION', '0.6.1');
+define('AWP_VERSION', '0.7');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
@@ -41,7 +41,7 @@ define('AWP_TESTIMONIALS_DEFAULT_TEMPLATE','default-testimonials.php');
 define('AWP_NEWSLETTER_WIDGET_DEFAULT_TEMPLATE','widget-default-template-usphone.php');
 //Apptivo API URL's
 //Dont change this unless specified, changing to incorrect values will make plugins to not work properly.
-define('APPTIVO_API_URL','https://www.apptivo.com/app/services/');
+define('APPTIVO_API_URL','https://api.apptivo.com/app/services/');
 define('APPTIVO_SITE_SERVICES', APPTIVO_API_URL.'SiteServices?wsdl');
 define('APPTIVO_USER_SERVICES', APPTIVO_API_URL.'UserServices?wsdl');
 define('APPTIVO_CONTACTUS_SERVICES', APPTIVO_API_URL.'ContactUsServices?wsdl');
