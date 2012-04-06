@@ -10,7 +10,6 @@ define('AWP_DEFAULT_MORE_TEXT','More..');
 //define('AWP_EVENTS_DISABLE',1);
 //define('AWP_TESTIMONIALS_DISABLE',1);
 //define('AWP_JOBS_DISABLE',1);
-
 /* 
  User updateable define statements ends here..
  Changing define statements below will make plugin to not work properly.
@@ -42,7 +41,7 @@ define('AWP_TESTIMONIALS_DEFAULT_TEMPLATE','default-testimonials.php');
 define('AWP_NEWSLETTER_WIDGET_DEFAULT_TEMPLATE','widget-default-template-usphone.php');
 //Apptivo API URL's
 //Dont change this unless specified, changing to incorrect values will make plugins to not work properly.
-define('APPTIVO_API_URL','https://api.apptivo.com/app/services/');
+define('APPTIVO_API_URL','https://www.apptivo.com/app/services/');
 define('APPTIVO_SITE_SERVICES', APPTIVO_API_URL.'SiteServices?wsdl');
 define('APPTIVO_USER_SERVICES', APPTIVO_API_URL.'UserServices?wsdl');
 define('APPTIVO_CONTACTUS_SERVICES', APPTIVO_API_URL.'ContactUsServices?wsdl');
@@ -59,8 +58,8 @@ if(!defined('APPTIVO_SITE_KEY') )
 	if(empty($apptivo_site_key) || strlen(trim($apptivo_site_key)) == 0 ){
 		//No site key in DB
 	}else{
-		define('APPTIVO_SITE_KEY',$apptivo_site_key);
-		define('APPTIVO_ACCESS_KEY',$apptivo_accesskey);
+		define('APPTIVO_SITE_KEY',trim($apptivo_site_key));
+		define('APPTIVO_ACCESS_KEY',trim($apptivo_accesskey));
 	}
 }
 /**
@@ -503,7 +502,7 @@ function awp_path($path)
     $path = preg_replace('~[/\\\]+~', '/', $path);
     $path = rtrim($path, '/');
     return $path;
-}
+ }
 //Label Field
 function awp_labelfield($field,$class='contactform_field_label',$before='',$after='')
 {
@@ -570,7 +569,17 @@ function awp_jobsearch_textfield ($field,$class='',$before='',$after='')
 	 return $html;
 }
 
-
+/**
+ * Enter description here...
+ *
+ * @param unknown_type $forms
+ * @param unknown_type $field
+ * @param unknown_type $countries
+ * @param Bollean  $value_present
+ * @param unknown_type $before
+ * @param unknown_type $after
+ * @return unknown
+ */
 function awp_textfield($forms,$field,$countries,$value_present,$before='',$after='')
 {
 	$fieldid=$field['fieldid'];
@@ -743,7 +752,7 @@ function awp_textfield($forms,$field,$countries,$value_present,$before='',$after
 			   $html.= '<input type="hidden" name="uploadfile_docid" id="uploadfile_docid" value="" class="absp_jobapplicant_input_text'.$validateclass.'"  />';
 			break;
 			   
-		} 
+		}
 		return $before.$html.$after;           
 }
 
@@ -755,10 +764,19 @@ function awp_textfield($forms,$field,$countries,$value_present,$before='',$after
  */
 
 function awp_submit_type($forms,$form_submitname,$class,$before='',$after='')
-{
-	$html ='<input type="hidden" name="'.$form_submitname.'"/>';
-      if($forms[submit_button_type]=="submit" &&($forms[submit_button_val])!=""){
-        $button_value = 'value="'.$forms[submit_button_val].'"';
+{   
+	if(strlen(trim($form_submitname)) != 0 ) :
+	  $html ='<input type="hidden" name="'.$form_submitname.'"/>';
+	endif;
+	
+      if($forms[submit_button_type] == "submit" ){
+      	if(strlen(trim($forms[submit_button_val])) != 0)
+      	{
+      		$value = $forms[submit_button_val];
+      	}else {
+      		$value = 'Submit';
+      	}
+        $button_value = 'value="'.$value.'"';
       }
       else{
       	if(strlen(trim($forms[submit_button_val])) == 0)
@@ -814,4 +832,12 @@ function awp_mandatoryfield($field,$before='',$after='',$mandatory_symbol = '*')
 	else :
 	 return 0; 
 	endif;    
+}
+//Powered By Apptivo.
+function poweredby_apptivo()
+{	
+$apptivo_logo = '<a target="_blank" href="http://www.apptivo.com/e-commerce">
+<img style="border: medium none;" alt="Apptivo.com is the best free way to run your business. Apptivo.com powers ecommerce websites, provides free CMS, free CRM, free ERP, free Project Management and free Invoicing to small businesses." title="Apptivo.com is the best free way to run your business. Apptivo.com powers ecommerce websites, provides free CMS, free CRM, free ERP, free Project Management and free Invoicing to small businesses." src="http://cdn18.apptivo.com/templates/app/footer/apptivo.png"> 
+</a>';
+return $apptivo_logo;
 }

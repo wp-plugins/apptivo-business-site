@@ -179,6 +179,18 @@ class AWP_Events extends AWP_Base
  <script type="text/javascript" language="javascript" >
 
  jQuery(document).ready(function(){
+		jQuery('#upload_image_button').click(function() {
+			 formfield = jQuery('#upload_image').attr('name');
+			 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
+			
+			 return false;
+			});
+		
+		window.send_to_editor = function(html) {		
+			 imgurl = jQuery('img',html).attr('src');
+			 jQuery('#awp_events_imageurl').val(imgurl);
+			 tb_remove();
+			}		
 		jQuery("#events_fullview_shortcode").focus(function(){
 	    	this.select();
 	    });
@@ -279,12 +291,12 @@ function isValidURL(url){
                     'Description' => stripslashes($_POST['awp_events_desc']),
                     'startdate' => gmdate(DATE_ATOM,mktime()),
                     'enddate' =>gmdate(DATE_ATOM,mktime(0,0,0,gmdate('m'),gmdate('d'),gmdate('Y')+20)),
-                    'Link' => $_POST['awp_events_link'],
+                    'Link' => stripslashes($_POST['awp_events_link']),
                     'publishedat' => stripslashes($_POST['awp_events_published_at']),
                     'publishedby' => stripslashes($_POST['awp_events_published_by']),
-                    'imageurl' => $_POST['awp_events_imageurl'],
-                    'showflag' => $_POST['awp_events_show'],
-                    'order' => $_POST['awp_events_order'],
+                    'imageurl' => stripslashes($_POST['awp_events_imageurl']),
+                    'showflag' => stripslashes($_POST['awp_events_show']),
+                    'order' => stripslashes($_POST['awp_events_order']),
                   );
              $awp_events_options= wp_parse_args($awp_events_options,array(
                     'Title' => '',
@@ -315,9 +327,9 @@ function isValidURL(url){
                     'Link' => $_POST['awp_events_link'],
                     'publishedat' => stripslashes($_POST['awp_events_published_at']),
                     'publishedby' => stripslashes($_POST['awp_events_published_by']),
-                    'imageurl' => $_POST['awp_events_imageurl'],
-                    'showflag' => $_POST['awp_events_show'],
-                    'order' => $_POST['awp_events_order']
+                    'imageurl' => stripslashes($_POST['awp_events_imageurl']),
+                    'showflag' => stripslashes($_POST['awp_events_show']),
+                    'order' => stripslashes($_POST['awp_events_order'])
                   );
              $awp_events_options= wp_parse_args($awp_events_options,array(
                     'Title' => '',
@@ -612,10 +624,21 @@ function isValidURL(url){
                                         <td><?php _e('Published by','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_events_published_by" id="awp_events_published_by" value="" size="63"/></td>
                                     </tr>
-                                    <tr>
-                                        <td><?php _e('Image URL','apptivo-businesssite'); ?></td>
+                                    
+                                    <!-- <tr>
+                                        <td><?php //_e('Image URL','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_events_imageurl" id="awp_events_imageurl" value="" size="63"/></td>
-                                    </tr>
+                                    </tr>-->
+                                    
+                                     <tr valign="top">
+									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
+									<td><label for="upload_image">
+									<input id="awp_events_imageurl" type="text" size="50" name="awp_events_imageurl" value="" />
+									<input id="upload_image_button" type="button" value="Upload Image" />
+									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
+									</label></td>
+									</tr>
+									
                                     <tr>
                                         <td><?php _e('Order to show','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_events_order" id="awp_events_order" value="" size="3" /></td>
@@ -664,10 +687,21 @@ function isValidURL(url){
                                         <td><?php _e('Published by','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_events_published_by" id="awp_events_published_by" value="<?php echo $events->publishedBy; ?>" size="63"/></td>
                                     </tr>
-                                    <tr>
-                                        <td><?php _e('Image URL','apptivo-businesssite'); ?></td>
-                                        <td><input type="text" name="awp_events_imageurl" id="awp_events_imageurl" value="<?php if(!is_array($events->eventImages)){ echo $events->eventImages; } else{ echo $events->eventImages[0]; } ?>" size="63"/></td>
-                                    </tr>
+                                    
+                                    <!-- <tr>
+                                        <td><?php //_e('Image URL','apptivo-businesssite'); ?></td>
+                                        <td><input type="text" name="awp_events_imageurl" id="awp_events_imageurl" value="<?php //if(!is_array($events->eventImages)){ echo $events->eventImages; } else{ echo $events->eventImages[0]; } ?>" size="63"/></td>
+                                    </tr>-->
+                                    
+                                    <tr valign="top">
+									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
+									<td><label for="upload_image">
+									<input id="awp_events_imageurl" type="text" size="50" name="awp_events_imageurl" value="<?php if(!is_array($events->eventImages)){ echo $events->eventImages; } else{ echo $events->eventImages[0]; } ?>" />
+									<input id="upload_image_button" type="button" value="Upload Image" />
+									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
+									</label></td>
+									</tr>
+									
                                     <tr>
                                         <td><?php _e('Order to show','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_events_order" id="awp_events_order" value="<?php echo $events->sequenceNumber; ?>" size="3" /></td>
@@ -914,6 +948,17 @@ function isValidURL(url){
 	        }
 	        }
         
+	       /* For Default Config*/
+            $events_pageid = get_option('awp_events_pageid');
+            if($events_pageid != '') {
+               if( count($allevents) == 0 || empty($allevents))
+	           {
+	           $allevents = dummy_events();
+            
+	           }
+            }
+            /* For Default Config*/
+            
             $awp_events = $allevents;
            
             $order=$awp_events_settings['order'];

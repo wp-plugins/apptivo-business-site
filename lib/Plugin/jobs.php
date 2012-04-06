@@ -182,7 +182,7 @@ function jobsearchform($atts){
         	}
         } 
         ob_start();
-        if($jobsearchForm_Submit && $response->return->methodResponse->responseCode == '1000' & $response->return->numResults == 0 )
+        if($jobsearchForm_Submit && $response->return->methodResponse->responseCode == '1000' && $response->return->numResults == 0 )
         {
         	echo awp_messagelist('jobsearch-noresult').'<br />'; //Display error Message.
         	$jobsearchForm_Submit = FALSE;
@@ -414,7 +414,7 @@ function save_applicantjobs($formname,$jobId,$jobNo){
                             else{
                             $confmsg="Job applicant uploaded Successfully";
                             }
-                        }
+                        }else if($response == 'E_IP') { echo awp_messagelist('IP_banned');}
 			
 		}
 		return $confmsg;
@@ -1477,10 +1477,18 @@ function confirmation(jobid) {
 					</td>
 				</tr>
                                  <tr valign="top">
-					<th><label for="awp_jobsform_submit_val"  id="awp_jobsform_submit_val" ><?php _e("Button Text", 'apptivo-businesssite' ); ?>:</label>
+					<th><label for="awp_jobsform_submit_val" id="awp_jobsform_submit_value" ><?php _e("Button Text", 'apptivo-businesssite' ); ?>:</label>
 					<br><span valign="top" class="description"></span>
 					</th>
-                                        <td valign="top"><input type="text" name="awp_jobsform_submit_val" id="awp_jobsform_submit_val" value="<?php echo $formproperties[submit_button_val];?>" size="52"/></td>
+                    <td valign="top">
+                    <input type="text" name="awp_jobsform_submit_val" id="awp_jobsform_submit_val" value="<?php echo $formproperties[submit_button_val];?>" size="52"/>
+                    
+                    <span id="upload_img_button" style="display:none;">
+                    <input id="upload_image_button" type="button" value="Upload Image" />
+					<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
+					</span>
+					
+                    </td>
 				</tr>
 		
             
@@ -1747,19 +1755,41 @@ function confirmation(jobid) {
 <script type="text/javascript" language="javascript" >
 jQuery(document).ready(function(){
 
+	jQuery('#upload_image_button').click(function() {
+		 formfield = jQuery('#upload_image').attr('name');
+		 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
+		 return false;
+		});
+	
+	window.send_to_editor = function(html) {
+		 imgurl = jQuery('img',html).attr('src');
+		 jQuery('#awp_jobsform_submit_val').val(imgurl);
+		 tb_remove();
+		}
+	
 	jQuery("#job_applicantform_shortcode").focus(function(){
     	this.select();
     });
 	
     if(jQuery('input:radio[name=awp_jobsform_submit_type]:checked').val()=='submit')
-            jQuery('#awp_jobsform_submit_val').text('Button Text');
-        else
-          jQuery('#awp_jobsform_submit_val').text('Button Image URL');
+    {
+          jQuery('#awp_jobsform_submit_value').text('Button Text');
+          jQuery("#upload_img_button").hide();
+    }else{
+          jQuery('#awp_jobsform_submit_value').text('Button Image URL');
+          jQuery("#upload_img_button").show();
+    }
+    
    jQuery('input:radio[name=awp_jobsform_submit_type]').change(function() {
         if(jQuery('input:radio[name=awp_jobsform_submit_type]:checked').val()=='submit')
-            jQuery('#awp_jobsform_submit_val').text('Button Text');
-        else
-          jQuery('#awp_jobsform_submit_val').text('Button Image URL');
+        {
+            jQuery('#awp_jobsform_submit_value').text('Button Text');
+            jQuery("#upload_img_button").hide();
+            jQuery('#awp_jobsform_submit_val').val('');
+        }else{
+          jQuery('#awp_jobsform_submit_value').text('Button Image URL');
+        jQuery("#upload_img_button").show();
+        }
     });
 
    
@@ -1876,9 +1906,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 	</script>
 	<?php
 		}
-	/*} else {
-    ?> <br /><br /><p><b style='color:#f00;'>Please create Jobs in apptivo before configuring Jobs form.</b></p><?php 
-	}*/
+	
 	}
 
 	function jobs()
@@ -2025,7 +2053,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 		
 			$jobs_settings_post = array('description_page' => $_POST['awp_joblist_descriptionpage'],
 			                       'submit_type' => $_POST['awp_joblist_submit_type'],
-                                   'submit_val' => $_POST['awp_joblist_submit_val'],
+                                   'submit_val' => $_POST['awp_joblist_submit_value'],
 			                       'applicant_form' =>  $applicantformName,
 								   'desc_template_name' => $jobdesc_template,
 								   'jobdescription_template_type' => $_POST['awp_jobdesc_templatetype'],
@@ -2060,7 +2088,14 @@ function hrjobsform_showoptionstextarea(fieldid){
 					<th><label for="awp_joblist_submit_val"  id="awp_joblist_submit_val" ><?php _e("Button Text", 'apptivo-businesssite' ); ?>:</label>
 					<br><span valign="top" class="description"></span>
 					</th>
-                    <td valign="top"><input style="width:360px;" type="text" name="awp_joblist_submit_val" id="awp_joblist_submit_val" value="<?php echo $jobs_settings[submit_val];?>" size="52"/></td>
+                    <td valign="top">
+                    <input style="width:360px;" type="text" name="awp_joblist_submit_value" id="awp_joblist_submit_value" value="<?php echo $jobs_settings[submit_val];?>" size="52"/>
+                    <span id="upload_img_button" style="display:none;">
+                    <input id="upload_image_button" type="button" value="Upload Image" />
+					<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
+					</span>
+                    
+                    </td>
 				</tr>
 				               
 				<tr valign="top">
@@ -2188,21 +2223,39 @@ function hrjobsform_showoptionstextarea(fieldid){
 		jQuery("#job_description_shortcode").focus(function(){
 	    	this.select();
 	    });
-	    
+
+		jQuery('#upload_image_button').click(function() {
+			 formfield = jQuery('#upload_image').attr('name');
+			 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
+			 return false;
+			});
+		
+		window.send_to_editor = function(html) {
+			 imgurl = jQuery('img',html).attr('src');		 
+			 jQuery('#awp_joblist_submit_value').val(imgurl);
+			 tb_remove();
+			}
+		
 	    if(jQuery('input:radio[name=awp_joblist_submit_type]:checked').val()=='submit')
 	    {		   
 	            jQuery('#awp_joblist_submit_val').text('Button Text');
+	            jQuery("#upload_img_button").hide();
 	    } else {
 	          jQuery('#awp_joblist_submit_val').text('Button Image URL');
-	           }
+	          jQuery("#upload_img_button").show();
+	    }
+        
 	   jQuery('input:radio[name=awp_joblist_submit_type]').change(function() {
+		   jQuery('#awp_joblist_submit_value').val('');
 	        if(jQuery('input:radio[name=awp_joblist_submit_type]:checked').val()=='submit')
 	            {	        	 
 	            jQuery('#awp_joblist_submit_val').text('Button Text');
+	            jQuery("#upload_img_button").hide();
 	            }
 	        else
 	        {		      
 	          jQuery('#awp_joblist_submit_val').text('Button Image URL');
+	          jQuery("#upload_img_button").show();
 	        }
 	    });   
 	});
@@ -2294,7 +2347,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 	                        'css' => stripslashes($_POST['awp_jobsearchform_customcss']),
                             'subscribe_option' => $_POST['subscribe_option'],
                             'submit_button_type' => $_POST['awp_jobsearchform_submit_type'],
-                            'submit_button_val' => $_POST['awp_jobsearchform_submit_val'],
+                            'submit_button_val' => $_POST['awp_jobsearchform_submit_value'],
 			                'target_pageurl' => $_POST['awp_target_pageurl'],
 			                'jobapplicant_pageurl' => $_POST['awp_jobapplicant_pageurl']
 			                 );
@@ -2483,7 +2536,13 @@ function hrjobsform_showoptionstextarea(fieldid){
 					<th><label for="awp_jobsearchform_submit_val"  id="awp_jobsearchform_submit_val" ><?php _e("Button Text", 'apptivo-businesssite' ); ?>:</label>
 					<br><span valign="top" class="description"></span>
 					</th>
-                    <td valign="top"><input style="width:360px;" type="text" name="awp_jobsearchform_submit_val" id="awp_jobsearchform_submit_val" value="<?php echo $formproperties[submit_button_val];?>" size="52"/></td>
+                    <td valign="top">
+                    <input style="width:360px;" type="text" name="awp_jobsearchform_submit_value" id="awp_jobsearchform_submit_value" value="<?php echo $formproperties[submit_button_val];?>" size="52"/>
+                    <span id="upload_img_button" style="display:none;">
+                    <input id="upload_image_button" type="button" value="Upload Image" />
+					<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
+					</span>
+                    </td>
 				</tr>
             
 			</tbody>
@@ -2697,19 +2756,43 @@ function hrjobsform_showoptionstextarea(fieldid){
 	
 <script type="text/javascript" language="javascript" >
 jQuery(document).ready(function(){
+
+	jQuery('#upload_image_button').click(function() {
+		 formfield = jQuery('#upload_image').attr('name');
+		 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
+		 return false;
+		});
+	
+	window.send_to_editor = function(html) {
+		 imgurl = jQuery('img',html).attr('src');		 
+		 jQuery('#awp_jobsearchform_submit_value').val(imgurl);
+		 tb_remove();
+		}
+	
 	jQuery("#job_searchform_shortcode").focus(function(){
     	this.select();
     });
     
     if(jQuery('input:radio[name=awp_jobsearchform_submit_type]:checked').val()=='submit')
-            jQuery('#awp_jobsearchform_submit_val').text('Button Text');
-        else
-          jQuery('#awp_jobsearchform_submit_val').text('Button Image URL');
+    {
+      jQuery('#awp_jobsearchform_submit_val').text('Button Text');
+      jQuery("#upload_img_button").hide();
+    } else {
+      jQuery('#awp_jobsearchform_submit_val').text('Button Image URL');
+      jQuery("#upload_img_button").show();
+    }
    jQuery('input:radio[name=awp_jobsearchform_submit_type]').change(function() {
+	   jQuery('#awp_jobsearchform_submit_value').val('');
         if(jQuery('input:radio[name=awp_jobsearchform_submit_type]:checked').val()=='submit')
+        {    
             jQuery('#awp_jobsearchform_submit_val').text('Button Text');
+            jQuery("#upload_img_button").hide();
+        }
         else
+        {
           jQuery('#awp_jobsearchform_submit_val').text('Button Image URL');
+          jQuery("#upload_img_button").show();
+        }
     });   
 });
 
@@ -2839,7 +2922,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 	
 	function loadscripts() {
 		
-           wp_enqueue_script('jquery_validation','http://ajax.aspnetcdn.com/ajax/jquery.validate/1.8.1/jquery.validate.min.js',array('jquery'));
+           wp_enqueue_script('jquery_validation',AWP_PLUGIN_BASEURL. '/assets/js/validator-min.js',array('jquery'));
            
             //wp_enqueue_script('jquery_uploadify_jquery',AWP_PLUGIN_BASEURL.'/inc/jobs/files/jquery.js',array('jquery'));
             wp_enqueue_script('jquery_uploadify_swfobject',AWP_PLUGIN_BASEURL.'/inc/jobs/files/uploadify/swfobject.js',array('jquery'));
@@ -2986,6 +3069,11 @@ function getJobByJobId($jobId)
  */
 function createJobApplicant($addressId, $addressLine1, $addressLine2, $applicantId, $applicantNumber, $city, $comments, $country, $countyAndDistrict, $emailId, $expectedDesignation, $expectedSalary, $firstName, $industryId, $jobApplicantId, $jobId, $jobNumber, $lastName, $middleName, $noteDetails, $phoneNumber, $postalCode, $provinceAndState, $resumeCoverLetter, $resumeDetails, $resumeFileName, $resumeId, $skills,$upload_docid)
 {   
+   $verification = check_blockip();
+   if($verification){
+   	 return $verification;
+   }
+   
 	$jobapplicantdetals = new JobApplicantDetails($addressId, $addressLine1, $addressLine2, $applicantId, $applicantNumber, $city, $comments, $country,$countyAndDistrict,$emailId, $expectedDesignation, $expectedSalary, $firstName, $industryId, $jobApplicantId,$jobId, $jobNumber, $lastName, $middleName, $noteDetails, $phoneNumber, $postalCode, $provinceAndState, $resumeCoverLetter, $resumeDetails, $resumeFileName, $resumeId, $skills,$upload_docid);
 	$params = array ( 
                 "arg0" => APPTIVO_SITE_KEY,

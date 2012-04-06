@@ -12,7 +12,7 @@ echo $before_widget;
                 {
                         $css='<style type="text/css">'.$newsletterproperties[css].'</style>';
                 }
-                wp_register_script('jquery_validation','http://ajax.aspnetcdn.com/ajax/jquery.validate/1.8.1/jquery.validate.min.js',array('jquery'));
+                wp_register_script('jquery_validation',AWP_PLUGIN_BASEURL. '/assets/js/validator-min.js',array('jquery'));
 	            wp_print_scripts('jquery_validation');
                 $jscript='<script type="text/javascript">
 						 jQuery(document).ready(function(){

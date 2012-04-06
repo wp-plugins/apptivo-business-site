@@ -54,6 +54,7 @@ class AWP_Newsletter extends AWP_Base
     }
 
 function shownewsletterform($atts){
+    $this->loadscripts();
 	extract(shortcode_atts(array('name'=>  ''), $atts));
 	$formname=trim($name);
 	$content="";
@@ -109,6 +110,11 @@ function save_newsletter($formname){
                 if($response == 'E_100')
                 { 
                 	echo awp_messagelist('newslettertarget-display-page'); 
+                }else  if($response == 'E_N001' || $response == 'E_N002' )
+                { 
+                	echo awp_messagelist('newsletter-target-error'); 
+                }else if($response == 'E_IP') {
+                	echo awp_messagelist('IP_banned');
                 }else if(!empty($confmsg) && $confmsg != "Email already registered"){
                     if(!empty($newsletterform[confmsg])){
                         $confmsg = $newsletterform[confmsg];
@@ -330,7 +336,7 @@ if($_POST['awp_newsletterform_settings']){
                         'css' => $_POST['awp_newsletterform_customcss'],
                         'category' => $_POST['awp_newsletterform_category'],
                          'submit_button_type' => $_POST['awp_newsletterform_submit_type'],
-                         'submit_button_val' => $_POST['awp_newsletterform_submit_val']);
+                         'submit_button_val' => $_POST['awp_newsletterform_submit_value']);
 					
 		$newsletterformfields=array();
 		foreach( $this->get_master_newsletterform_fields() as $fieldsmasterproperties )
@@ -646,7 +652,13 @@ arsort($plugintemplates_newsletter);
 					<th><label for="awp_newsletterform_submit_val"  id="awp_newsletterform_submit_val" ><?php _e("Button Text", 'apptivo-businesssite' ); ?>:</label>
 					<br><span valign="top" class="description"></span>
 					</th>
-                                        <td valign="top"><input type="text" name="awp_newsletterform_submit_val" id="awp_newsletterform_submit_val" value="<?php echo $newsletter_formproperties[submit_button_val];?>" size="52"/></td>
+                      <td valign="top">
+                      <input type="text" name="awp_newsletterform_submit_value" id="awp_newsletterform_submit_value" value="<?php echo $newsletter_formproperties[submit_button_val];?>" size="52"/>
+                      <span id="upload_img_button" style="display:none;"  >
+                    <input id="upload_image_button" type="button" value="Upload Image" />
+					<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
+					</span>
+					</td>
 				</tr>
                         <tr valign="top">
 				<th><label for="awp_newsletterform_customcss"><?php _e("Apptivo Target List", 'apptivo-businesssite' ); ?>:</label>
@@ -776,18 +788,42 @@ arsort($plugintemplates_newsletter);
     </form>
     <script type="text/javascript">
     jQuery(document).ready(function(){
+    
+    jQuery('#upload_image_button').click(function() {
+		 formfield = jQuery('#upload_image').attr('name');
+		 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
+		 return false;
+		});
+	
+	window.send_to_editor = function(html) {
+		 imgurl = jQuery('img',html).attr('src');		 
+		 jQuery('#awp_newsletterform_submit_value').val(imgurl);
+		 tb_remove();
+		}
+		
+		
     jQuery("#newsletterform_shortcode").focus(function(){
     	this.select();
     });    	
     if(jQuery('input:radio[name=awp_newsletterform_submit_type]:checked').val()=='submit')
-            jQuery('#awp_newsletterform_submit_val').text('Button Text');
-        else
-          jQuery('#awp_newsletterform_submit_val').text('Button Image URL');
+    {
+      jQuery('#awp_newsletterform_submit_val').text('Button Text');
+      jQuery("#upload_img_button").hide();
+    }else {
+      jQuery('#awp_newsletterform_submit_val').text('Button Image URL');
+      jQuery("#upload_img_button").show();
+    }
+          
    jQuery('input:radio[name=awp_newsletterform_submit_type]').change(function() {
+    jQuery('#awp_newsletterform_submit_value').val('');
         if(jQuery('input:radio[name=awp_newsletterform_submit_type]:checked').val()=='submit')
+        {
             jQuery('#awp_newsletterform_submit_val').text('Button Text');
-        else
+            jQuery("#upload_img_button").hide();
+        }else {
           jQuery('#awp_newsletterform_submit_val').text('Button Image URL');
+          jQuery("#upload_img_button").show();
+        }
     });
 
 });
@@ -880,18 +916,17 @@ arsort($plugintemplates_newsletter);
 	function check_for_shortcode($posts) {
 		$found=awp_check_for_shortcode($posts,'[apptivonewsletterform');
 		if ($found){
-                // load styles and scripts
+             // load styles and scripts
 	        $this->loadscripts();
 	        
 	    }
 	    return $posts;
 	}
-        function loadscripts() {
-
-        	wp_enqueue_script('jquery_validation','http://ajax.aspnetcdn.com/ajax/jquery.validate/1.8.1/jquery.validate.min.js',array('jquery'));
-
+	
+    function loadscripts() {
+      wp_register_script('jquery_validation',AWP_PLUGIN_BASEURL. '/assets/js/validator-min.js',array('jquery'));
+	  wp_print_scripts('jquery_validation');
 	}
-
 
 }
 /**
@@ -921,6 +956,17 @@ function getAllTargetListcategory()
  */
 function createTargetList($category,$fname,$lname,$email,$phoneNumber,$comments,$userId=null)
 {
+   
+   $target_category = target_lists_category(trim($category));
+   if(trim($category) != $target_category )
+   {
+   	return $target_category;
+   }
+   
+   $verification = check_blockip();
+   if($verification){
+   	 return $verification;
+   }
 	$appParam = new AWP_appParam('PHONE',$phoneNumber);	
 	$params = array ( 
                 "arg0" => APPTIVO_SITE_KEY,
@@ -931,9 +977,26 @@ function createTargetList($category,$fname,$lname,$email,$phoneNumber,$comments,
 	            "arg5" => $email,
 	            "arg6" => $comments,
 	            "arg7" => $userId,
-		    "arg8" => $appParam
+		        "arg8" => $appParam
                  );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'addTargetWithCommunicationDetailsAndAddToTargetList',$params);
     return $response;
+}
+
+function target_lists_category($category)
+{
+   $target = new AWP_Newsletter();	
+   $targetcategory = $target->getNewsletterCategory();
+   foreach($targetcategory as $targetLists):
+	   if($targetLists->targetListName == $category)
+	   {
+	   	return $category;
+	   }
+   endforeach;
+   if($targetcategory == '' || $targetcategory[0] == '') :
+     return 'E_N001'; //target Lists not available
+   else:
+     return 'E_N002'; // Need to configuration newsletter once.
+   endif;
 }
 ?>

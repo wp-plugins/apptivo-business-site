@@ -75,11 +75,11 @@ function check_for_shortcode($posts) {
 	                'name' => stripslashes($_POST['awp_testimonials_name']),
 	                'jobtitle' => stripslashes($_POST['awp_testimonials_jobtitle']),
 	                'company' => stripslashes($_POST['awp_testimonials_company']),
-	                'website' => $_POST['awp_testimonials_website'],
-	                'email' => $_POST['awp_testimonials_email'],
-	                'imageurl' => $_POST['awp_testimonials_imageurl'],
+	                'website' => stripslashes($_POST['awp_testimonials_website']),
+	                'email' => stripslashes($_POST['awp_testimonials_email']),
+	                'imageurl' => stripslashes($_POST['awp_testimonials_imageurl']),
 	                'testimonial' => stripslashes($_POST['awp_testimonials_cnt']),
-	                'order' => $_POST['awp_testimonials_order']
+	                'order' => stripslashes($_POST['awp_testimonials_order'])
             
 	        );
               $awp_testimonials_options= wp_parse_args($awp_testimonials_options,array(
@@ -108,11 +108,11 @@ function check_for_shortcode($posts) {
 	                'name' => stripslashes($_POST['awp_testimonials_name']),
 	                'jobtitle' => stripslashes($_POST['awp_testimonials_jobtitle']),
 	                'company' => stripslashes($_POST['awp_testimonials_company']),
-	                'website' => $_POST['awp_testimonials_website'],
-	                'email' => $_POST['awp_testimonials_email'],
-	                'imageurl' => $_POST['awp_testimonials_imageurl'],
+	                'website' => stripslashes($_POST['awp_testimonials_website']),
+	                'email' => stripslashes($_POST['awp_testimonials_email']),
+	                'imageurl' => stripslashes($_POST['awp_testimonials_imageurl']),
 	                'testimonial' => stripslashes($_POST['awp_testimonials_cnt']),
-	                'order' => $_POST['awp_testimonials_order']
+	                'order' => stripslashes($_POST['awp_testimonials_order'])
 	   	        );
                  $awp_testimonials_options= wp_parse_args($awp_testimonials_options,array(
                 'testimonialId' => '',
@@ -253,6 +253,18 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
 <script type="text/javascript" language="javascript" >
 jQuery(document).ready(function(){
 
+	jQuery('#upload_image_button').click(function() {
+		 formfield = jQuery('#upload_image').attr('name');
+		 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
+		 return false;
+		});
+	
+	window.send_to_editor = function(html) {		
+		 imgurl = jQuery('img',html).attr('src');
+		 jQuery('#awp_testimonials_imageurl').val(imgurl);
+		 tb_remove();
+		}
+	
 	jQuery("#testimonials_fullview_shortcode").focus(function(){
     	this.select();
     });
@@ -728,9 +740,16 @@ function isValidURL(url){
 	            	$templatefile = AWP_TESTIMONIALS_TEMPLATEPATH."/".AWP_TESTIMONIALS_DEFAULT_TEMPLATE;
 	          endif;
 	          
-               $response = getAllTestimonials();
-               $awp_all_testimonials = awp_convertObjToArray($response->testimonialsList);
-               $order=$awp_testimonials_settings['order'];
+              $response = getAllTestimonials();
+              $awp_all_testimonials = awp_convertObjToArray($response->testimonialsList);
+               
+              $testimonials_pageid = get_option('awp_testimonials_pageid'); 
+              if(count($response->testimonialsList) == 0 && empty($response->testimonialsList) && $testimonials_pageid != '')
+	            {
+	            $awp_all_testimonials = dummy_testimonials();
+	            }
+	            
+	           $order=$awp_testimonials_settings['order'];
                $awp_testimonials = $this->sortTestimonialByOrder($awp_all_testimonials, $order);
                $testimonials = array();
                $testimonials['alltestimonials'] = $awp_testimonials;
@@ -953,10 +972,21 @@ function isValidURL(url){
 	                                        <td><?php _e('Email','apptivo-businesssite'); ?></td>
 	                                        <td><input type="text" name="awp_testimonials_email" id="awp_testimonials_email" value="" size="43"/></td>
 	                                    </tr>
-	                                    <tr>
-	                                        <td><?php _e('Image URL','apptivo-businesssite'); ?></td>
+	                                    
+	                                   <!--<tr>
+	                                        <td><?php //_e('Image URL','apptivo-businesssite'); ?></td>
 	                                        <td><input type="text" name="awp_testimonials_imageurl" id="awp_testimonials_imageurl" value="" size="43"/></td>
-	                                    </tr>
+	                                    </tr>-->
+
+	                                    <tr valign="top">
+									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
+									<td><label for="upload_image">
+									<input id="awp_testimonials_imageurl" type="text" size="43" name="awp_testimonials_imageurl" value="" />
+									<input id="upload_image_button" type="button" value="Upload Image" />
+									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
+									</label></td>
+									</tr>
+									
 	                                    <tr>
 	                                        <td valign="top"style="padding-bottom:10px;"><?php _e('Testimonials','apptivo-businesssite'); ?>&nbsp;<span style="color:#f00;">*</span></td>
 	                                        <td>
@@ -1009,10 +1039,21 @@ function isValidURL(url){
 	                                        <td><?php _e('Email','apptivo-businesssite'); ?></td>
 	                                        <td><input type="text" name="awp_testimonials_email" id="awp_testimonials_email" value="<?php echo $all_awp_testimonials->email; ?>" size="43"/></td>
 	                                    </tr>
-	                                    <tr>
-	                                        <td><?php _e('Image URL','apptivo-businesssite'); ?></td>
-	                                        <td><input type="text" name="awp_testimonials_imageurl" id="awp_testimonials_imageurl" value="<?php echo $all_awp_testimonials->testimonialImageUrl; ?>" size="43"/></td>
-	                                    </tr>
+	                                    
+	                                    <!--<tr>
+	                                        <td><?php //_e('Image URL','apptivo-businesssite'); ?></td>
+	                                        <td><input type="text" name="awp_testimonials_imageurl" id="awp_testimonials_imageurl" value="<?php //echo $all_awp_testimonials->testimonialImageUrl; ?>" size="43"/></td>
+	                                    </tr>-->
+	                                    
+	                                    <tr valign="top">
+									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
+									<td><label for="upload_image">
+									<input id="awp_testimonials_imageurl" type="text" size="43" name="awp_testimonials_imageurl" value="<?php echo $all_awp_testimonials->testimonialImageUrl; ?>" />
+									<input id="upload_image_button" type="button" value="Upload Image" />
+									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
+									</label></td>
+									</tr>
+									
 	                                    <tr>
 	                                        <td valign="top"style="padding-bottom:10px;"><?php _e('Testimonials','apptivo-businesssite'); ?>&nbsp;<span style="color:#f00;">*</span></td>
 	                                        <td>
@@ -1076,7 +1117,7 @@ function getAllTestimonials()
                 "arg2" => null
                 );
           //Memcache  
-          $response = get_data(APPTIVO_BUSINESS_SERVICES,'-news-publisheddate','-news-data','getSiteLasteUpdateDate','fetchAllTestimonials',$pubdate_params,$plugin_params);
+          $response = get_data(APPTIVO_BUSINESS_SERVICES,'-testimonials-publisheddate','-testimonials-data','getSiteLasteUpdateDate','fetchAllTestimonials',$pubdate_params,$plugin_params);
          // Without Memcache.     
          //$response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchAllTestimonials',$plugin_params);
     return $response->return;

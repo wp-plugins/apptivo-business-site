@@ -24,7 +24,11 @@ p {color: #211B15;font-family: Trebuchet MS,Arial,Helvetica,sans-serif;font-size
 foreach($allevents as $events) {
 	$creationDate = explode('T',$events->creationDate);
 	$ListDate=strtotime($creationDate[0]);
-	$dispDate=date('M d, y',$ListDate);
+	if($events->publishedAt != '')
+	{
+	$dispDate = $events->publishedAt;
+	}else {
+	$dispDate=date('M d, y',$ListDate); }
 	$imgSrc = $events->eventImages;
 	
 	?>
@@ -32,14 +36,18 @@ foreach($allevents as $events) {
                         <div class="eventss">
                         <div class="top"></div>
                           <p class="absp_events_posttitle"><?php echo $events->eventName; ?></p>
-  <div class="absp_events_postmeta"><span class="absp_events_post">Posted: </span><span class="absp_events_postdate"><?php echo $dispDate; ?></span><span class="absp_events_postby"> by </span><?php echo '<span class="event_postauthor"><a class="absp_events_postauthor" href="'.$events->link.'" >'.$events->publishedBy.'</a></span>';?>.</div>
+                          <div class="absp_events_postmeta">
+                          <span class="absp_events_post">Posted: </span><span class="absp_events_postdate"><?php echo $dispDate; ?></span>
+                          <?php if($events->publishedBy != '' ) { ?>
+                          <span class="absp_events_postby"> by </span>
+                          <?php echo '<span class="event_postauthor"><a class="absp_events_postauthor" href="'.$events->link.'" >'.$events->publishedBy.'</a></span>';?>
+                          <?php } ?>
+                          </div>
                         <div class="middle">
                         <?php if( strlen(trim($imgSrc)) != 0 ) { ?>
                         <img class="absp_events_image" src="<?php echo $imgSrc; ?>"> <?php } ?>              
 <p class="absp_events_description"><?php echo $events->description; ?></p> 
-                    <div style="float: right;">
-                        <?php if(strlen(trim($Name)) != 0) { ?><p><?php echo '<span class="absp_events_name">'.$Name.'</span>'; echo '&nbsp;'.'<span class="absp_events_jobtitle">'.$JobTitle.$seperator.'</span>'.'<a class="absp_events_company" href="'.$website.'" target="_blank" >'.$companyName.'</a>'; ?></p> <?php } ?>
-                    </div>
+               
                     </div> 
           <div class="bottom"></div>      
                 

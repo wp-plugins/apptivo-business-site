@@ -77,11 +77,11 @@ class AWP_News extends AWP_Base
                 'startdate' => gmdate(DATE_ATOM,mktime()),
                 'enddate' =>gmdate(DATE_ATOM,mktime(0,0,0,gmdate('m'),gmdate('d'),gmdate('Y')+20)),
                 'Link' => $_POST['awp_news_link'],
-                'publishedat' => $_POST['awp_news_published_at'],
+                'publishedat' => stripslashes($_POST['awp_news_published_at']),
                 'publishedby' => stripslashes($_POST['awp_news_published_by']),
-                'imageurl' => $_POST['awp_news_imageurl'],
-                'showflag' => $_POST['awp_news_show'],
-                'order' => $_POST['awp_news_order'],
+                'imageurl' => stripslashes($_POST['awp_news_imageurl']),
+                'showflag' => stripslashes($_POST['awp_news_show']),
+                'order' => stripslashes($_POST['awp_news_order']),
               );
          $awp_news_options= wp_parse_args($awp_news_options,array(
                 'Title' => '',
@@ -110,11 +110,11 @@ class AWP_News extends AWP_Base
                 'startdate' =>$_POST['startdate'],
                 'enddate' =>$_POST['enddate'],
                 'Link' => $_POST['awp_news_link'],
-                'publishedat' => $_POST['awp_news_published_at'],
+                'publishedat' => stripslashes($_POST['awp_news_published_at']),
                 'publishedby' => stripslashes($_POST['awp_news_published_by']),
-                'imageurl' => $_POST['awp_news_imageurl'],
-                'showflag' => $_POST['awp_news_show'],
-                'order' => $_POST['awp_news_order'],
+                'imageurl' => stripslashes($_POST['awp_news_imageurl']),
+                'showflag' => stripslashes($_POST['awp_news_show']),
+                'order' => stripslashes($_POST['awp_news_order']),
               );
         //print_obj($awp_news_options);
          $awp_news_options= wp_parse_args($awp_news_options,array(
@@ -255,6 +255,19 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
 <script type="text/javascript" language="javascript" >
 
 jQuery(document).ready(function(){
+
+	jQuery('#upload_image_button').click(function() {
+		 formfield = jQuery('#upload_image').attr('name');
+		 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
+		 return false;
+		});
+	
+	window.send_to_editor = function(html) {		
+		 imgurl = jQuery('img',html).attr('src');
+		 jQuery('#awp_news_imageurl').val(imgurl);
+		 tb_remove();
+		}
+	
 	jQuery("#news_fullview_shortcode").focus(function(){
     	this.select();
     });
@@ -719,8 +732,7 @@ function isValidURL(url){
             if (!file_exists($templatefile)) 
             {   
             	$templatefile = AWP_NEWS_TEMPLATEPATH."/".AWP_NEWS_DEFAULT_TEMPLATE;
-            }
-            
+            }            
             $awp_news=array();
             $response=getAllNews();
             $all_awp_news = awp_convertObjToArray($response->return->newsList);
@@ -733,8 +745,18 @@ function isValidURL(url){
             }
             }
             }
-            $awp_news = $allnews;
-          
+            /* For Default Config*/
+            $news_pageid = get_option('awp_news_pageid');
+            if($news_pageid != '') {
+               if( count($allnews) == 0 || empty($allnews))
+	           {
+	           $allnews = dummy_news();
+            
+	           }
+            }
+            /* For Default Config*/
+            
+            $awp_news = $allnews;          
             $order=$awp_news_settings['order'];
             $awp_news = $this->sortNewsByOrder($awp_news,$order);
             $news = array();
@@ -934,10 +956,22 @@ function isValidURL(url){
                                         <td><?php _e('Published by','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_news_published_by" id="awp_news_published_by" value="" size="63"/></td>
                                     </tr>
-                                    <tr>
-                                        <td><?php _e('Image URL','apptivo-businesssite'); ?></td>
+                                    
+                                    <!-- <tr>
+                                        <td><?php //_e('Image URL','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_news_imageurl" id="awp_news_imageurl" value="" size="63"/></td>
-                                    </tr>
+                                    </tr>-->
+                                    
+                                    <tr valign="top">
+									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
+									<td><label for="upload_image">
+									<input id="awp_news_imageurl" type="text" size="50" name="awp_news_imageurl" value="" />
+									<input id="upload_image_button" type="button" value="Upload Image" />
+									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
+									</label></td>
+									</tr>
+                                    
+                                    
                                     <tr>
                                         <td><?php _e('Order to show','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_news_order" id="awp_news_order" value="" size="3" /></td>
@@ -988,10 +1022,21 @@ function isValidURL(url){
                                         <td><?php _e('Published by','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_news_published_by" id="awp_news_published_by" value="<?php echo $news->publishedBy; ?>" size="63"/></td>
                                     </tr>
-                                    <tr>
-                                        <td><?php _e('Image URL','apptivo-businesssite'); ?></td>
-                                        <td><input type="text" name="awp_news_imageurl" id="awp_news_imageurl" value="<?php if(!is_array($news->newsImages)){ echo $news->newsImages; } else{echo $news->newsImages[0]; } ?>" size="63"/></td>
-                                    </tr>
+                                    
+                                    <!-- <tr>
+                                        <td><?php //_e('Image URL','apptivo-businesssite'); ?></td>
+                                        <td><input type="text" name="awp_news_imageurl" id="awp_news_imageurl" value="<?php //if(!is_array($news->newsImages)){ echo $news->newsImages; } else{echo $news->newsImages[0]; } ?>" size="63"/></td>
+                                    </tr>-->
+                                    
+                                     <tr valign="top">
+									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
+									<td><label for="upload_image">
+									<input id="awp_news_imageurl" type="text" size="50" name="awp_news_imageurl" value="<?php if(!is_array($news->newsImages)){ echo $news->newsImages; } else{echo $news->newsImages[0]; } ?>" />
+									<input id="upload_image_button" type="button" value="Upload Image" />
+									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
+									</label></td>
+									</tr>
+									
                                     <tr>
                                         <td><?php _e('Order to show','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_news_order" id="awp_news_order" value="<?php echo $news->sequenceNumber; ?>" size="3" /></td>

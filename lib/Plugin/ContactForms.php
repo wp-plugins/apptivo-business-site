@@ -50,7 +50,6 @@ class AWP_ContactForms extends AWP_Base
 	    if($this->_plugin_activated){    
 			// perform the check when the_posts() function is called]
 		    session_start();
-			add_action('the_posts', array( &$this, 'check_for_shortcode'));
 			add_shortcode('apptivocontactform', array(&$this,'showcontactform'));
 			add_action( 'contextual_help', array(&$this,'inlinedocument'), 10, 2 );
 			
@@ -96,7 +95,9 @@ class AWP_ContactForms extends AWP_Base
 	 * Contact Form shortcode handler
 	 */
 	function showcontactform($atts){
-        $value_present = false;
+	   //Registering Validation Scripts. 
+	   $this->loadscripts();
+	    $value_present = false;
         extract(shortcode_atts(array('name'=>  ''), $atts));
 		$formname=trim($name);
 		$content="";
@@ -220,8 +221,12 @@ class AWP_ContactForms extends AWP_Base
 					}
 				}
 			}
+			$customfields .= "<br/><b>Requested IP</b>:".stripslashes(get_RealIpAddr());
+			
                      	if(trim($customfields)!="")
-				        $submittedformvalues["notes"]=$customfields;
+                     	{
+				         $submittedformvalues["notes"]=$customfields;
+                     	}
                         $firstName = $submittedformvalues['firstname'];
                         $lastName = $submittedformvalues['lastname'];
                         $emailId = $submittedformvalues['email'];
@@ -257,7 +262,8 @@ class AWP_ContactForms extends AWP_Base
                             else{
                             $confmsg="Your request has been submitted. Thanks for contacting us.";
                             }
-                        }else { echo awp_messagelist('contactlead-display-page'); }
+                        }else if($response == 'E_IP') { echo awp_messagelist('IP_banned');}
+                        else { echo awp_messagelist('contactlead-display-page'); }
 			
 		}
 		return $confmsg;
@@ -481,7 +487,7 @@ function get_plugin_templates()
 		$contactformdetails=array();
 		$contact_forms=get_option('awp_contactforms');
 		
-         /*
+		 /*
 		 * Saving New form
 		 */
 		if(isset($_POST['newcontactformname']))
@@ -559,7 +565,7 @@ function get_plugin_templates()
                             'subscribe_option' => $_POST['subscribe_option'],
 			                'subscribe_to_newsletter_displaytext' => $_POST['awp_subscribe_to_newsletter'],
                             'submit_button_type' => $_POST['awp_contactform_submit_type'],
-                            'submit_button_val' => $_POST['awp_contactform_submit_val']);
+                            'submit_button_val' => $_POST['awp_contactform_submit_value']);
 			
 			//New Custom fields 
 			$stack = array();
@@ -897,11 +903,16 @@ function get_plugin_templates()
                                             <input type="radio" value="image" name="awp_contactform_submit_type"<?php checked('image',$formproperties[submit_button_type]); ?>/> Image
 					</td>
 				</tr>
-                                 <tr valign="top">
+                <tr valign="top">
 					<th><label for="awp_contactform_submit_val"  id="awp_contactform_submit_val" ><?php _e("Button Text", 'apptivo-businesssite' ); ?>:</label>
 					<br><span valign="top" class="description"></span>
 					</th>
-                                        <td valign="top"><input type="text" name="awp_contactform_submit_val" id="awp_contactform_submit_val" value="<?php echo $formproperties[submit_button_val];?>" size="52"/></td>
+                    <td valign="top"><input type="text" name="awp_contactform_submit_value" id="awp_contactform_submit_value" value="<?php echo $formproperties[submit_button_val];?>" size="52"/>
+                    <span id="upload_img_button" style="display:none;">
+                    <input id="upload_image_button" type="button" value="Upload Image" />
+					<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
+					</span>
+					</td>
 				</tr>
 				<?php if(!empty($newsletter_categories[0])) { ?>
 				<tr valign="top">
@@ -1214,20 +1225,44 @@ function get_plugin_templates()
 	    });
 	});
 	
-	jQuery(document).ready(function(){	
+	jQuery(document).ready(function(){
+	
+		jQuery('#upload_image_button').click(function() {
+		 formfield = jQuery('#upload_image').attr('name');
+		 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
+		 return false;
+		});
+	
+	window.send_to_editor = function(html) {
+		 imgurl = jQuery('img',html).attr('src');		 
+		 jQuery('#awp_contactform_submit_value').val(imgurl);
+		 tb_remove();
+		}
+		
 		jQuery("#contactform_shortcode").focus(function(){
 			this.select();
-		});			
+		});	
+				
 	    if(jQuery('input:radio[name=awp_contactform_submit_type]:checked').val()=='submit')
-	            jQuery('#awp_contactform_submit_val').text('Button Text');
-	        else
-	          jQuery('#awp_contactform_submit_val').text('Button Image URL');	     
+	    {
+	           jQuery('#awp_contactform_submit_val').text('Button Text');
+	           jQuery("#upload_img_button").hide();
+	    }else {	   
+	          jQuery('#awp_contactform_submit_val').text('Button Image URL');
+	          jQuery("#upload_img_button").show();
+	   }	     
 	 	                 
 	   jQuery('input:radio[name=awp_contactform_submit_type]').change(function() {
+	   jQuery('#awp_contactform_submit_value').val('');
 	        if(jQuery('input:radio[name=awp_contactform_submit_type]:checked').val()=='submit')
+	        {
 	            jQuery('#awp_contactform_submit_val').text('Button Text');
-	        else
+	            jQuery("#upload_img_button").hide();
+	        }
+	        else {
 	          jQuery('#awp_contactform_submit_val').text('Button Image URL');
+	          jQuery("#upload_img_button").show();
+	        }
 	    });	    
 	});
            
@@ -1397,8 +1432,9 @@ function get_plugin_templates()
 	 * Load the JS files
 	 */
 	function loadscripts() {
-            wp_enqueue_script('jquery_validation','http://ajax.aspnetcdn.com/ajax/jquery.validate/1.8.1/jquery.validate.min.js',array('jquery'));
-			
+            wp_register_script('jquery_validation',AWP_PLUGIN_BASEURL. '/assets/js/validator-min.js',array('jquery'));
+	        wp_print_scripts('jquery_validation');
+	        
 	}
     function getAllCountryList(){
         $countrylist = getAllCountries();
@@ -1463,8 +1499,12 @@ function getTargetListcategory()
  */
 function saveLeadDetails($firstName, $lastName, $emailId, $jobTitle, $company, $address1, $address2, $city, $state, $zipCode, $bestWayToContact, $country, $leadSource, $phoneNumber, $comments, $noteDetails,$targetlistid)
 {
+   $verification = check_blockip();
+   if($verification){
+   	 return $verification;
+   }
 	$leads = new AWP_LeadDetails(APPTIVO_SITE_KEY,$firstName, $lastName, $emailId, $jobTitle, $company, $address1, $address2, $city, $state, $zipCode, $bestWayToContact, $country, $leadSource, $phoneNumber, $comments, $noteDetails,$targetlistid);
-        $params = array (
+    $params = array (
                 "arg0" => APPTIVO_SITE_KEY,
                 "arg1" => APPTIVO_ACCESS_KEY,
                 "arg2" => $leads

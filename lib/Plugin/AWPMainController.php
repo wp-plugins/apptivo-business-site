@@ -115,15 +115,15 @@ class AWP_MainController extends AWP_Base
         
         switch (true) {
         	case ($this->_page == 'awp_general'):
+        	case ($this->_page == 'awp_ip_deny'):
             case ($this->_page == 'awp_contactforms'):
             case ($this->_page == 'awp_newsletter'):
             case ($this->_page == 'awp_testimonials'):
             case ($this->_page == 'awp_news'):
             case ($this->_page == 'awp_events'):
-            case ($this->_page == 'awp_jobs'):          
-            		           
-                break;
-            
+            case ($this->_page == 'awp_jobs'):                       
+            break;
+                        
             default:
                 $this->_page = 'awp_general';
         }
@@ -163,18 +163,15 @@ class AWP_MainController extends AWP_Base
      */
     function admin_menu()
     {
-        /*$pages = array(
-            'awp_general' => array('General Settings',  'General Settings' ), 
-            'awp_contactforms' => array('Contact Forms','Contact Forms'),
-            'awp_newsletter' => array('Newsletter', 'Newsletter' ),            
-            'awp_events' => array('Events','Events'),
-            'awp_news' => array('News','News'),           
-            'awp_testimonials' => array('Testimonials', 'Testimonials'),
-            'awp_jobs' => array('Jobs', 'Jobs')
-                );*/
-          $pages = array('awp_general' => array('General Settings',  'General Settings' ));
+       
+    	 $pages = array('awp_general' => array('General Settings',  'General Settings' ));
           $awp_pluginsettings = get_option('awp_plugins');
           
+         if(!defined('AWP_IP_DENY') || !AWP_IP_DENY)
+          {
+          	$ip_deny = array('awp_ip_deny' => array('IP Deny','IP Deny'));
+          	$pages = array_merge($pages, $ip_deny); 
+          }
    		 if(!defined('AWP_CONTACTFORM_DISABLE') || !AWP_CONTACTFORM_DISABLE)
           {
           	$contact_pages = array('awp_contactforms' => array('Contact Forms','Contact Forms'));
@@ -207,8 +204,8 @@ class AWP_MainController extends AWP_Base
           	$pages = array_merge($pages, $jobs_pages); 
           }
       
-         
-        add_menu_page('Apptivo', 'Apptivo', 'manage_options', 'awp_general', '',"http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/12377wp10031/uploads/2011/07/apptivo-1.png");
+        $apptivo_iconurl = awp_image('apptivo_icon'); 
+        add_menu_page('Apptivo', 'Apptivo', 'manage_options', 'awp_general', '',$apptivo_iconurl);
         $submenu_pages = array();
         
 		foreach ($pages as $slug => $titles) {
@@ -237,11 +234,15 @@ class AWP_MainController extends AWP_Base
         /**
          * Show tab
          */
-        switch ($this->_page) {
+    switch ($this->_page) {
             case 'awp_general':
                 $this->options_general();
                 break;
             
+            case 'awp_ip_deny':
+            	$this->options_ipdeny();
+            	break;  
+            	  
             case 'awp_contactforms':
                 $this->options_contactforms();
                 break;
@@ -277,6 +278,15 @@ class AWP_MainController extends AWP_Base
     function options_general(){
     	$this->show_general_settings();
     }
+    /**
+     * Denyed IP
+     */
+    function options_ipdeny(){
+    	require_once AWP_PLUGINS_DIR . '/ipdeny.php';
+        $awp_ipdeny = & AWP_IPDeny::instance();
+        $awp_ipdeny->settings();
+    }
+    
     /**
      * Contact Forms tab
      */
@@ -446,6 +456,26 @@ class AWP_MainController extends AWP_Base
                     </td>
 				</tr>
 				
+				
+				<tr valign="top">
+					<th valign="top"><label for="poweredby_apptivo"><?php _e("Show Powered By Apptivo", 'apptivo-businesssite' ); ?> </label>
+					<br />
+					<br />					
+					<a target="_blank" href="http://www.apptivo.com/e-commerce">
+                    <img style="border: medium none;" alt="Apptivo.com is the best free way to run your business. Apptivo.com powers ecommerce websites, provides free CMS, free CRM, free ERP, free Project Management and free Invoicing to small businesses." title="Apptivo.com is the best free way to run your business. Apptivo.com powers ecommerce websites, provides free CMS, free CRM, free ERP, free Project Management and free Invoicing to small businesses." src="http://cdn18.apptivo.com/templates/app/footer/apptivo.png"> 
+                    </a>
+						
+					</th>
+					<td valign="top">
+                   
+                   <input  <?php checked('dont_show',get_option('apptivo_poweredby_status')); ?> <?php checked('',get_option('apptivo_poweredby_status')); ?> type="radio" name="powered_status"  value="dont_show"/> Don't Show &nbsp;&nbsp;&nbsp;
+                   <input  <?php checked('show_homepage',get_option('apptivo_poweredby_status')); ?> type="radio" name="powered_status"  value="show_homepage"/> Show in Home Page &nbsp;&nbsp;&nbsp;
+                   <input  <?php checked('show_allpages',get_option('apptivo_poweredby_status')); ?> type="radio" name="powered_status"  value="show_allpages"/> Show in All Pages &nbsp;&nbsp;&nbsp;
+                   
+                    </td>
+				</tr>
+				
+				
 				<tr>
 					<td colspan="2">
 						<p class="submit">
@@ -459,9 +489,8 @@ class AWP_MainController extends AWP_Base
                     </table>
                 </form>
             <script type="text/javascript" language="javascript" > 
-			function cmp_sitekey()
+    		function cmp_sitekey()
             {   
-				
 				var prev_siteKey = jQuery.trim( jQuery('#prev_site_key').val() );
 				var current_sitekey = jQuery.trim( jQuery('#site_key').val() );
 				var accessKey = jQuery.trim( jQuery('#access_key').val() );
@@ -469,9 +498,9 @@ class AWP_MainController extends AWP_Base
 				if( current_sitekey == '' || accessKey == '') //To chk site key is empty
 				{
 					if(current_sitekey == '' && accessKey == '') {
-						jQuery('#site_key').css('border', '1px solid #f00');
-						jQuery('#access_key').css('border','1px solid #f00');
-						alert("Site Key and Access Key can not be empty.");
+					jQuery('#site_key').css('border', '1px solid #f00');
+					jQuery('#access_key').css('border','1px solid #f00');
+					alert("Site Key and Access Key can not be empty.");
 					}else if(current_sitekey == '' && accessKey != '') {
 					jQuery('#site_key').css('border', '1px solid #f00');
 					jQuery('#access_key').css('border', '1px solid #dfdfdf');
@@ -485,9 +514,10 @@ class AWP_MainController extends AWP_Base
 				}else if( prev_siteKey == '' ) //To chk Previous site key is empty
 				{
 					return true;
-				}else if( current_sitekey != prev_siteKey ) 
+				}
+				else if( current_sitekey != prev_siteKey ) 
 				{
-					var answer = confirm('Are you sure  change the Site Key? \n Changing site key will reset all apptivo business site plugin settings.');
+					var answer = confirm('Are you sure  change the Site Key?');
 					if (answer){ 
 						return true;
 					}
@@ -499,8 +529,7 @@ class AWP_MainController extends AWP_Base
 					}
 				}else   //To chk both site keys are equal or not.
 				{
-					//alert("This Site Key already configured.");
-					jQuery('#update_site_inf').val('no');   // update_site_inf value is set 'no'
+					jQuery('#update_site_inf').val('no');   //This Site Key already configured.  update_site_inf value is set 'no'
 					return true; 
 					}
 				
@@ -704,18 +733,11 @@ class AWP_MainController extends AWP_Base
 	        $test_connect = $awp_datacache->connectmcache( $memcachesettings['hostname_portno']);
 	        return $test_connect;
 		    }else{
-		    	//echo '<span style="color:#f00;">PHP Memcache is not detected in this system. Install PHP Memcache and configure to Test Memcache connection.</span>';
+		    //echo '<span style="color:#f00;">PHP Memcache is not detected in this system. Install PHP Memcache and configure to Test Memcache connection.</span>';
 		    	return false;
-		    //trigger_error("PHP Class 'Memcache' does not exist!", E_USER_ERROR);	
 		    }
-		    
-	         
-		}
-	          
+		}     
 	}
-	
-	
-	
 	
  /**
      * Render Apptivo General Settings page
@@ -723,29 +745,18 @@ class AWP_MainController extends AWP_Base
     function show_general_settings(){
        /* Stored Site Information */	            	
        if(isset($_POST['awp_siteinfo_form'])){
-            $apptivo_site_key= AWP_Request::get_string("site_key");
+       	    $apptivo_poweredby_status = AWP_Request::get_string('powered_status');
+       	    update_option('apptivo_poweredby_status',$apptivo_poweredby_status);
+       	    $apptivo_site_key= AWP_Request::get_string("site_key");
             $apptivo_access_key= AWP_Request::get_string("access_key");
             $apptivo_update_site_inf= AWP_Request::get_string("update_site_inf"); // To check options or delete or not.
             if ((!empty($apptivo_site_key) || strlen(trim($apptivo_site_key)) > 0) && (strtolower($apptivo_update_site_inf) != 'no'))
             {
-            //apptivo site key.	
-              if(get_option("apptivo_sitekey")!=="false"){        //options are deleted if changinging the sitekey.  So check apptivo-update_site_inf is 'yes' or 'no',in default apptivo-update_site_inf is 'yes'
-	                update_option('apptivo_sitekey',$apptivo_site_key);
-					delete_option('awp_contactforms');				//Contactform configuration
-					delete_option('awp_events_settings');			//Events Full view configuration.
-					delete_option('awp_events_inline_settings');	//Events InlineView configurayion.
-					delete_option('awp_jobsforms');					//job forms configuraion.
-					delete_option('awp_jobs_settings');				//Job settings page confiduration.
-					delete_option('awp_jobsearchforms');			//Job search form configuration.
-					delete_option('awp_news_inline_settings');		//News Inline View configuration.
-					delete_option('awp_news_settings');				//News Full View Configuration.
-					delete_option('awp_newsletterforms');			//Newsletter Form Configuration.
-					delete_option('awp_testimonials_inline_settings');//Testimonials Inline view Configuration.
-					delete_option('awp_testimonials_settings');		//Testimonials Full View Configuration.
-	           }
-	           else{
-	               add_option('apptivo_sitekey', $apptivo_site_key);
-	           }
+            if(get_option("apptivo_sitekey")!=="false"){ 
+            update_option('apptivo_sitekey',$apptivo_site_key);
+            }else {
+            	add_option('apptivo_sitekey', $apptivo_site_key);
+            }
             }
             
             //apptivo access Key
@@ -770,15 +781,12 @@ class AWP_MainController extends AWP_Base
 	        </p>
 	    </div>
 	    <?php }
-	    
-	    //$apptivo_site_key= AWP_Request::get_string("site_key");
-            if(!defined("APPTIVO_SITE_KEY") )
+	        if(!defined("APPTIVO_SITE_KEY") )
             	$this->siteInformation($apptivo_site_key,$apptivo_access_key);
             else if (!empty($apptivo_site_key)){
             	$this->siteInformation($apptivo_site_key,$apptivo_access_key);
             }
             $general_plugins_settings=get_option("awp_plugins");
-            
             if($general_plugins_settings == '' || empty($general_plugins_settings)) :
 	            if( basename(dirname(AWP_LIB_DIR))  == 'apptivo-businesssite-crm') :
 	            $general_plugins_settings = array(

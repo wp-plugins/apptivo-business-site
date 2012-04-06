@@ -31,11 +31,17 @@ $testimonial = $Tesimonials->testimonial;
                         <div class="top"></div>
                         <div class="middle">
                         <?php if( strlen(trim($imgSrc)) != 0 ) { ?>
-                        <img class="absp_testimonials_image" src="<?php echo $imgSrc; ?>"> <?php } ?>  
-                                  
+                        <img class="absp_testimonials_image" src="<?php echo $imgSrc; ?>"> <?php } ?>                                    
 <?php echo $testimonial; ?> 
+
                     <div style="float: right;">
-                        <?php if(strlen(trim($Name)) != 0) { ?><p><?php echo '<span class="absp_testimonials_name">'.$Name.'</span>'; echo '&nbsp;'.'<span class="absp_testimonials_jobtitle">'.$JobTitle.$seperator.'<span>'.'<a href="'.$website.'" target="_blank" class="absp_testimonials_company">'.$companyName.'</a>'; ?></p> <?php } ?>
+                        <?php if(strlen(trim($Name)) != 0) { ?><p><?php 
+                        echo '<span class="absp_testimonials_name">'.$Name.'</span>'; 
+                        if(strlen(trim($JobTitle)) != 0 ) {
+                        echo '&nbsp;<span class="absp_testimonials_jobtitle">'.$JobTitle.$seperator.'<span>';
+                        }
+                         if(strlen(trim($companyName)) != 0 && strlen(trim($website)) != 0) {
+                        echo '<a href="'.$website.'" target="_blank" class="absp_testimonials_company">'.$companyName.'</a>'; }  ?></p> <?php } ?>
                     </div>
                     </div> 
           <div class="bottom"></div>      

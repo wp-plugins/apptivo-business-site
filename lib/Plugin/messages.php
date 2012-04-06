@@ -18,11 +18,13 @@ function awp_messagelist($key='')
         "jobsearch-form-display-page"    		=> '<span class="error_message">Job Search form is not configured.</span>',
 		"contactlead-display-page"     			=> '<span class="error_message">Your message was not sent. Please try again after 10 mins</span>',
 		"newslettertarget-display-page"     	=> '<span class="error_message">Your Subscription was not sent. Please try again after 10 mins</span>',
+	    "newsletter-target-error"               => '<span class="error_message">Your Subscription was not Submitted. Please try again after 10 mins.</span>',
 		"validate-searchJobsBySearchText"       => '<span class="error_message">Search Results are not found.Please try again after 10 mins.</span>',
 		"validate-getAllJobsWithStatus"         => '<span class="error_message">Jobs are not found.Please try again after 10 mins.</span>',
 		"jobapplicant-display-page"             => '<span class="error_message">Your request was not sent.Please try again after 10 mins.</span>',
 		"validate-getJobsByNo"                  => '<span class="error_message">Selected jobs are not found.Please try again after 10 mins.</span>',
-		"jobsearch-noresult"                    => '<span class="error_message">No jobs are found. Please modify your search and try again</span>'
+		"jobsearch-noresult"                    => '<span class="error_message">No jobs are found. Please modify your search and try again</span>',
+	    "IP_banned"                             => '<span class="error_message">Your IP Banned.</span>'
     );
 	
 	return $awp_errormessage_list[$key];	
@@ -111,7 +113,8 @@ function awp_image($key='')
 	 "testimonials_icon"   => AWP_PLUGIN_BASEURL."/assets/images/testimonials_icon.gif",
 	 "jobs_icon"           => AWP_PLUGIN_BASEURL."/assets/images/jobs_icon.jpeg",
 	 "edit_icon"           => AWP_PLUGIN_BASEURL."/assets/images/edit.jpeg",
-	 "delete_icon"         => AWP_PLUGIN_BASEURL."/assets/images/del.jpeg"
+	 "delete_icon"         => AWP_PLUGIN_BASEURL."/assets/images/del.jpeg",
+	 "apptivo_icon"         => AWP_PLUGIN_BASEURL."/assets/images/apptivo.png"
 	 );
 	 return $images[$key];	
 }
