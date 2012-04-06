@@ -1,0 +1,63 @@
+(
+	function(){
+	
+		var icon_url = 'http://d3piu9okvoz5ps.cloudfront.net/awp-content_1/12377wp10031/uploads/2011/07/apptivo-1.png';
+	
+		tinymce.create(
+			"tinymce.plugins.ApptivoBusinesssiteShortcodes",
+			{
+				init: function(d,e) {},
+				createControl:function(d,e)
+				{
+				
+					if(d=="apptivo-businesssite_shortcodes_button"){
+					
+						d=e.createMenuButton( "apptivo-businesssite_shortcodes_button",{
+							title:"Insert Apptivo Businesssite Shortcode",
+							image:icon_url,
+							icons:false
+							});
+							
+							var a=this;d.onRenderMenu.add(function(c,b){
+								
+								
+								a.addImmediate(b,"Contact Form", '[apptivocontactform name="&lt;&lt;contactform name&gt;&gt;"]');
+																
+								c=b.addMenu({title:"Testimonials"});
+										a.addImmediate(c,"Full View","[apptivo_testimonials_fullview]" );
+										a.addImmediate(c,"Inline View","[apptivo_testimonials_inline]" );
+                               
+								c=b.addMenu({title:"News"});
+										a.addImmediate(c,"Full View","[apptivo_news_fullview]" );
+										a.addImmediate(c,"Inline View","[apptivo_news_inline]" );
+										
+								c=b.addMenu({title:"Events"});
+										a.addImmediate(c,"Full View","[apptivo_events_fullview]" );
+										a.addImmediate(c,"Inline View","[apptivo_events_inline]" );
+								
+								b.addSeparator();
+								
+								a.addImmediate(b,"Newsletter", '[apptivonewsletterform name="&lt;&lt;newsletterform name&gt;&gt;"]');
+								
+								c=b.addMenu({title:"Jobs"});
+										a.addImmediate(c,"Job Lists","[apptivo_jobs]" );
+										a.addImmediate(c,"Job Search Form",'[apptivo_job_searchform name="jsform"]');
+										a.addImmediate(c,"Job Description","[apptivo_job_description]" );
+										a.addImmediate(c,"Job Applicant Form",'[apptivo_job_applicantform name="jaform"]');
+
+							});
+						return d
+					
+					} // End IF Statement
+					
+					return null
+				},
+		
+				addImmediate:function(d,e,a){d.add({title:e,onclick:function(){tinyMCE.activeEditor.execCommand( "mceInsertContent",false,a)}})}
+				
+			}
+		);
+		
+		tinymce.PluginManager.add( "ApptivoBusinesssiteShortcodes", tinymce.plugins.ApptivoBusinesssiteShortcodes);
+	}
+)();
