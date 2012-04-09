@@ -67,7 +67,13 @@ class AWP_IPDeny extends AWP_Base
 	                                            `ip_address` VARCHAR(200),
 	                                            `ip_type` VARCHAR(200),
 	                                            `cur_timestamp` TIMESTAMP)";		 
-	    $result=mysql_query($query) or die('Unable to create table, Error is'.mysql_error());	     
+	    $result=mysql_query($query) or die('Unable to create table, Error is'.mysql_error());
+		
+	    if($result) 
+		{
+		    	update_option('apptivo_ipdeny_table','yes');
+		}
+	    
 		}   
 		if (!$result) {
 	            return false;
@@ -319,63 +325,20 @@ function validateIpAddress($ip_addr)
   else
     return false; //if format of ip address doesn't matches
     
-/*if( $type == 'Single') {	
-  //first of all the format of the ip address is matched
-  if(preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/",$ip_addr))
-  {
-    //now all the intger values are separated
-    $parts=explode(".",$ip_addr);
-    //now we need to check each part can range from 0-255
-    foreach($parts as $ip_parts)
-    {
-      if(intval($ip_parts)>255 || intval($ip_parts)<0)
-      return false; //if number is not within range of 0-255
-    }
-    return true;
-  }
-  else
-    return false; //if format of ip address doesn't matches
-}
-else {
-	//first of all the format of the ip address is matched
-  if(preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\-(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/",$ip_addr))
-  {
-  	$rangeparts=explode("-",$ip_addr);
-  	foreach($rangeparts as $range_parts)
-    {
-      //now all the intger values are separated
-    $parts=explode(".",$range_parts);
-    //now we need to check each part can range from 0-255
-    foreach($parts as $ip_parts)
-    {
-      if(intval($ip_parts)>255 || intval($ip_parts)<0)
-      return false; //if number is not within range of 0-255
-    }
-    }
-    $start_ip = ip2long($rangeparts[0]);
-    $end_ip = ip2long($rangeparts[1]);
-   if($end_ip == $start_ip)
-    {
-    	return false;
-    }
-    if($end_ip < $start_ip)
-    {
-    	return false;
-    }
-    
-    return true;
-  }
-  else
-    return false; //if format of ip address doesn't matches
-}
-*/
+
 }
 
 function check_blockip()
 {  
-	$visitorIp = get_RealIpAddr();
+	
 	global $wpdb;
-	$table_name = $wpdb->prefix . "absp_ipdeny";  //table Name
+	$table_name = $wpdb->prefix . "absp_ipdeny";  //table Name	
+	$ipdeny_table = absp_table_exists($table_name);
+	if(!$ipdeny_table)
+	{
+		return false;
+	}	
+	$visitorIp = get_RealIpAddr();
 	$single_results = $wpdb->get_results("SELECT * FROM " . $table_name . " where ip_type='Single'");
 	$singles = array();	
 	foreach($single_results as $singleresults)
@@ -432,4 +395,17 @@ function get_RealIpAddr()
 	    }
 	    return $ip;
 }
+
+function absp_table_exists($tableName)
+{
+	if( mysql_num_rows( mysql_query("SHOW TABLES LIKE '" . $tableName . "'")))
+	 {
+	   return TRUE;
+	 }
+	 else
+	 {
+	  return FALSE;
+	 } 
+}
+
 ?>

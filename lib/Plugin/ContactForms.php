@@ -117,7 +117,7 @@ class AWP_ContactForms extends AWP_Base
         if(isset($_POST['awp_contactform_submit']) && $submitformname==$formname)
          {  
           if(isset($_POST['captcha'])){
-            if($_POST['captcha'] == $_SESSION['6_letters_code'])
+            if(trim($_POST['captcha']) == $_SESSION['6_letters_code'])
             {
                 $successmsg=$this->save_contact($submitformname);
             }

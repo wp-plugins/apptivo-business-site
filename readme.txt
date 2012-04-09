@@ -3,7 +3,7 @@ Contributors: apptivo, rmohanasundaram
 Tags: apptivo, contact forms, crm, newsletters, testimonials
 Requires at least: 3.0
 Tested up to: 3.3.1
-Stable tag: 0.7
+Stable tag: 0.7.1
 
 Create contact forms, newsletter signups, and customer testimonials, integrated with Apptivo.
 
@@ -50,6 +50,9 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 2. screenshot-2.jpg
 
 == Changelog ==
+
+= 0.7.1 =
+* Bug Fixes
 
 = 0.7 =
 * Form Submission IP Restriction

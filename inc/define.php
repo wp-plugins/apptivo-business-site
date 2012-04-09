@@ -15,7 +15,7 @@ define('AWP_DEFAULT_MORE_TEXT','More..');
  Changing define statements below will make plugin to not work properly.
  * */
 //Plugin Version
-define('AWP_VERSION', '0.7');
+define('AWP_VERSION', '0.7.1');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
@@ -580,7 +580,7 @@ function awp_jobsearch_textfield ($field,$class='',$before='',$after='')
  * @param unknown_type $after
  * @return unknown
  */
-function awp_textfield($forms,$field,$countries,$value_present,$before='',$after='')
+function awp_textfield($forms='',$field='',$countries='',$value_present='',$before='',$after='')
 {
 	$fieldid=$field['fieldid'];
 	$showtext=$field['showtext'];
@@ -763,7 +763,7 @@ function awp_textfield($forms,$field,$countries,$value_present,$before='',$after
  * @return html field(form submit type)
  */
 
-function awp_submit_type($forms,$form_submitname,$class,$before='',$after='')
+function awp_submit_type($forms='',$form_submitname='',$class='',$before='',$after='')
 {   
 	if(strlen(trim($form_submitname)) != 0 ) :
 	  $html ='<input type="hidden" name="'.$form_submitname.'"/>';
