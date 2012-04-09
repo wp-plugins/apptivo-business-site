@@ -52,7 +52,7 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 == Changelog ==
 
 = 0.7.1 =
-* Bug Fixes
+* Security Bug fixes related to Uploadify plugin used for Jobs.
 
 = 0.7 =
 * Form Submission IP Restriction
