@@ -38,7 +38,7 @@ $testimonial = $Tesimonials->testimonial;
                         <?php if(strlen(trim($Name)) != 0) { ?><p><?php 
                         echo '<span class="absp_testimonials_name">'.$Name.'</span>'; 
                         if(strlen(trim($JobTitle)) != 0 ) {
-                        echo '&nbsp;<span class="absp_testimonials_jobtitle">'.$JobTitle.$seperator.'<span>';
+                        echo '&nbsp;<span class="absp_testimonials_jobtitle">'.$JobTitle.$seperator.'</span>';
                         }
                          if(strlen(trim($companyName)) != 0 && strlen(trim($website)) != 0) {
                         echo '<a href="'.$website.'" target="_blank" class="absp_testimonials_company">'.$companyName.'</a>'; }  ?></p> <?php } ?>
@@ -51,4 +51,4 @@ $testimonial = $Tesimonials->testimonial;
                 <br>
              </div>
 <?php } ?>
-<?php echo $css; ?>            
+<?php echo $css; ?>           

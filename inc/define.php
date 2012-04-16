@@ -15,7 +15,7 @@ define('AWP_DEFAULT_MORE_TEXT','More..');
  Changing define statements below will make plugin to not work properly.
  * */
 //Plugin Version
-define('AWP_VERSION', '0.7.1');
+define('AWP_VERSION', '0.7.2');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
@@ -251,7 +251,6 @@ function awp_paginate($reload, $page, $tpages,$totalitems) {
 	}
 	
 	// current
-	//$out.= "<span class=\"current\">Page " . $page . " of " . $tpages . "</span>\n";
 	$out .='<span class="paging-input"><input type="text" class="current-page" title="Current page" name="paged" value="'.$page.'" size="1"> of <span class="total-pages">'.$tpages.'&nbsp;&nbsp;</span></span>';
 	
 	// next
@@ -504,7 +503,7 @@ function awp_path($path)
     return $path;
  }
 //Label Field
-function awp_labelfield($field,$class='contactform_field_label',$before='',$after='')
+function awp_labelfield($field='',$class='contactform_field_label',$before='',$after='')
 {
 	$fieldid=$field['fieldid'];
 	$showtext=$field['showtext'];
@@ -512,7 +511,7 @@ function awp_labelfield($field,$class='contactform_field_label',$before='',$afte
 	
 }
 
-function awp_jobsearch_textfield ($field,$class='',$before='',$after='')
+function awp_jobsearch_textfield ($field='',$class='',$before='',$after='')
 {
 	
 	$fieldid   = $field['fieldid'];
@@ -802,7 +801,7 @@ function awp_submit_type($forms='',$form_submitname='',$class='',$before='',$aft
  * @param unknown_type $after
  * @return unknown
  */
-function awp_create_labelfield($showtext,$customtext='',$class='',$before='',$after='',$fieldid='')
+function awp_create_labelfield($showtext='',$customtext='',$class='',$before='',$after='',$fieldid='')
 {
     if($showtext == '' || strlen(trim($showtext)) == 0) :
     	$showtext = $customtext;
@@ -811,7 +810,7 @@ function awp_create_labelfield($showtext,$customtext='',$class='',$before='',$af
 	
 }
 
-function awp_create_textfiled($type,$fieldid,$class='',$before='',$after='')
+function awp_create_textfiled($type='',$fieldid='',$class='',$before='',$after='')
 {
 	switch(strtolower($type))
 	{
@@ -824,7 +823,7 @@ function awp_create_textfiled($type,$fieldid,$class='',$before='',$after='')
 }
 
 //Mandatory Field.
-function awp_mandatoryfield($field,$before='',$after='',$mandatory_symbol = '*')
+function awp_mandatoryfield($field='',$before='',$after='',$mandatory_symbol = '*')
 {
 	$required=$field['required'];
 	if($required):
