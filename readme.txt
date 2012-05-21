@@ -3,7 +3,7 @@ Contributors: apptivo, rmohanasundaram
 Tags: apptivo, contact forms, crm, newsletters, testimonials
 Requires at least: 3.0
 Tested up to: 3.3.1
-Stable tag: 0.7.2
+Stable tag: 1.0
 
 Create contact forms, newsletter signups, and customer testimonials, integrated with Apptivo.
 
@@ -50,6 +50,11 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 2. screenshot-2.jpg
 
 == Changelog ==
+
+= 1.0 =
+* Hot Fix to Jobs Upload features. Older version of plugin has to be updated to this release to continue uploading resumes on Jobs.
+* Cases feature added to Plugin. It enables customers to log a case from your website and you can manage it using Apptivo Cases App.
+* Other bug fixes.
 
 = 0.7.2 =
 * UI bug fixes for IE

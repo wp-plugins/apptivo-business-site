@@ -238,7 +238,7 @@ class AWP_Cache_Util extends AWP_Common_Util
             $response = $this->set_diskcache_data($plugincall_function, $plugincall_params, $publishdate_function, $publishdate_params, $plugincall_key, $publishdate_key);
         }
         else {
-            $publish_date = getsoapCall(APPTIVO_SITE_SERVICES, $publishdate_function, $publishdate_params);
+        	$publish_date = getsoapCall(APPTIVO_SITE_SERVICES, $publishdate_function, $publishdate_params);
             $publish_prevDate = $publish_date->return;
             if ($publish_date != "E_100") {
                 if ($publish_prevDate == $awp_cache_publishdate) {

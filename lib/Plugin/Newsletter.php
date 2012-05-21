@@ -62,10 +62,10 @@ function shownewsletterform($atts){
 	$newsletterform=$this->get_newsletterform_fields($formname);
          $submitformname=$_POST['awp_newsletterformname'];
          if(isset($_POST['awp_newsletterform_submit']) && $submitformname==$formname){
-              $successmsg= $this->save_newsletter($submitformname);
+	          $successmsg= $this->save_newsletter($submitformname); 
           }
 	ob_start();
-	if(!empty($newsletterform) && !empty($newsletterform[fields]) ){
+	if(!empty($newsletterform) && !empty($newsletterform[fields]) ){		
 		include $newsletterform['templatefile'];
 	}else{
 		echo awp_messagelist('newsletter-display-page');
@@ -95,8 +95,8 @@ function save_newsletter($formname){
 			$submittedformvalues[$fieldid]= stripslashes($_POST[$fieldid]);
            }
 		}
-	    //Submit the $submittedformvalues to Apptivo Lead Webservice
-		//Dont forgot to save the contact form name as Lead Source value
+			    //Submit the $submittedformvalues to Apptivo Lead Webservice
+				//Dont forgot to save the contact form name as Lead Source value
                 $category = $submittedformvalues[category];
                 $firstname = $submittedformvalues[newsletter_firstname];
                 $lastname = $submittedformvalues[newsletter_lastname];
@@ -104,8 +104,8 @@ function save_newsletter($formname){
                 $phoneNumber = $submittedformvalues[newsletter_phone];
                 $comments = $submittedformvalues[newsletter_comments];
                 if(!empty($email)){
-                        $response = createTargetList($category, $firstname, $lastname,$email,$phoneNumber,$comments);
-                        $confmsg = $response->return->responseMessage;
+                   $response = createTargetList($category, $firstname, $lastname,$email,$phoneNumber,$comments);
+                   $confmsg = $response->return->statusMessage;
                 }
                 if($response == 'E_100')
                 { 
@@ -118,8 +118,9 @@ function save_newsletter($formname){
                 }else if(!empty($confmsg) && $confmsg != "Email already registered"){
                     if(!empty($newsletterform[confmsg])){
                         $confmsg = $newsletterform[confmsg];
-                    }
+                     }
                 }
+                             
     		
 	}
 	return $confmsg;
@@ -588,36 +589,7 @@ arsort($plugintemplates_newsletter);
 				<input type="hidden" id="awp_newsletterform_subscribetype" name="awp_newsletterform_subscribetype" value="subscribe">
 			</tr>
 			
-			
-			<!-- <tr valign="top">
-				<th valign="top"><label for="awp_newsletterform_shortcode">Type:</label>
-				</th>
-				<td valign="top">
-				<input type="hidden" id="awp_newsletterform_name"
-					name="awp_newsletterform_name" value="<?php //echo $selectednewsletterform;?>">
 				
-				<select name="awp_newsletterform_subscribetype"
-					id="awp_newsletterform_subscribetype">
-					<?php
-					/*$newsletterSubscribe = $this->get_subscribeLists();
-					foreach (array_keys( $newsletterSubscribe ) as $subscribe )
-					{ if(  $newsletter_formproperties[subscribetype] == $newsletterSubscribe[$subscribe] )
-					{
-						$selectedsubs = 'selected="selected"';
-					}
-					else {
-						$selectedsubs = '';
-					}
-						?>
-						<option <?php echo $selectedsubs; ?> value="<?php echo $newsletterSubscribe[$subscribe]?>" >
-						<?php echo $subscribe; ?>
-						</option>
-						<?php } */?>
-				</select> 
-				
-				
-				</td>
-			</tr>-->			
 	
 			<tr valign="top">
 				<th valign="top"><label for="awp_newsletterform_confirmation_msg1"><?php _e('Confirmation Message:','apptivo-businesssite'); ?></label>
@@ -936,12 +908,11 @@ arsort($plugintemplates_newsletter);
  */
 function getAllTargetListcategory()
 {
-
 	$params = array (
                 "arg0" => APPTIVO_SITE_KEY,
                 "arg1" => APPTIVO_ACCESS_KEY
                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchAllTargetLists',$params);
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getAllTargetLists',$params);
     return $response;
 }
 /**
@@ -979,7 +950,7 @@ function createTargetList($category,$fname,$lname,$email,$phoneNumber,$comments,
 	            "arg7" => $userId,
 		        "arg8" => $appParam
                  );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'addTargetWithCommunicationDetailsAndAddToTargetList',$params);
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createTargetWithCommunicationDetailsAndAddToTargetList',$params);
     return $response;
 }
 

@@ -81,7 +81,7 @@ class AWP_Newsletter_Widget extends WP_Widget {
                         $comments = $submittedformvalues[newsletter_comments];
                          if(!empty($email)){
                         $response = createTargetList($category, $firstname, $lastname,$email,$phoneNumber,$comments);
-                        $successmsg = $response->return->responseMessage;
+                        $successmsg = $response->return->statusMessage;
                         }
 		               if($response == 'E_100')
 		                { 

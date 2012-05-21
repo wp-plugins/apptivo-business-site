@@ -1,10 +1,10 @@
 <?php
 /**
- * AWP Contact Forms Plugin
+ * IP Deny
  */
 require_once AWP_LIB_DIR . '/Plugin.php';
 /**
- * Class AWP_ContactForms
+ * Class AWP_IPDeny
  */
 
 add_action('wp_ajax_nopriv_delete_ipbannedaccount', 'delete_ipbannedaccount');

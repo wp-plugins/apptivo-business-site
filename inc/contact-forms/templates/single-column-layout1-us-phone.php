@@ -171,7 +171,7 @@ foreach($formfields as $field)
                                 }
 			break;
 			case "radio":
-				$i=0;
+				$i=0;$opt=0;
 				foreach( $optionvalues as $optionvalue )
 				{
                                     if(trim($postValue) == trim($optionvalue)){
@@ -185,13 +185,13 @@ foreach($formfields as $field)
 					if($i>0)
 
 						$html.='<br>';
-					$html.='<label for="'.$fieldid.'">'.$optionvalue.'</label><input type="radio" name="'.$fieldid.'" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'">';
-					$i++;
+					$html.='<label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'">';
+					$i++;$opt++;
 					}
 				}
 			break;
 			case "checkbox":
-				$i=0;
+				$i=0;$opt=0;
 				foreach( $optionvalues as $optionvalue )
 				{
                                      $selected ="";
@@ -204,16 +204,16 @@ foreach($formfields as $field)
 					{
 					if($i>0)
 						$html.='<br>';
-					$html.='<label for="'.$fieldid.'">'.$optionvalue.'</label><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_contact_input_checkbox '.$validateclass.'" '.$selected.'>';
-					$i++;
+					$html.='<label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_checkbox '.$validateclass.'" '.$selected.'>';
+					$i++;$opt++;
 					}
 				}
 			break;
-                        case "captcha":
-                                $html.='<div class="captcha_image"><img src="'.$contactform['captchaimagepath'].'" id="captchaimg" style="border:1px solid #000;"/></div>
-                                     <div class="captcha_label"><label for="message">*'.$field['showtext'].'</label></div>
-                                     <div class="captcha_input"><input type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value=""  class="absp_contact_input_text'.$validateclass.'"/></div>';
-                            break;
+           case "captcha":
+              $html.='<div class="captcha_image"><img src="'.$contactform['captchaimagepath'].'" id="captchaimg" style="border:1px solid #000;"/></div>
+                      <div class="captcha_label"><label for="message">*'.$field['showtext'].'</label></div>
+                      <div class="captcha_input"><input type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value=""  class="absp_contact_input_text'.$validateclass.'"/></div>';
+           break;
 		}
 		$html.='</div>'.'</div>';
      }
@@ -247,5 +247,4 @@ foreach($formfields as $field)
       echo $css;
       echo $jscript;
       echo $html;
-
 ?>

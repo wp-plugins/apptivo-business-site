@@ -43,6 +43,14 @@ class AWP_MainController extends AWP_Base
         $awp_contactforms = & AWP_ContactForms::instance();
         $awp_contactforms->run();
         
+        /**
+         * Run Contact Forms Plugin
+         */
+        require_once AWP_PLUGINS_DIR . '/cases.php';
+        $awp_cases = & AWP_Cases::instance();
+        $awp_cases->run();
+        
+        
          /**
          * Run Forms Plugin
          */
@@ -121,7 +129,8 @@ class AWP_MainController extends AWP_Base
             case ($this->_page == 'awp_testimonials'):
             case ($this->_page == 'awp_news'):
             case ($this->_page == 'awp_events'):
-            case ($this->_page == 'awp_jobs'):                       
+            case ($this->_page == 'awp_jobs'):   
+             case ($this->_page == 'awp_cases'):                    
             break;
                         
             default:
@@ -150,8 +159,8 @@ class AWP_MainController extends AWP_Base
     	$settings["news"]=AWP_Request::get_boolean("news_enable");
     	$settings["events"]=AWP_Request::get_boolean("events_enable");
         $settings["jobs"]=AWP_Request::get_boolean("jobs_enable");
+        $settings["cases"]=AWP_Request::get_boolean("cases_enable");        
     	if(get_option("awp_plugins")!=="false"){
-        
     		update_option("awp_plugins", $settings);
     	}else{
     		add_option("awp_plugins", $settings);
@@ -165,12 +174,16 @@ class AWP_MainController extends AWP_Base
     {
        
     	 $pages = array('awp_general' => array('General Settings',  'General Settings' ));
-          $awp_pluginsettings = get_option('awp_plugins');
-          
-         if(!defined('AWP_IP_DENY') || !AWP_IP_DENY)
-          {
+          	
+    	 $awp_pluginsettings = get_option('awp_plugins');
+         
           	$ip_deny = array('awp_ip_deny' => array('IP Deny','IP Deny'));
           	$pages = array_merge($pages, $ip_deny); 
+         
+          if(!defined('AWP_CASES_DISABLE') || !AWP_CASES_DISABLE)
+          {
+           $cases = array('awp_cases' => array('Cases','Cases'));
+           $pages = array_merge($pages, $cases); 
           }
    		 if(!defined('AWP_CONTACTFORM_DISABLE') || !AWP_CONTACTFORM_DISABLE)
           {
@@ -266,6 +279,9 @@ class AWP_MainController extends AWP_Base
            case 'awp_jobs':
                 $this->options_jobs();
                 break;
+           case 'awp_cases':
+                $this->options_cases();
+                break;     
          
 
         }
@@ -279,7 +295,7 @@ class AWP_MainController extends AWP_Base
     	$this->show_general_settings();
     }
     /**
-     * Denyed IP
+     * Denyed IP tab
      */
     function options_ipdeny(){
     	require_once AWP_PLUGINS_DIR . '/ipdeny.php';
@@ -294,6 +310,14 @@ class AWP_MainController extends AWP_Base
     	require_once AWP_PLUGINS_DIR . '/ContactForms.php';
         $awp_contactforms = & AWP_ContactForms::instance();
         $awp_contactforms->options();
+    }
+    /**
+     * Cases tab
+     */
+    function options_cases(){
+    	require_once AWP_PLUGINS_DIR . '/cases.php';
+        $awp_cases= & AWP_Cases::instance();
+        $awp_cases->settings();
     }
    /**
      * Jobs Form tab
@@ -468,9 +492,9 @@ class AWP_MainController extends AWP_Base
 					</th>
 					<td valign="top">
                    
-                   <input  <?php checked('dont_show',get_option('apptivo_poweredby_status')); ?> <?php checked('',get_option('apptivo_poweredby_status')); ?> type="radio" name="powered_status"  value="dont_show"/> Don't Show &nbsp;&nbsp;&nbsp;
-                   <input  <?php checked('show_homepage',get_option('apptivo_poweredby_status')); ?> type="radio" name="powered_status"  value="show_homepage"/> Show in Home Page &nbsp;&nbsp;&nbsp;
-                   <input  <?php checked('show_allpages',get_option('apptivo_poweredby_status')); ?> type="radio" name="powered_status"  value="show_allpages"/> Show in All Pages &nbsp;&nbsp;&nbsp;
+                   <input  <?php checked('dont_show',get_option('apptivo_poweredby_status')); ?> <?php checked('',get_option('apptivo_poweredby_status')); ?> type="radio" name="powered_status" id="donot_show"  value="dont_show"/><label for="donot_show">Don't Show &nbsp;&nbsp;&nbsp;</label>
+                   <input  <?php checked('show_homepage',get_option('apptivo_poweredby_status')); ?> type="radio" name="powered_status" id="show_home"  value="show_homepage"/><label for="show_home"> Show in Home Page &nbsp;&nbsp;&nbsp;</label>
+                   <input  <?php checked('show_allpages',get_option('apptivo_poweredby_status')); ?> type="radio" name="powered_status" id="show_all"  value="show_allpages"/> <label for="show_all">Show in All Pages &nbsp;&nbsp;&nbsp;</label> 
                    
                     </td>
 				</tr>
@@ -573,77 +597,73 @@ class AWP_MainController extends AWP_Base
 	  <form name="awp_generalsettings_form" method="post" action="">
 		<table class="form-table">
 			<tbody>
-			    <tr valign="top">
-			    <?php if(!defined('AWP_CONTACTFORM_DISABLE') || !AWP_CONTACTFORM_DISABLE) {  ?>
-					<th valign="top"><label for="contactforms_enable"><?php _e("Contact Forms", 'apptivo-businesssite' ); ?>:</label>
-						<br><span class="description">Contact Forms to collect lead from your website.</span>
-					</th>
-					<td valign="top">
-						<input type="checkbox" name="contactforms_enable" id="contactforms_enable" class="enabled" 
+			<!-- Contact Forms  -->
+			 <?php if(!defined('AWP_CONTACTFORM_DISABLE') || !AWP_CONTACTFORM_DISABLE) {  ?>
+			<tr valign="top">
+					<th class="titledesc" scope="row"><?php _e("Contact Forms", 'apptivo-businesssite' ); ?></th>
+                    <td class="forminp">
+                    <input type="checkbox" name="contactforms_enable" id="contactforms_enable" class="enabled" 
 						<?php if($disable_plugin) {?>
 						disabled="disabled"
 						<?php } if($generalsettings["contactforms"]){?>
 						checked="checked"
 						<?php }?>
 						>
-						<strong>Enable</strong>			
-					</td>
-				    <?php } if(!defined('AWP_NEWSLETTER_DISABLE') || !AWP_NEWSLETTER_DISABLE) {?>
-					<th valign="top"><label for="newsletters_enable"><?php _e("Newsletters", 'apptivo-businesssite' ); ?>:</label>
-						<br><span class="description">Subscribe your users to newsletters using Apptivo Campaigns.</span>
-					</th>
-					<td valign="top">
-						<input type="checkbox" name="newsletters_enable" id="newsletters_enable" class="enabled"
+                    <span class="description">Contact Forms to collect lead from your website.</span></td>
+                </tr>
+               <?php } ?> 
+               <!-- Newsletter Form -->
+                <?php if(!defined('AWP_NEWSLETTER_DISABLE') || !AWP_NEWSLETTER_DISABLE) {  ?>
+			<tr valign="top">
+					<th class="titledesc" scope="row"><?php _e("Newsletters", 'apptivo-businesssite' ); ?></th>
+                    <td class="forminp">
+                   <input type="checkbox" name="newsletters_enable" id="newsletters_enable" class="enabled"
 						<?php if($disable_plugin){?>
 						disabled="disabled"
 						<?php  } if($generalsettings["newsletters"]){?>
 						checked="checked"
 						<?php }?>
 						>
-						<strong>Enable</strong>			
-					</td>
-					<?php } ?>
-				</tr>
-				<tr valign="top">
-				<?php if(!defined('AWP_TESTIMONIALS_DISABLE') || !AWP_TESTIMONIALS_DISABLE) {?>
-					<th valign="top"><label for="testimonials_enable"><?php _e("Testimonials", 'apptivo-businesssite' ); ?>:</label>
-						<br><span class="description">Collect and show in your website, what your clients tell about you.</span>
-					</th>
-					<td valign="top">
-						<input type="checkbox" name="testimonials_enable" id="testimonials_enable" class="enabled"
+                    <span class="description">Subscribe your users to newsletters using Apptivo Campaigns.</span></td>
+                </tr>
+               <?php } ?> 
+               
+             <!-- Testimonials Sections -->
+                  <?php if(!defined('AWP_TESTIMONIALS_DISABLE') || !AWP_TESTIMONIALS_DISABLE) {  ?>
+			<tr valign="top">
+					<th class="titledesc" scope="row"><?php _e("Testimonials", 'apptivo-businesssite' ); ?></th>
+                    <td class="forminp">
+                   <input type="checkbox" name="testimonials_enable" id="testimonials_enable" class="enabled"
 						<?php if($disable_plugin){?>
 						disabled="disabled"
 						<?php } if($generalsettings["testimonials"]){?>
 						checked="checked"
 						<?php }?>
 						>
-						<strong>Enable</strong>			
-					</td>
-					<?php } if(!defined('AWP_NEWS_DISABLE') || !AWP_NEWS_DISABLE) { ?>
-				
-					<th valign="top"><label for="news_enable"><?php _e("News", 'apptivo-businesssite' ); ?>:</label>
-						<br><span class="description">Show what's News about your company in your websites.</span>
-					</th>
-					<td valign="top">
-						<input type="checkbox" name="news_enable" id="news_enable" class="enabled"
+                   <span class="description">Collect and show in your website, what your clients tell about you.</span></td>
+                </tr>
+               <?php } ?> 
+               <!-- News Sections -->
+                    <?php if(!defined('AWP_NEWS_DISABLE') || !AWP_NEWS_DISABLE) {  ?>
+			<tr valign="top">
+					<th class="titledesc" scope="row"><?php _e("News", 'apptivo-businesssite' ); ?></th>
+                    <td class="forminp">
+                   <input type="checkbox" name="news_enable" id="news_enable" class="enabled"
 						<?php if($disable_plugin) {?>
 						disabled="disabled"
 						<?php } if($generalsettings["news"]){?>
 						checked="checked"
 						<?php }?>
 						>
-						<strong>Enable</strong>			
-					</td>
-					<?php } ?>
-				</tr>
-				<tr valign="top">
-				<?php if(!defined('AWP_EVENTS_DISABLE') || !AWP_EVENTS_DISABLE) { ?>
-					<th valign="top"><label for="events_enable"><?php _e("Events", 'apptivo-businesssite' ); ?>:</label>
-						<br><span class="description">Show various events organized by you in your website.</span>
-					</th>
-
-					<td valign="top">
-						<input type="checkbox" name="events_enable" id="events_enable" class="enabled"
+                   <span class="description">Show what's News about your company in your websites.</span></td>
+                </tr>
+               <?php } ?> 
+               <!-- Events Sections -->
+				    <?php if(!defined('AWP_EVENTS_DISABLE') || !AWP_EVENTS_DISABLE) {  ?>
+			<tr valign="top">
+					<th class="titledesc" scope="row"><?php _e("Events", 'apptivo-businesssite' ); ?></th>
+                    <td class="forminp">
+                   <input type="checkbox" name="events_enable" id="events_enable" class="enabled"
 						<?php if($disable_plugin){?>
 						disabled="disabled"
 						<?php }
@@ -651,26 +671,41 @@ class AWP_MainController extends AWP_Base
 						checked="checked"
 						<?php }?>
 						>
-						<strong>Enable</strong>			
-					</td>
-					<?php } if(!defined('AWP_JOBS_DISABLE') || !AWP_JOBS_DISABLE ) { ?>
-					
-					<th valign="top"><label for="jobs_enable"><?php _e("Jobs", 'apptivo-businesssite' ); ?>:</label>
-						<br><span class="description">Jobs</span>
-					</th>
-					<td valign="top">
-						<input type="checkbox" name="jobs_enable" id="jobs_enable" class="enabled" 
+                    <span class="description">Show various events organized by you in your website.</span></td>
+                </tr>
+               <?php } ?> 
+               <!-- Jobs Sections -->
+                <?php if(!defined('AWP_JOBS_DISABLE') || !AWP_JOBS_DISABLE) {  ?>
+			<tr valign="top">
+					<th class="titledesc" scope="row"><?php _e("Jobs", 'apptivo-businesssite' ); ?></th>
+                    <td class="forminp">
+                  <input type="checkbox" name="jobs_enable" id="jobs_enable" class="enabled" 
 						<?php if($disable_plugin){?>
 						disabled="disabled"
 						<?php } if($generalsettings["jobs"]){?>
 						checked="checked"
 						<?php }?>
 						>
-						<strong>Enable</strong>			
-					</td>
-					<?php } ?>
-					
-				</tr>
+                    <span class="description">Customers to upload a resume from your website and you can manage it using Apptivo Jobs App</span></td>
+                </tr>
+               <?php } ?> 
+               
+                 <?php if(!defined('AWP_CASES_DISABLE') || !AWP_CASES_DISABLE) {  ?>
+			<tr valign="top">
+					<th class="titledesc" scope="row"><?php _e("Cases", 'apptivo-businesssite' ); ?></th>
+                    <td class="forminp">
+                  <input type="checkbox" name="cases_enable" id="cases_enable" class="enabled" 
+						<?php if($disable_plugin){?>
+						disabled="disabled"
+						<?php } if($generalsettings["cases"]){?>
+						checked="checked"
+						<?php }?>
+						>
+                   <span class="description">Customers to log a case from your website and you can manage it using Apptivo Cases App</span></td>
+                </tr>
+               <?php } ?> 
+               
+			 
 				<tr>
 					<td colspan="2">
 						<p class="submit">
@@ -739,11 +774,9 @@ class AWP_MainController extends AWP_Base
 		}     
 	}
 	
- /**
-     * Render Apptivo General Settings page
-     */
-    function show_general_settings(){
-       /* Stored Site Information */	            	
+	function general_tabssettings()
+	{
+		 /* Stored Site Information */	            	
        if(isset($_POST['awp_siteinfo_form'])){
        	    $apptivo_poweredby_status = AWP_Request::get_string('powered_status');
        	    update_option('apptivo_poweredby_status',$apptivo_poweredby_status);
@@ -770,10 +803,8 @@ class AWP_MainController extends AWP_Base
        
        $apptivo_site_key = get_option('apptivo_sitekey');
        $apptivo_access_key = get_option('apptivo_accesskey');
-    	// Now display the settings editing screen
-		echo '<div class="wrap">';
-		echo "<h2>" . __( 'Apptivo General Settings', 'apptivo-businesssite' ) . "</h2>";
-		if(trim($updatemessage)!=""){
+       
+	if(trim($updatemessage)!=""){
 		?>
 		<div id="message" class="updated">
 	        <p>
@@ -786,7 +817,11 @@ class AWP_MainController extends AWP_Base
             else if (!empty($apptivo_site_key)){
             	$this->siteInformation($apptivo_site_key,$apptivo_access_key);
             }
-            $general_plugins_settings=get_option("awp_plugins");
+	}
+	
+	function plugin_tabsettings()
+	{
+		$general_plugins_settings=get_option("awp_plugins");
             if($general_plugins_settings == '' || empty($general_plugins_settings)) :
 	            if( basename(dirname(AWP_LIB_DIR))  == 'apptivo-businesssite-crm') :
 	            $general_plugins_settings = array(
@@ -812,6 +847,11 @@ class AWP_MainController extends AWP_Base
             endif;
             
             $this->pluginsSettings($general_plugins_settings);
+	}
+	
+	function memcache_tabsettings()
+	{
+	 
             if(!defined("AWP_MEMCACHED_HOST") && !defined("AWP_MEMCACHED_PORT") )
             {
             	$this->configure_memcache();
@@ -819,7 +859,22 @@ class AWP_MainController extends AWP_Base
                 $test_m_cacheconnect = $this->test_mcacheconnect();
                 $this->memCacheSettings($memcachesettings,$test_m_cacheconnect);
 	        }
-	     ?>
+	}
+	/**
+     * Render Apptivo General Settings page
+     */
+    function show_general_settings(){
+    	echo '<div class="wrap">';
+	    echo "<h2>" . __( 'Apptivo General Settings', 'apptivo-businesssite' ) . "</h2></ br>";
+		?>
+    	<?php 
+       //General Settings
+		$this->general_tabssettings();
+		//Plugin Settings
+		$this->plugin_tabsettings();
+		//Memcache Settings.
+		$this->memcache_tabsettings();
+		 ?>
 			<script language="javascript" type="text/javascript">
 			function genralform_enablefield(fld)
 			{

@@ -3,11 +3,11 @@
  Plugin Name: Apptivo Business site Plugin
  Plugin URI: http://www.apptivo.com/apptivo-business-site-wordpress-plug-in/
  Description: Apptivo Business Site plugin provides News , Events , Testimonials, Jobs, Contact Forms and Newsletter sub plugins with <a href="http://www.apptivo.com" target="_blank">Apptivo ERP</a>.
- Version: 0.7.2
+ Version: 1.0
  Author: Rajkumar Mohanasundaram (rmohanasundaram@apptivo.com) 
  Author URI: http://www.apptivo.com/
  */
-
+if (!session_id()) session_start();
  if (!defined('AWP_PLUGIN_BASEPATH')) {
  	define('AWP_PLUGIN_BASEPATH',plugin_dir_path(__FILE__));
  	define('AWP_PLUGIN_BASEURL',plugins_url(basename( dirname(__FILE__))));
@@ -31,9 +31,9 @@
     /**
      * Run plugin
      */
-add_action( 'admin_enqueue_scripts', 'my_enqueue' );
+add_action( 'admin_enqueue_scripts', 'apptivo_business_enqueue' );
 
-function my_enqueue($hook) {
+function apptivo_business_enqueue($hook) {
 	switch ($hook) {
         	case 'apptivo_page_awp_news':
         	case 'apptivo_page_awp_events':
@@ -41,6 +41,7 @@ function my_enqueue($hook) {
         	case 'apptivo_page_awp_jobs':
         	case 'apptivo_page_awp_contactforms':
         	case 'apptivo_page_awp_newsletter':
+        	case 'apptivo_page_awp_cases':	
             	add_filter("mce_buttons", "remove_mce_buttons");
             	add_filter( 'wp_default_editor', create_function('', 'return "tinymce";') );  	           
                 break;  
@@ -61,15 +62,8 @@ function do_shortcode_apptivo($content)
    	return $content;
    }
 
-    $contact_form_pos = strpos($content, '[apptivocontactform');
-    $newsletter_form_pos = strpos($content, '[apptivonewsletterform name=');
     $pattern = get_shortcode_regex();    
-     
-	if ($contact_form_pos !== false || $newsletter_form_pos !== false) {
-	   return preg_replace_callback( "/$pattern/s", 'do_shortcode_tag', $content );
-	} else {
-	   return $content;
-	}
+    return preg_replace_callback( "/$pattern/s", 'do_shortcode_tag', $content );
 	
 }
 
@@ -107,21 +101,20 @@ echo '<script type="text/javascript" language="javascript" >jQuery(document).rea
     $awp_maincontroller = & AWP_MainController::instance();
     $awp_maincontroller->run();
 }
-function my_admin_scripts() {
+function apptivo_business_scripts() {
 wp_enqueue_script('media-upload');
 wp_enqueue_script('thickbox');
 }
 
-function my_admin_styles() {
+function apptivo_business_styles() {
 wp_enqueue_style('thickbox');
 }
 
 
 if ( is_admin() ) {
-	if ( $_GET['page'] == 'awp_events' || $_GET['page'] == 'awp_testimonials' || $_GET['page'] == 'awp_contactforms' || $_GET['page'] == 'awp_jobs' || $_GET['page'] == 'awp_newsletter' || $_GET['page'] == 'awp_news' ) {
-	add_action('admin_print_scripts', 'my_admin_scripts');
-	add_action('admin_print_styles', 'my_admin_styles');
-	}
+	add_action('admin_print_scripts', 'apptivo_business_scripts');
+	add_action('admin_print_styles', 'apptivo_business_styles');
+	
 }
 
 /**
@@ -268,5 +261,59 @@ function powered_apptivo_status()
   	endif;	
   	echo '<div class="poweredbyapptivo" style="text-align:center;" >'.$apptivo_logo.'</div>';
   	endif;
+}
+//Contact Form Submit.
+add_action('wp_ajax_apptivo_business_contactus', 'apptivo_business_contactus_lead');
+add_action('wp_ajax_nopriv_apptivo_business_contactus', 'apptivo_business_contactus_lead');
+function apptivo_business_contactus_lead(){	
+    $formname = $_POST['awp_contactformname'];
+    $contact_form = &new AWP_ContactForms();
+    $contact_formlead = $contact_form->save_contact($formname,true);
+    echo $contact_formlead;exit;		
+}
+
+add_action('wp_ajax_apptivo_business_captcha_refresh', 'apptivo_business_captcha_refresh');
+add_action('wp_ajax_nopriv_apptivo_business_captcha_refresh', 'apptivo_business_captcha_refresh');
+
+function apptivo_business_captcha_refresh()
+{
+	if (!session_id()) session_start();
+	$possible_letters = '23456789bcdfghjkmnpqrstvwxyz';
+	$characters_on_image = 6;
+	$code = '';
+	$i = 0;
+	while ($i < $characters_on_image) { 
+	$code .= substr($possible_letters, mt_rand(0, strlen($possible_letters)-1), 1);
+	$i++;
+	}
+	$_SESSION['apptivo_business_captcha_code'] = $code;
+    $image_src = AWP_PLUGIN_BASEURL.'/assets/captcha/captcha_code_file.php?captcha_code='.$code;
+	echo '<img style="border: 1px solid rgb(0, 0, 0);" id="captchaimg" src="'.$image_src.'">';
+	exit;
+}
+//Newsletter Form Submit.
+add_action('wp_ajax_apptivo_business_newsletter', 'apptivo_business_newsletter_target');
+add_action('wp_ajax_nopriv_apptivo_business_newsletter', 'apptivo_business_newsletter_target');
+function apptivo_business_newsletter_target(){	
+    $formname = $_POST['awp_newsletterformname'];
+    $newsletter_form = &new AWP_Newsletter();
+    $newsletter_subscribe = $newsletter_form->save_newsletter($formname);
+    echo $newsletter_subscribe;exit;		
+}
+//Jobs Doc ID
+add_action('wp_ajax_apptivo_business_jobs_docid', 'apptivo_business_jobs_docid');
+add_action('wp_ajax_nopriv_apptivo_business_jobs_docid', 'apptivo_business_jobs_docid');
+function apptivo_business_jobs_docid()
+{
+	$key  = $_POST['dockey'];
+	$size = $_POST['docsize'];
+	$name = $_POST['docname'];
+	$type = $_POST['doctype'];	
+	$params = array ( "arg0" => APPTIVO_SITE_KEY,"arg1" => null,
+	                  "arg2" => $type,"arg3" => $key,"arg4" => $size,
+	                  "arg5" => null,"arg6" => null,"arg7"=> null,"arg8"=>$name);
+	 $response = getsoapCall(APPTIVO_SITE_SERVICES,'saveDocument',$params);
+	 echo $response->return;
+	 die();
 }
 ?>

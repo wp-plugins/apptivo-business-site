@@ -186,31 +186,31 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
         //Message Displayed...
         if(!$this->_plugin_activated){
 	    	echo "Testiomonials plugin is currently <span style='color:red'>disabled</span>. Please enable this in <a href='/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
-	    }else if (isset($_POST['awp_testimonial_add'])) {          //Add Testimonials.
+	    }else if (isset($_POST['awp_testimonial_add']) && ($_POST['nogdog'] == $_SESSION['apptivo_single_testimonials']) ) {          //Add Testimonials.
 	    	$addtestimonials_response = $this->add_testimonials();	
 	    	if(strlen(trim($_POST['awp_testimonials_name'])) == 0 )
 	    	{
 	    	$_SESSION['awp_testmonials_messge'] = 'Please enter a testimonial name';
-            }else if($addtestimonials_response->return->responseCode != '1000')
+            }else if($addtestimonials_response->return->statusCode != '1000')
                     {
-                    	$_SESSION['awp_testmonials_messge'] = '<span style=color:#f00;">'.$addtestimonials_response->return->responseMessage.'</span>';
+                    	$_SESSION['awp_testmonials_messge'] = '<span style=color:#f00;">'.$addtestimonials_response->return->statusMessage.'</span>';
                     }else {
 						$_SESSION['awp_testmonials_messge'] = 'Testimonials Added Successfully';	    		
                     }
 	    	            
         }else if ($_POST['awp_testimonial_update'] == 'Update') {     //Update Testimonails.
             $updatetestimonials_response = $this->update_testimonials();
-            if($updatetestimonials_response->return->responseCode != '1000')
+            if($updatetestimonials_response->return->statusCode != '1000')
             {
-            	$_SESSION['awp_testmonials_messge'] = '<span style=color:#f00;">'.$updatetestimonials_response->return->responseMessage.'</span>';
+            	$_SESSION['awp_testmonials_messge'] = '<span style=color:#f00;">'.$updatetestimonials_response->return->statusMessage.'</span>';
             }else {
             $_SESSION['awp_testmonials_messge'] = 'Testimonials Updated Successfully';
             }
         }else if ($_REQUEST['tstmode'] == 'delete') {         //Delete Testimonails.
             $deletetestimonials_response = $this->delete_testimonials();
-        if($deletetestimonials_response->return->responseCode != '1000')
+        if($deletetestimonials_response->return->statusCode != '1000')
             {
-            	$_SESSION['awp_testmonials_messge'] = '<span style=color:#f00;">'.$deletetestimonials_response->return->responseMessage.'</span>';
+            	$_SESSION['awp_testmonials_messge'] = '<span style=color:#f00;">'.$deletetestimonials_response->return->statusMessage.'</span>';
             }else {
             $_SESSION['awp_testmonials_messge'] = 'Testimonials Deleted Successfully';
             }
@@ -233,10 +233,10 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
         		{                                     
         		   $awp_tstid = $_REQUEST['tstid'];	        
 	               $all_awp_testimonials = getTestimonialByTestimonialId($awp_tstid);
-	               if($all_awp_testimonials->methodResponse->responseCode != '1000' && isset($all_awp_testimonials->methodResponse))
+	               if($all_awp_testimonials->statusCode != '1000' && isset($all_awp_testimonials->statusCode))
 					{  
 					echo '<div class="message" id="errormessage" style="margin: 5px 0pt 15px; background-color: rgb(255, 255, 224); border: 1px solid rgb(230, 219, 85);">
-					      <p style="margin: 0.5em; padding: 2px;"><span style="color: rgb(255, 0, 0);">'.$all_awp_testimonials->methodResponse->responseMessage.'</span></p></div>';
+					      <p style="margin: 0.5em; padding: 2px;"><span style="color: rgb(255, 0, 0);">'.$all_awp_testimonials->methodResponse->statusMessage.'</span></p></div>';
 					}
 							         
         		   $this->edit_testimonials($all_awp_testimonials);   //Testimonails Edit Form.
@@ -906,20 +906,27 @@ function isValidURL(url){
 	//Save Inline View settings
 	function save_inline_settings()
 	{
-                 if ($_POST['awp_testimonials_templatetype'] == "awp_plugin_template")
+            if ($_POST['awp_testimonials_templatetype'] == "awp_plugin_template") :
 	            $testimonial_layout = $_POST['awp_testimonials_plugintemplatelayout'];
-	        else
+	        else:
 	            $testimonial_layout = $_POST['awp_testimonials_themetemplatelayout'];
+	        endif;    
+		     //Inline Testimonials items to show.
+	         $inline_testimonials_itemtoshow = $_POST['itemstoshow'];
+	         if(!is_numeric($_POST['itemstoshow']) || $_POST['itemstoshow'] <= 0 ):
+	         	$inline_testimonials_itemtoshow =   AWP_DEFAULT_ITEM_SHOW;
+	         endif; 
+	         
 	        $awp_testimonials_inline_settings = array(
                             'template_type' => $_POST['awp_testimonials_templatetype'],
                             'template_layout' => $testimonial_layout,
-	                     'style' => $_POST['style'],
-	                     'custom_css' => stripslashes($_POST['custom_css']),
-	                     'order' => $_POST['order'],
-	                     'itemstoshow' => is_numeric($_POST['itemstoshow'])?$_POST['itemstoshow']:AWP_DEFAULT_ITEM_SHOW,
-	                     'more_text' => (trim($_POST['more_text'])!="")?$_POST['more_text']:AWP_DEFAULT_MORE_TEXT,
-	                     'page_ID' => $_POST['page_ID'],
-	                     );
+	                        'style' => $_POST['style'],
+	                     	'custom_css' => stripslashes($_POST['custom_css']),
+	                     	'order' => $_POST['order'],
+	                     	'itemstoshow' => $inline_testimonials_itemtoshow,
+	                     	'more_text' => (trim($_POST['more_text'])!="")?$_POST['more_text']:AWP_DEFAULT_MORE_TEXT,
+	                     	'page_ID' => $_POST['page_ID'],
+	                     	);
 	       
 	        update_option('awp_testimonials_inline_settings', $awp_testimonials_inline_settings);
 	}
@@ -950,7 +957,9 @@ function isValidURL(url){
 	        <div class="wrap">
             <h2>Add Testimonials</h2>
             <div class="testimonilas_err"></div>
+            <?php $nogdog = uniqid();$_SESSION['apptivo_single_testimonials'] = $nogdog; ?>
 	        <form method="post" action="/wp-admin/admin.php?page=awp_testimonials" name="awp_testimonials_form" onsubmit="return validatetestimonialsforms(this)" >
+	        <input type="hidden" name="nogdog" value="<?php echo $nogdog;?>" >
 	            <table class="form-table" width="700" cellspacing="0" cellpadding="0">
 	                                    <tr>
 	                                        <td><?php _e('Name','apptivo-businesssite'); ?>&nbsp;<span style="color:#f00;">*</span></td>
@@ -973,12 +982,8 @@ function isValidURL(url){
 	                                        <td><input type="text" name="awp_testimonials_email" id="awp_testimonials_email" value="" size="43"/></td>
 	                                    </tr>
 	                                    
-	                                   <!--<tr>
-	                                        <td><?php //_e('Image URL','apptivo-businesssite'); ?></td>
-	                                        <td><input type="text" name="awp_testimonials_imageurl" id="awp_testimonials_imageurl" value="" size="43"/></td>
-	                                    </tr>-->
-
-	                                    <tr valign="top">
+	                                   
+	                                <tr valign="top">
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_testimonials_imageurl" type="text" size="43" name="awp_testimonials_imageurl" value="" />
@@ -1039,13 +1044,7 @@ function isValidURL(url){
 	                                        <td><?php _e('Email','apptivo-businesssite'); ?></td>
 	                                        <td><input type="text" name="awp_testimonials_email" id="awp_testimonials_email" value="<?php echo $all_awp_testimonials->email; ?>" size="43"/></td>
 	                                    </tr>
-	                                    
-	                                    <!--<tr>
-	                                        <td><?php //_e('Image URL','apptivo-businesssite'); ?></td>
-	                                        <td><input type="text" name="awp_testimonials_imageurl" id="awp_testimonials_imageurl" value="<?php //echo $all_awp_testimonials->testimonialImageUrl; ?>" size="43"/></td>
-	                                    </tr>-->
-	                                    
-	                                    <tr valign="top">
+	                                 <tr valign="top">
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_testimonials_imageurl" type="text" size="43" name="awp_testimonials_imageurl" value="<?php echo $all_awp_testimonials->testimonialImageUrl; ?>" />
@@ -1098,7 +1097,7 @@ function addTestimonials($account, $accountId, $company, $contact, $contactId, $
                 "arg2" => $mktg_testimonials,
                 "arg3" => null
                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'addTestimonial',$params);
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createTestimonial',$params);
     return $response;
 	
 }
@@ -1116,11 +1115,8 @@ function getAllTestimonials()
 				"arg1" => APPTIVO_ACCESS_KEY,
                 "arg2" => null
                 );
-          //Memcache  
-          $response = get_data(APPTIVO_BUSINESS_SERVICES,'-testimonials-publisheddate','-testimonials-data','getSiteLasteUpdateDate','fetchAllTestimonials',$pubdate_params,$plugin_params);
-         // Without Memcache.     
-         //$response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchAllTestimonials',$plugin_params);
-    return $response->return;
+          $response = get_data(APPTIVO_BUSINESS_SERVICES,'-testimonials-publisheddate','-testimonials-data','getSiteLasteUpdateDate','getAllTestimonials',$pubdate_params,$plugin_params);
+          return $response->return;
 }
 /**
  * @method getAllTestimonials
@@ -1133,7 +1129,7 @@ function getTestimonialByTestimonialId($awp_tstid)
 				"arg1" => APPTIVO_ACCESS_KEY,
                 "arg2" => $awp_tstid
                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchTestimonialByTestimonialId',$params);
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getTestimonialByTestimonialId',$params);
     return $response->return;
 }
 /**
@@ -1149,7 +1145,7 @@ function deleteTestimonialByTestimonialId($awp_tstid)
 				"arg1" => APPTIVO_ACCESS_KEY,
                 "arg2" => $awp_tstid
                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'removeTestimonialByTestimonialId',$params);
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'deleteTestimonialByTestimonialId',$params);
     return $response;
 }
 /**
@@ -1165,7 +1161,7 @@ function updateTestimonials($account, $accountId, $company, $contact, $contactId
                 "arg2" => $mktg_testimonials,
                 "arg3" => null
                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'editTestimonial',$params);
-    return $response;
+  $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'updateTestimonial',$params);
+  return $response;
 }
 ?>

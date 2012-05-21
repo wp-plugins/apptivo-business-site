@@ -47,12 +47,9 @@ class AWP_ContactForms extends AWP_Base
      */
     function run()
     {
-	    if($this->_plugin_activated){    
-			// perform the check when the_posts() function is called]
-		    session_start();
-			add_shortcode('apptivocontactform', array(&$this,'showcontactform'));
-			add_action( 'contextual_help', array(&$this,'inlinedocument'), 10, 2 );
-			
+	    if($this->_plugin_activated){
+	    	add_shortcode('apptivocontactform', array(&$this,'showcontactform'));
+			add_action( 'contextual_help', array(&$this,'inlinedocument'), 10, 2 );			
 	   }
     }
     
@@ -94,52 +91,51 @@ class AWP_ContactForms extends AWP_Base
 	/**
 	 * Contact Form shortcode handler
 	 */
-	function showcontactform($atts){
-	   //Registering Validation Scripts. 
-	   $this->loadscripts();
-	    $value_present = false;
-        extract(shortcode_atts(array('name'=>  ''), $atts));
-		$formname=trim($name);
-		$content="";
-		$successmsg="";
+	function showcontactform($atts){	
+	extract(shortcode_atts(array('name'=>  ''), $atts));
+	$formname=trim($name);
+	$content="";
+	$successmsg="";
+	$submitformname=$_POST['awp_contactformname'];
+	$value_present = false;
+        if(isset($_POST['awp_contactform_submit']) && $submitformname==$formname )
+         {         
+	          if(isset($_POST['captcha'])){
+	            if(trim($_POST['captcha']) == $_SESSION['apptivo_business_captcha_code'])
+	            {		            
+			          $successmsg=$this->save_contact($submitformname); 
+	            }
+	            else{
+	                $value_present = true;
+	                $captch_error = 'Please enter correct Verification code';
+	            }
+	          }
+	          else{          	
+                    $successmsg=$this->save_contact($submitformname); 
+                  }
+             
+         }
 		$contactform=$this->get_contactform_fields($formname);
-		if(!empty($contactform[fields]))
+		if(strlen(trim($successmsg)) != 0 && $contactform['confmsg_pagemode'] == 'other' ) :
+                $location = get_permalink($contactform['confmsg_pageid']);
+	            wp_safe_redirect($location);	                 	           
+	    endif;
+		if(!empty($contactform['fields']))
 		{
-                foreach($contactform[fields] as $field){
-                    if($field[fieldid]=="country")
+                foreach($contactform['fields'] as $field){
+                    if($field['fieldid']=="country")
                     {
                        $countrylist = $this->getAllCountryList();
                        break;
                     }
                 }
 		}
-         $submitformname=$_POST['awp_contactformname'];
-        if(isset($_POST['awp_contactform_submit']) && $submitformname==$formname)
-         {  
-          if(isset($_POST['captcha'])){
-            if(trim($_POST['captcha']) == $_SESSION['6_letters_code'])
-            {
-                $successmsg=$this->save_contact($submitformname);
-            }
-            else{
-                $value_present = true;
-                $captch_error = 'Please enter correct Verification code';
-            }
-          }
-          else{
-              $successmsg=$this->save_contact($submitformname);
-          }
-            
-         }
-          if($successmsg != '' || !empty($successmsg) ) :
-               if($contactform['confmsg_pagemode'] == 'other') :
-	            $confmsg_pageid = get_permalink($contactform['confmsg_pageid']);
-	            header('Location:'.$confmsg_pageid);
-	           endif;
-	      endif;	              
-        ob_start();                 
-		if(!empty($contactform) && !empty($contactform[fields])){
-			include $contactform['templatefile'];
+          	              
+        ob_start();             
+		if(!empty($contactform) && !empty($contactform['fields'])){
+			    //Registering Validation Scripts. 
+	            $this->loadscripts();			
+				include $contactform['templatefile'];			
 		}else {
 			echo awp_messagelist('contactform-display-page');
 		}
@@ -150,11 +146,21 @@ class AWP_ContactForms extends AWP_Base
 	/**
 	 * Save contact from submitted
 	 */
-	function save_contact($formname){
-               
-                $contactform=$this->get_contactform_fields($formname);
+	function save_contact($formname,$ajaxform=false){
+		
+		if($ajaxform)
+		{
+           	 if(isset($_POST['captcha'])){
+	            if(trim($_POST['captcha']) != $_SESSION['apptivo_business_captcha_code'])
+	            {		            
+			         $captch_error = 'Please enter correct Verification code';
+			         return $captch_error;
+	            }
+           	 }
+		}        
+		
+        $contactform=$this->get_contactform_fields($formname);
 		if(!empty($contactform)){
-			
 			$contactformfields=$contactform['fields'];
 			//Process the $_POST here..
 			$submittedformvalues=array();
@@ -168,23 +174,26 @@ class AWP_ContactForms extends AWP_Base
                             }
                         }
                         $customfields="";
+             
 			foreach($contactformfields as $field) 
 			{
 				$fieldid=$field['fieldid'];
 				$pos=strpos($fieldid, "customfield");
 				if($pos===false){
-                                        if($fieldid=='telephonenumber'){
-                                            if(isset($_POST['telephonenumber1'])){
-                                                $submittedformvalues[$fieldid]= $_POST['telephonenumber1'].$_POST['telephonenumber2'].$_POST['telephonenumber3'];
-                                            }
-                                            else{
-                                                $submittedformvalues[$fieldid]= $_POST[$fieldid];
-                                            }
-                                        }
-                                        else{
-                                          $submittedformvalues[$fieldid]= stripslashes($_POST[$fieldid]);
-                                        }
-								
+                    if($fieldid=='telephonenumber'){
+	                     if(isset($_POST['telephonenumber1'])){
+	                      $submittedformvalues[$fieldid]= $_POST['telephonenumber1'].$_POST['telephonenumber2'].$_POST['telephonenumber3'];
+	                     }
+	                     else{
+	                     	
+	                      $submittedformvalues[$fieldid]= $_POST[$fieldid];	                      
+	                      
+	                     }
+                    }
+                    else{
+                         $submittedformvalues[$fieldid]= stripslashes($_POST[$fieldid]);
+                         
+                    }								
 				}else{
 					if(trim($customfields)!="")
 					{
@@ -198,7 +207,7 @@ class AWP_ContactForms extends AWP_Base
 							    }
 								
 							}else {
-                                                           $customfieldVal = $_POST[$fieldid];
+                                   $customfieldVal = $_POST[$fieldid];
 							   }
 						$customfields.="<br/><b>".$field['showtext']."</b>:&nbsp;".stripslashes($customfieldVal);
 					}
@@ -207,15 +216,15 @@ class AWP_ContactForms extends AWP_Base
 						if(is_array($_POST[$fieldid]))
 						{ 
 							$CustomArr = $_POST[$fieldid];
-                                                       	$customfieldVal= "";
+                            $customfieldVal= "";
 						    for($i=0; $i<count($CustomArr); $i++)
 							    {
 							    	$customfieldVal .= ($i==(count($CustomArr)-1))?$CustomArr[$i]:$CustomArr[$i].", ";
 							    }
 							
 						}else {
-                                                      $customfieldVal = $_POST[$fieldid];
-                                                    }
+                                  $customfieldVal = $_POST[$fieldid];
+                               }
 					
 						$customfields .= "<br/><b>".$field['showtext']."</b>:".stripslashes($customfieldVal);
 					}
@@ -226,7 +235,7 @@ class AWP_ContactForms extends AWP_Base
                      	if(trim($customfields)!="")
                      	{
 				         $submittedformvalues["notes"]=$customfields;
-                     	}
+                     	}                     	
                         $firstName = $submittedformvalues['firstname'];
                         $lastName = $submittedformvalues['lastname'];
                         $emailId = $submittedformvalues['email'];
@@ -253,7 +262,10 @@ class AWP_ContactForms extends AWP_Base
                         endif;
                         if(!empty($emailId)){
                         $response = saveLeadDetails($firstName , $lastName, $emailId, $jobTitle, $company, $address1, $address2, $city, $state, $zipCode, $bestWayToContact, $country, $leadSource, $phoneNumber, $comments, $noteDetails,$targetlistid);
-                        $response_msg = $response->return->responseMessage;
+                        $response_msg = $response->return->statusMessage;
+                        }else{
+                        	echo 'Getting Email Failed';
+                        	exit;
                         }
                         if($response_msg=='Success' && $response != 'E_100'){
                             if(!empty($contactform[confmsg])){
@@ -312,7 +324,17 @@ class AWP_ContactForms extends AWP_Base
 			endif;
 					
 			$contactformdetails['templatefile']=$templatefile;
-            $contactformdetails['captchaimagepath'] = AWP_PLUGIN_BASEURL.'/assets/captcha/captcha_code_file.php?rand='.rand();
+			
+			$possible_letters = '23456789bcdfghjkmnpqrstvwxyz';
+			$characters_on_image = 6;
+			$code = '';
+			$i = 0;
+			while ($i < $characters_on_image) { 
+			$code .= substr($possible_letters, mt_rand(0, strlen($possible_letters)-1), 1);
+			$i++;
+			}
+			$_SESSION['apptivo_business_captcha_code'] = $code;
+            $contactformdetails['captchaimagepath'] = AWP_PLUGIN_BASEURL.'/assets/captcha/captcha_code_file.php?captcha_code='.$code;
 			//add fields
 			$contactformfields=$contactform['fields'];
 			if(!empty($contactformfields)){
@@ -767,19 +789,18 @@ function get_plugin_templates()
 					</th>
 					<td valign="top">
 					<form name="awp_contact_selection_form" method="post" action="" style="float:left;" >
-					<select name="awp_contactform_select_form"
-						id="awp_contactform_select_form" onchange="this.form.submit();">
+					<select name="awp_contactform_select_form" id="awp_contactform_select_form" onchange="this.form.submit();">
 						<?php
 						for($i=0; $i<count($contact_forms); $i++)
-						{
-							?>
+						{ ?>
 							<option value="<?php echo $contact_forms[$i][name]?>"
 							<?php if(trim($selectedcontactform)==$contact_forms[$i][name])
 							echo "selected='true'";?>>
 							<?php echo $contact_forms[$i][name]?>
 							</option>
-							<?php }?>
+							<?php } ?>
 					</select>
+					
 					</form>
 					&nbsp;&nbsp;&nbsp;&nbsp;
 					<?php if($this->_plugin_activated)
@@ -952,7 +973,7 @@ function get_plugin_templates()
                     <td valign="top"><input <?php echo $disbleAction; ?> type="text" size="52" value="<?php echo $formproperties[subscribe_to_newsletter_displaytext]; ?>" id="awp_subscribe_to_newsletter" name="awp_subscribe_to_newsletter"></td>
 				</tr>
 				
-                 <?php } //To Check !empty($newsletter_categories) ?>
+                 <?php } ?>
                                 
 			</tbody>
 		</table>
@@ -1112,6 +1133,7 @@ function get_plugin_templates()
 						
 						if($pos===false) {?>readonly="readonly"<?php }
 						if(!$enabled || ($pos===false)) { ?> disabled="disabled" <?php } ?>
+						
 						onChange="contactform_showoptionstextarea('<?php echo $fieldData['fieldid']?>');"
 					>
 					<?php foreach( $this->get_master_fieldtypes() as $masterfieldtypes )
@@ -1158,6 +1180,7 @@ function get_plugin_templates()
                                         <select name="<?php echo $fieldData['fieldid']?>_validation" id="<?php echo $fieldData['fieldid']?>_validation"
 					<?php if(!$enabled){ ?> disabled="disabled" <?php }
 						if($pos===false) {?>readonly="readonly"<?php }?>
+						<?php if( ($fieldData['type'] != 'text' && (strtolower($fieldData['validation']) == 'none' || strtolower($fieldData['validation']) == ''))) { ?>disabled="disabled"<?php }?>
 					>
 					<?php foreach( $this->get_master_validations() as $masterfieldtypes )
                                         { ?>
@@ -1228,7 +1251,6 @@ function get_plugin_templates()
 	jQuery(document).ready(function(){
 	
 		jQuery('#upload_image_button').click(function() {
-		 formfield = jQuery('#upload_image').attr('name');
 		 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
 		 return false;
 		});
@@ -1455,10 +1477,11 @@ function get_plugin_templates()
  */
 function getAllCountries()
 {
-	   $params = array ( 
-                "arg0" => APPTIVO_SITE_KEY               
+	$params = array ( 
+                "arg0" => APPTIVO_SITE_KEY,
+	            "arg1" => APPTIVO_ACCESS_KEY               
                 );
-    $response = getsoapCall(APPTIVO_USER_SERVICES,'getAllCountries',$params);      
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getAllCountries',$params);      
     return $response;
 
 }
@@ -1473,7 +1496,7 @@ function getTargetListcategory()
                 "arg0" => APPTIVO_SITE_KEY,
                 "arg1" => APPTIVO_ACCESS_KEY
                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchAllTargetLists',$params);
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getAllTargetLists',$params);
     return $response;
 }
 /**
@@ -1508,8 +1531,8 @@ function saveLeadDetails($firstName, $lastName, $emailId, $jobTitle, $company, $
                 "arg0" => APPTIVO_SITE_KEY,
                 "arg1" => APPTIVO_ACCESS_KEY,
                 "arg2" => $leads
-                );
-  	$response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'addLeadWithLeadSource',$params);
+                );    
+  	$response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createLeadWithLeadSource',$params);  	
     return $response;
 }
 /**
@@ -1526,4 +1549,3 @@ function notes($label,$nodeDetails,$noteId)
 	$notetextDetails=new AWP_noteDetails($labelDetails,$noteId, $nodeDetails);
 	return $notetextDetails;
 }
-?>

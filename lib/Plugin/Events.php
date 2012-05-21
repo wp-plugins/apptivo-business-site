@@ -113,33 +113,34 @@ class AWP_Events extends AWP_Base
              if(!$this->_plugin_activated){
                     echo "Events Plugin is currently <span style='color:red'>disabled</span>. Please enable this in <a href='/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
                 }
-            if (isset($_POST['awp_events_add'])) {          //Events Add.
+            if (isset($_POST['awp_events_add']) && ($_POST['nogdog'] == $_SESSION['apptivo_single_events']) ) {          //Events Add.
             	    $addevents_response = $this->add_events(); 
             	   
                     if ( strlen(trim($_POST['awp_events_title'])) == 0 )
                     {
                             $_SESSION['awp_events_messge'] = 'Please Enter a Events title';
                             
-                    }else if($addevents_response->return->responseCode != '1000')
+                    }else if($addevents_response->return->statusCode != '1000')
                     {
-                    	$_SESSION['awp_events_messge'] = '<span style=color:#f00;">'.$addevents_response->return->responseMessage.'</span>';
+                    	$_SESSION['awp_events_messge'] = '<span style=color:#f00;">'.$addevents_response->return->statusMessage.'</span>';
                     }else {
                           $_SESSION['awp_events_messge'] = 'Events Added Successfully';
                     }
 
             }else if ($_POST['awp_events_update'] == 'Update') {  //Events Update.
                  $updateevents_response = $this->update_events();
-            if($updateevents_response->return->responseCode != '1000')
+                
+            if($updateevents_response->return->statusCode != '1000')
             {
-            	$_SESSION['awp_events_messge'] = '<span style=color:#f00;">'.$updateevents_response->return->responseMessage.'</span>';
+            	$_SESSION['awp_events_messge'] = '<span style=color:#f00;">'.$updateevents_response->return->statusMessage.'</span>';
             }else {
                  $_SESSION['awp_events_messge'] = 'Events Updated Successfully';
             }
             }else if ($_REQUEST['tstmode'] == 'delete') {   //Events Delete.
                 $deleteevents_response = $this->delete_events();
-             if($deleteevents_response->return->responseCode != '1000')
+             if($deleteevents_response->return->statusCode != '1000')
             {
-            	$_SESSION['awp_events_messge'] = '<span style=color:#f00;">'.$deleteevents_response->return->responseMessage.'</span>';
+            	$_SESSION['awp_events_messge'] = '<span style=color:#f00;">'.$deleteevents_response->return->statusMessage.'</span>';
             }else {
                 $_SESSION['awp_events_messge'] = 'Events Deleted Successfully';
             }
@@ -161,10 +162,10 @@ class AWP_Events extends AWP_Base
                             {        $eventsId = $_REQUEST['tstid'];
        								 $response = getMarketingEventById($eventsId);
        								 $events = $response->return;
-					                 if($events->methodResponse->responseCode != '1000')
+					                 if($events->statusCode != '1000')
 							         {  
 							         	echo '<div class="message" id="newsmessage" style="margin: 5px 0pt 15px; background-color: rgb(255, 255, 224); border: 1px solid rgb(230, 219, 85);">
-					      	                <p style="margin: 0.5em; padding: 2px;"><span style="color: rgb(255, 0, 0);">'.$events->methodResponse->responseMessage.'</span></p></div>';
+					      	                <p style="margin: 0.5em; padding: 2px;"><span style="color: rgb(255, 0, 0);">'.$events->methodResponse->statusMessage.'</span></p></div>';
 							         }
                                      $this->edit_events($events);   //Events Edit form.
                             } else {
@@ -470,17 +471,24 @@ function isValidURL(url){
     //Save Inline View settings
     function save_inline_settings()
     {
-         if ($_POST['awp_events_templatetype'] == "awp_plugin_template")
+         if ($_POST['awp_events_templatetype'] == "awp_plugin_template"):
             $events_layout = $_POST['awp_events_plugintemplatelayout'];
-        else
+        else:
             $events_layout = $_POST['awp_events_themetemplatelayout'];
+        endif;    
+        //Inline Events items to show.
+         $inline_events_itemtoshow = $_POST['itemstoshow'];
+         if(!is_numeric($_POST['itemstoshow']) || $_POST['itemstoshow'] <= 0 ):
+         	$inline_events_itemtoshow =   AWP_DEFAULT_ITEM_SHOW;
+         endif; 
+             
         $awp_events_inline_settings = array(
                     'template_type' => $_POST['awp_events_templatetype'],
                     'template_layout' => $events_layout,
                      'style' => $_POST['style'],
                      'custom_css' => stripslashes($_POST['custom_css']),
                      'order' => $_POST['order'],
-                     'itemstoshow' => is_numeric($_POST['itemstoshow'])?$_POST['itemstoshow']:AWP_DEFAULT_ITEM_SHOW,
+                     'itemstoshow' => $inline_events_itemtoshow,
                      'more_text' => (trim($_POST['more_text'])!="")?$_POST['more_text']:AWP_DEFAULT_MORE_TEXT,
                      'page_ID' => $_POST['page_ID'],
                      );
@@ -598,7 +606,9 @@ function isValidURL(url){
         ?>
         <div class="wrap addevents">
              <h2>Add Events</h2>
+        <?php $nogdog = uniqid();$_SESSION['apptivo_single_events'] = $nogdog; ?>
         <form method="post" action="" name="awp_events_form" onsubmit="return validateevents('add')" >
+         <input type="hidden" name="nogdog" value="<?php echo $nogdog;?>" >
             <table class="form-table" width="700" cellspacing="0" cellpadding="0">
                                      <tr>
                                         <td><?php _e('Title','apptivo-businesssite'); ?>&nbsp;<span style="color:#f00;">*</span></td>
@@ -624,12 +634,6 @@ function isValidURL(url){
                                         <td><?php _e('Published by','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_events_published_by" id="awp_events_published_by" value="" size="63"/></td>
                                     </tr>
-                                    
-                                    <!-- <tr>
-                                        <td><?php //_e('Image URL','apptivo-businesssite'); ?></td>
-                                        <td><input type="text" name="awp_events_imageurl" id="awp_events_imageurl" value="" size="63"/></td>
-                                    </tr>-->
-                                    
                                      <tr valign="top">
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
@@ -687,11 +691,6 @@ function isValidURL(url){
                                         <td><?php _e('Published by','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_events_published_by" id="awp_events_published_by" value="<?php echo $events->publishedBy; ?>" size="63"/></td>
                                     </tr>
-                                    
-                                    <!-- <tr>
-                                        <td><?php //_e('Image URL','apptivo-businesssite'); ?></td>
-                                        <td><input type="text" name="awp_events_imageurl" id="awp_events_imageurl" value="<?php //if(!is_array($events->eventImages)){ echo $events->eventImages; } else{ echo $events->eventImages[0]; } ?>" size="63"/></td>
-                                    </tr>-->
                                     
                                     <tr valign="top">
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
@@ -1037,16 +1036,7 @@ function isValidURL(url){
     //function to get all Events from apptivo
     function getAllEvents(){
       	$response = getAllEvents();
-      	/*
-      	//Error Method Response
-    	if(isset($response->return->methodResponse) && $response->return->methodResponse->responseCode != '1000')
-        {
-          echo '<div class="message" style="margin: 5px 0pt 15px; background-color: rgb(255, 255, 224); border: 1px solid rgb(230, 219, 85);width:80%;">
-      	                <p style="margin: 0.5em; padding: 2px;"><span style="color: rgb(255, 0, 0);">'.$response->return->methodResponse->responseMessage.'</span></p></div>';
-          
-        }
-		*/
-        $all_awp_events = awp_convertObjToArray($response->return->eventsList);
+      	$all_awp_events = awp_convertObjToArray($response->return->eventsList);
         $allevents=array();
         $currentdate = gmdate(DATE_ATOM,mktime());
         if( count($all_awp_events)>0){
@@ -1093,10 +1083,7 @@ function getAllEvents()
                 "arg0" => APPTIVO_SITE_KEY,
 	            "arg1" => APPTIVO_ACCESS_KEY
                 );
-  //Memcache              
-  $response = get_data(APPTIVO_BUSINESS_SERVICES,'-events-publisheddate','-events-data','getSiteLasteUpdateDate','fetchAllEvents',$pubdate_params,$plugin_params);
-  //Without Memcache. 
-  //$response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchAllEvents',$plugin_params); 
+  $response = get_data(APPTIVO_BUSINESS_SERVICES,'-events-publisheddate','-events-data','getSiteLasteUpdateDate','getAllEvents',$pubdate_params,$plugin_params);
   return $response;
                 
 }
@@ -1141,7 +1128,7 @@ function addEvents($eventName, $description, $startDate, $endDate, $displayFirst
     			"arg1" => APPTIVO_ACCESS_KEY,
                 "arg2" => $mktg_events
                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createMarketingEvent',$params);          
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'addMarketingEvent',$params);
     return $response;
 }
 /**
@@ -1157,7 +1144,7 @@ function getMarketingEventById($eventsId)
 				"arg1" => APPTIVO_ACCESS_KEY,
                 "arg2" => $eventsId
                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchMarketingEventById',$params);      
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getMarketingEventById',$params);      
     return $response;
 }
 /**
@@ -1195,13 +1182,13 @@ function getMarketingEventById($eventsId)
  */
 function updateEvents($eventName, $description, $startDate, $endDate, $displayFirstName, $displayLastName, $displayAddress, $displayEmailId, $displayPhoneNumber, $sendRegistrationEmail, $registrantFirstName, $registrantLastName, $registrantEmailId, $registrantPhoneNumber, $registrantAddressLine1, $registrantAddressLine2, $registrantCity, $registrantStateCode, $registrantStateName, $registrantPinCode, $registrantCountryCode, $registrantCountryName, $pageSectionImages, $link, $publishedAt, $publishedBy, $sequenceNumber = '', $marketingEventId = '',$creationDate = '',$newsImages = '')
 {   
-	$mktg_events = new AWP_MarketingEvent($eventName, $description, $startDate, $endDate, $displayFirstName, $displayLastName, $displayAddress, $displayEmailId, $displayPhoneNumber, $sendRegistrationEmail, $registrantFirstName, $registrantLastName, $registrantEmailId, $registrantPhoneNumber, $registrantAddressLine1, $registrantAddressLine2, $registrantCity, $registrantStateCode, $registrantStateName, $registrantPinCode, $registrantCountryCode, $registrantCountryName, $pageSectionImages, $link, $publishedAt, $publishedBy, $sequenceNumber, $marketingEventId,null,$newsImages);
+    $mktg_events = new AWP_MarketingEvent($eventName, $description, $startDate, $endDate, $displayFirstName, $displayLastName, $displayAddress, $displayEmailId, $displayPhoneNumber, $sendRegistrationEmail, $registrantFirstName, $registrantLastName, $registrantEmailId, $registrantPhoneNumber, $registrantAddressLine1, $registrantAddressLine2, $registrantCity, $registrantStateCode, $registrantStateName, $registrantPinCode, $registrantCountryCode, $registrantCountryName, $pageSectionImages, $link, $publishedAt, $publishedBy, $sequenceNumber, $marketingEventId,null,$newsImages);
     $params = array ( 
                 "arg0" => APPTIVO_SITE_KEY,
     			"arg1" => APPTIVO_ACCESS_KEY,
                 "arg2" => $mktg_events
                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'editEvent',$params);    
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'updateEvent',$params);    
     return $response;
 }
 ?>

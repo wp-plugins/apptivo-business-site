@@ -22,6 +22,7 @@
 								
 								
 								a.addImmediate(b,"Contact Form", '[apptivocontactform name="&lt;&lt;contactform name&gt;&gt;"]');
+								a.addImmediate(b,"Cases Form", '[apptivo_cases]');
 																
 								c=b.addMenu({title:"Testimonials"});
 										a.addImmediate(c,"Full View","[apptivo_testimonials_fullview]" );

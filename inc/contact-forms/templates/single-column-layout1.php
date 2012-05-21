@@ -37,6 +37,7 @@ if($captch_error!="" && $submitformname==$contactform[name]){
         $html.= '<div id="error'.$contactform[name].'" class="error_'.$contactform[name].'">'.$captch_error."</div>";
 }
 $html.= '<form id="'.$contactform[name].'_contactforms" class="awp_contact_form" name="'.$contactform[name].'_contactforms" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
+$form_sessionid = uniqid();$_SESSION['nogdog'] = $form_sessionid;
 $html.='<input type="hidden" value="'.$contactform[name].'" name="awp_contactformname" id="awp_contactformname">';
 $html.='<div class="awp_contactform_maindiv_'.$contactform[name].'">';
 foreach($formfields as $field) 
@@ -142,7 +143,7 @@ foreach($formfields as $field)
                                 }
 			break;
 			case "radio":
-				$i=0;
+				$i=0;$opt=0;
 				foreach( $optionvalues as $optionvalue )
 				{
                                      if(trim($postValue) == trim($optionvalue)){
@@ -156,13 +157,13 @@ foreach($formfields as $field)
 					if($i>0)
 					
 						$html.='<br>';
-					$html.='<label for="'.$fieldid.'">'.$optionvalue.'</label><input type="radio" name="'.$fieldid.'" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'" '.$selected.'>';
-					$i++;
+					$html.='<label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'" '.$selected.'>';
+					$i++;$opt++;
 					}
 				}
 			break;
 			case "checkbox":
-				$i=0;
+				$i=0;$opt=0;
 				foreach( $optionvalues as $optionvalue )
 				{
                                       $selected ="";
@@ -175,8 +176,8 @@ foreach($formfields as $field)
 					{
 					if($i>0)
 						$html.='<br>';
-					$html.='<label for="'.$fieldid.'">'.$optionvalue.'</label><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_contact_input_checkbox '.$validateclass.'" '.$selected.'>';
-					$i++;
+					$html.='<label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_checkbox '.$validateclass.'" '.$selected.'>';
+					$i++;$opt++;
 					}
 				}
 			break;

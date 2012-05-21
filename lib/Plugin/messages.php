@@ -4,6 +4,9 @@ function awp_messagelist($key='')
 {   
 	$awp_errormessage_list = array(
         "contactform-display-page" 				=> '<span class="error_message">Contact form is not configured.</span>',
+	    "casesform-display-page" 				=> '<span class="error_message">Cases form is not configured.</span>',
+	    "casesform-e100" 				        => 'Your request was not sent.Please try again after 10 mins.',
+	    "caseform-captcha_error"                =>'Please enter correct Verification code',
 		"newsletter-display-page" 				=> '<span class="error_message">Newsletter form is not configured.</span>',
 		"events-display-page" 					=> '<span class="error_message">Events not found.</span>',
         "eventsconfigure-display-page" 			=> '<span class="error_message">Events is not configured.</span>',
@@ -89,7 +92,7 @@ function awp_developerguide($key='')
 }
 
 
-function awp_flow_diagram($key='')
+function awp_flow_diagram($key='',$imgtag=false)
 {
 	$flow_diagrams = array(
 	"contactform" 	=> AWP_PLUGIN_BASEURL."/assets/images/contact.jpg",
@@ -97,14 +100,18 @@ function awp_flow_diagram($key='')
 	"news" 		 	=> AWP_PLUGIN_BASEURL."/assets/images/news.jpg",
 	"events"  	 	=> AWP_PLUGIN_BASEURL."/assets/images/events.jpg",
 	"testimonials"  => AWP_PLUGIN_BASEURL."/assets/images/testimonials.jpg",
-	"jobs"   		=> AWP_PLUGIN_BASEURL."/assets/images/jobs.jpg"
+	"jobs"   		=> AWP_PLUGIN_BASEURL."/assets/images/jobs.jpg",
+	"cases"   		=> AWP_PLUGIN_BASEURL."/assets/images/cases.jpg"
 	
 	);
+	if($imgtag):
+	 	return '<img src="'.$flow_diagrams[$key].'" alt="" />'; 
+	 endif;	
 	return $flow_diagrams[$key];
 
 }
 
-function awp_image($key='')
+function awp_image($key='',$imgtag=false)
 {
 	 $images = array(
 	 "submit_button"       => AWP_PLUGIN_BASEURL."/assets/images/submit.jpeg",
@@ -114,9 +121,15 @@ function awp_image($key='')
 	 "jobs_icon"           => AWP_PLUGIN_BASEURL."/assets/images/jobs_icon.jpeg",
 	 "edit_icon"           => AWP_PLUGIN_BASEURL."/assets/images/edit.jpeg",
 	 "delete_icon"         => AWP_PLUGIN_BASEURL."/assets/images/del.jpeg",
-	 "apptivo_icon"         => AWP_PLUGIN_BASEURL."/assets/images/apptivo.png"
+	 "apptivo_icon"        => AWP_PLUGIN_BASEURL."/assets/images/apptivo.png",
+	 "success"             => AWP_PLUGIN_BASEURL."/assets/images/success.gif",
+	 "success-off"         => AWP_PLUGIN_BASEURL."/assets/images/success-off.gif"
 	 );
-	 return $images[$key];	
+	 if($imgtag):
+	 	return '<img src="'.$images[$key].'" alt="" />'; 
+	 endif;	
+	 return $images[$key];
+	 
 }
 
 ?>

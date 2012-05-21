@@ -192,29 +192,29 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
          if(!$this->_plugin_activated){
 	    	echo "News Plugin is currently <span style='color:red'>disabled</span>. Please enable this in <a href='/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
 	    }
-        if (isset($_POST['awp_news_add'])) {                 //ADD News.
+        if (isset($_POST['awp_news_add']) && ($_POST['nogdog'] == $_SESSION['apptivo_single_news'])) {   //ADD News.
         	$addnews_response = $this->add_news();
         	if(strlen(trim($_POST['awp_news_title'])) == 0 )
 	    	{
              $_SESSION['awp_news_messge']  = 'Please enter a news title.';
-            }else if($addnews_response->responseCode != '1000') {
-	    		$_SESSION['awp_news_messge']  = '<span style=color:#f00;">'.$addnews_response->responseMessage.'</span>';
+            }else if($addnews_response->statusCode != '1000') {
+	    		$_SESSION['awp_news_messge']  = '<span style=color:#f00;">'.$addnews_response->statusMessage.'</span>';
 	    	}else { 
 	    		 $_SESSION['awp_news_messge']  = 'News Added Successfully';
 	    	} 
         } else if ($_POST['awp_news_update'] == 'Update') {  //Update News.
             $updatenews_response = $this->update_news();
-            if($updatenews_response->return->responseCode != '1000')
+            if($updatenews_response->return->statusCode != '1000')
             {
-            	$_SESSION['awp_news_messge'] = '<span style=color:#f00;">'.$updatenews_response->return->responseMessage.'</span>';
+            	$_SESSION['awp_news_messge'] = '<span style=color:#f00;">'.$updatenews_response->return->statusMessage.'</span>';
             }else {
             $_SESSION['awp_news_messge'] = 'News Updated Successfully';
             }
         } else if ($_REQUEST['tstmode'] == 'delete') {      //Delete News.
             $deletenews_response = $this->delete_news();
-            if($deletenews_response->return->responseCode != '1000')
+            if($deletenews_response->return->statusCode != '1000')
             {
-            	$_SESSION['awp_news_messge'] = '<span style=color:#f00;">'.$deletenews_response->return->responseMessage.'</span>';
+            	$_SESSION['awp_news_messge'] = '<span style=color:#f00;">'.$deletenews_response->return->statusMessage.'</span>';
             }else {
             $_SESSION['awp_news_messge'] = 'News Deleted Successfully';
             }
@@ -236,10 +236,10 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
         	     $newsId = $_REQUEST['tstid'];
 		         $response = getNewsById($newsId);
 		         $news = $response->return;
-		         if($news->methodResponse->responseCode != '1000')
+		       if($news->statusCode != '1000')
 		         {  
 		         	echo '<div class="message" id="newsmessage" style="margin: 5px 0pt 15px; background-color: rgb(255, 255, 224); border: 1px solid rgb(230, 219, 85);">
-      	                <p style="margin: 0.5em; padding: 2px;"><span style="color: rgb(255, 0, 0);">'.$news->methodResponse->responseMessage.'</span></p></div>';
+      	                <p style="margin: 0.5em; padding: 2px;"><span style="color: rgb(255, 0, 0);">'.$news->methodResponse->statusMessage.'</span></p></div>';
 		         }
 		         $this->edit_news($news);                // News Edit Forms
          
@@ -885,17 +885,23 @@ function isValidURL(url){
     //Save Inline View settings
     function save_inline_settings()
     {
-         if ($_POST['awp_news_templatetype'] == "awp_plugin_template")
+         if ($_POST['awp_news_templatetype'] == "awp_plugin_template"):
             $news_layout = $_POST['awp_news_plugintemplatelayout'];
-        else
+        else:
             $news_layout = $_POST['awp_news_themetemplatelayout'];
+         endif;
+         //Inline news items to show.
+         $inline_news_itemtoshow = $_POST['itemstoshow'];
+         if(!is_numeric($_POST['itemstoshow']) || $_POST['itemstoshow'] <= 0 ):
+         	$inline_news_itemtoshow =   AWP_DEFAULT_ITEM_SHOW;
+         endif;  
         $awp_news_inline_settings = array(
                      'template_type' => $_POST['awp_news_templatetype'],
                      'template_layout' => $news_layout,
                      'style' => $_POST['style'],
                      'custom_css' => stripslashes($_POST['custom_css']),
                      'order' => $_POST['order'],
-                     'itemstoshow' => is_numeric($_POST['itemstoshow'])?$_POST['itemstoshow']:AWP_DEFAULT_ITEM_SHOW,
+                     'itemstoshow' => $inline_news_itemtoshow,
                      'more_text' => (trim($_POST['more_text'])!="")?$_POST['more_text']:AWP_DEFAULT_MORE_TEXT,
                      'page_ID' => $_POST['page_ID'],
                      );
@@ -925,7 +931,9 @@ function isValidURL(url){
         ?>
          <div class="wrap addnews">
          <h2>Add News</h2>
+         <?php $nogdog = uniqid();$_SESSION['apptivo_single_news'] = $nogdog; ?>
          <form method="post" action="/wp-admin/admin.php?page=awp_news" name="awp_news_form" onsubmit="return validatenews('add')" >
+         <input type="hidden" name="nogdog" value="<?php echo $nogdog;?>" >
             <table class="form-table" width="700" cellspacing="0" cellpadding="0">
                                     <tr>
                                         <td><?php _e('Title','apptivo-businesssite'); ?> &nbsp;<span style="color:#f00;">*</span></td>
@@ -933,15 +941,12 @@ function isValidURL(url){
                                     </tr>
                                     <tr>
                                         <td valign="top"><?php _e('Description','apptivo-businesssite'); ?>&nbsp;<span style="color:#f00;">*</span></td>
-                                        <td>
-                                       
+                                        <td>                                       
                                         <div style="width:630px;">
                                         <?php 
                                         the_editor($updated_value,'awp_news_desc','',FALSE); 
                                         ?>
                                         </div>
-                                        
-                                        
                                         </td>
                                     </tr>
                                     <tr>
@@ -956,12 +961,7 @@ function isValidURL(url){
                                         <td><?php _e('Published by','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="awp_news_published_by" id="awp_news_published_by" value="" size="63"/></td>
                                     </tr>
-                                    
-                                    <!-- <tr>
-                                        <td><?php //_e('Image URL','apptivo-businesssite'); ?></td>
-                                        <td><input type="text" name="awp_news_imageurl" id="awp_news_imageurl" value="" size="63"/></td>
-                                    </tr>-->
-                                    
+                                        
                                     <tr valign="top">
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
@@ -1067,9 +1067,10 @@ function isValidURL(url){
 		            }
 	            }
             }
-           return $allnews;
+            return $allnews;
     }
 }
+/** End Class
 /**
  * get ALL News.
  *
@@ -1085,7 +1086,7 @@ function getAllNews()
 	            "arg1" => APPTIVO_ACCESS_KEY
                 );
           
-           $response = get_data(APPTIVO_BUSINESS_SERVICES,'-news-publisheddate','-news-data','getSiteLasteUpdateDate','fetchAllNews',$pubdate_params,$plugin_params);
+           $response = get_data(APPTIVO_BUSINESS_SERVICES,'-news-publisheddate','-news-data','getSiteLasteUpdateDate','getAllNews',$pubdate_params,$plugin_params);
            return $response;
 }
 
@@ -1114,7 +1115,7 @@ function addNews($newsId, $newsHeadLine, $description, $isFeatured, $startDate, 
                 "arg1" => APPTIVO_ACCESS_KEY,
                 "arg2" => $mktg_news
                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createNews',$params);
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'addNews',$params);
     return $response;
    
 }
@@ -1131,7 +1132,7 @@ function getNewsById($newsId)
 				"arg1" => APPTIVO_ACCESS_KEY,
                 "arg2" => $newsId
                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'fetchNewsByNewsId',$params);
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getNewsByNewsId',$params);
     return $response;
 }
 /**
@@ -1158,7 +1159,7 @@ function updateNews($newsId, $newsHeadLine, $description, $isFeatured, $startDat
      			"arg1" => APPTIVO_ACCESS_KEY,
                 "arg2" => $mktg_news
                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'editNews',$params);     
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'updateNews',$params);     
     return $response;
 }
 
