@@ -3,7 +3,7 @@
  Template Name:Single Column Layout
  Template Type: Shortcode
  */ 
-
+//$jobsitem = $allJobs;
 $formfields=array();
 $formfields=$hrjobsform[fields];
 $countries = $countrylist;
@@ -38,6 +38,9 @@ if($submitformname==$hrjobsform[name] && $successmsg!=""){
 	$html.= '<div id="success_'.$hrjobsform[name].'" class="success_'.$hrjobsform[name].'">'.$successmsg."</div>";
 }
 $html.= '<form id="'.$hrjobsform[name].'_hrjobsforms" class="awp_hrjobs_form" name="'.$hrjobsform[name].'_hrjobsforms" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
+$html.= '<input type="hidden" value="'.$jobId.'" name="jobId" id="jobId"><input type="hidden" value="'.$jobNo.'" name="jobNo" id="jobNo">';
+$html.= '<input type="hidden" name="upload_script" id="upload_script" value="'.APPTIVO_DOC_UPLOADURL.'?token='.trim($token).'" />';
+
 $html.='<input type="hidden" value="'.$hrjobsform[name].'" name="awp_jobsformname" id="awp_jobsformname">';
 $html.='<div class="awp_hrjobsform_maindiv_'.$hrjobsform[name].'">';
 
@@ -166,29 +169,28 @@ foreach($formfields as $field)
 				$html.= '<input type="hidden" name="uploadfile_docid" id="uploadfile_docid" value="" class="absp_jobapplicant_input_text'.$validateclass.'"  />';
                break;
 			case "radio":
-				$i=0;$opt=0;
+				$i=0;
 				foreach( $optionvalues as $optionvalue )
 				{
 					if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 					{
 					
-					$html.='<div class="awp_custom_fields"><input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_jobapplicant_input_radio '.$validateclass.'">&nbsp&nbsp
-					<label class="awp_custom_lbl" for="'.$fieldid.$opt.'">'.trim($optionvalue).'</label> </div>';
-					$i++;$opt++;
+					$html.='<div class="awp_custom_fields"><input type="radio" name="'.$fieldid.'" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_jobapplicant_input_radio '.$validateclass.'">&nbsp&nbsp
+					<label class="awp_custom_lbl" for="'.$fieldid.'">'.trim($optionvalue).'</label> </div>';
+					$i++;
 					}
 				}
 			break;
 			case "checkbox":
-				$i=0;$opt=0;
+				$i=0;
 				foreach( $optionvalues as $optionvalue )
 				{
 					if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 					{
 				
-					$html.='<div class="awp_custom_fields">
-					<input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_jobapplicant_input_checkbox '.$validateclass.'">&nbsp&nbsp<label class="awp_custom_lbl" for="'.$fieldid.$opt.'">'.trim($optionvalue).'</label>
+					$html.='<div class="awp_custom_fields"><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_jobapplicant_input_checkbox '.$validateclass.'">&nbsp&nbsp<label class="awp_custom_lbl" for="'.$fieldid.'">'.trim($optionvalue).'</label>
                                             </div>';
-					$i++;$opt++;
+					$i++;
 					}
 				}
 			break;

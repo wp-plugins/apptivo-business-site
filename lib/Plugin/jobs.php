@@ -81,6 +81,7 @@ class AWP_Jobs extends AWP_Base
 		$allJobs = awp_convertObjToArray($allJobs);
 	    $jobId = $_POST['jobId'];
 		$jobNo = $_POST['jobNo'];
+		$token = getTokenForDocumentUpload();
 		        if(!empty($hrjobsform[fields])) {
 		        foreach($hrjobsform[fields] as $field){
                     if($field[fieldid]=="country"){
@@ -3104,5 +3105,20 @@ function getAllIndustries()
 		    	 $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getAllIndustries',$params);
 		    }
 		  return $response->return;
+}
+/**
+ * Get Token For Upload.
+ *
+ * @return unknown
+ */
+function getTokenForDocumentUpload()
+{
+	 $params = array ( 
+                "arg0" => APPTIVO_SITE_KEY,
+	            "arg1" => '',                
+	                );
+	 $response = getsoapCall(APPTIVO_SITE_SERVICES,'getTokenForDocumentUpload',$params);
+	 return $response->return;
+	    
 }
 ?>

@@ -46,7 +46,7 @@ define('AWP_NEWSLETTER_WIDGET_DEFAULT_TEMPLATE','widget-default-template-usphone
 define('APPTIVO_API_URL','https://api.apptivo.com/app/');
 define('APPTIVO_SITE_SERVICES', APPTIVO_API_URL.'services/SiteServices?wsdl');
 define('APPTIVO_BUSINESS_SERVICES', APPTIVO_API_URL.'appservices/BusinessSiteServices?wsdl');
-
+define('APPTIVO_DOC_UPLOADURL','http://www.apptivo.com/app/fileuploadservlet');
 if(!defined('APPTIVO_SITE_KEY') )
 {
 	$apptivo_site_key = get_option('apptivo_sitekey');
