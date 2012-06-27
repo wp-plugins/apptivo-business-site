@@ -23,7 +23,7 @@ Apptivo Wordpress Plugins ([http://www.apptivo.com/apptivo-business-site-wordpre
 1. Upload the extracted archive to `wp-content/plugins/`
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Purchase a API key from Apptivo. http://www.apptivo.com/where-to-find-your-apptivo-api-key-apptivo-access-key/
-4. Go to the "General Settings" and enter your API Key, and Access Key
+4. Go to the "General Settings" and enter your API Key and Access Key
 5. Enjoy!
 
 == Frequently Asked Questions ==
