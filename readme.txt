@@ -50,13 +50,13 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 
 == Changelog ==
 = 1.1 =
-* Jobs Upload functionality Bug fixes
-
-= 1.0.1 =
 * Updated Plugin to use Apptivo new API Key and Access Key in Firm Business settings.
 * Old Plugin users using Site key / Access key from Website App, has to update the keys in Plugin with Business settings API Key / Access Key.
 * For more information please check http://www.apptivo.com/where-to-find-your-apptivo-api-key-apptivo-access-key/
 * Improved performance of jobs plugin.
+
+= 1.0.1 =
+* Jobs Upload functionality Bug fixes
 
 = 1.0 =
 * Hot Fix to Jobs Upload features. Older version of plugin has to be updated to this release to continue uploading resumes on Jobs.
