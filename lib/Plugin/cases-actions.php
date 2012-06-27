@@ -1,6 +1,9 @@
 <?php
-
-//Apptivo Business Site Cases -- do shortcode
+/**
+ * Apptivo Business Site Cases -- do shortcode
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
+ */
 function apptivo_business_cases()
 {
 	$cases_fields_properties  = get_option('absp_cases_form_fields');
@@ -134,7 +137,6 @@ function apptivo_business_cases()
 //validate_load_script
 function validate_load_script()
 { 
-	//wp_enqueue_style('style_absp_cases', AWP_PLUGIN_BASEURL.'/inc/cases/css/style.css' , false, '1.0.0', 'screen');
 	wp_register_script('jquery_validation',AWP_PLUGIN_BASEURL. '/assets/js/validator-min.js',array('jquery'));
 	wp_print_scripts('jquery_validation');
 	
@@ -198,8 +200,8 @@ function process_cases_form($cases_fields_properties='') {
     $case['userIdStr']=null;
     /* create an array for method inputs */
     $params = array (
-            "arg0" => APPTIVO_SITE_KEY,  
-            "arg1" => APPTIVO_ACCESS_KEY,
+            "arg0" => APPTIVO_BUSINESS_API_KEY,  
+            "arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
             "arg2" => $case,             
     );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createCase',$params);
@@ -282,4 +284,3 @@ function absp_cases_captcha_refresh()
 	echo '<img style="border: 1px solid rgb(0, 0, 0);" id="cases_captchaimg" src="'.$image_src.'">';
 	exit;
 }
-?>

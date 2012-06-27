@@ -3,16 +3,20 @@
  Plugin Name: Apptivo Business site Plugin
  Plugin URI: http://www.apptivo.com/apptivo-business-site-wordpress-plug-in/
  Description: Apptivo Business Site plugin provides News , Events , Testimonials, Jobs, Contact Forms and Newsletter sub plugins with <a href="http://www.apptivo.com" target="_blank">Apptivo ERP</a>.
- Version: 1.0.1
- Author: Rajkumar Mohanasundaram (rmohanasundaram@apptivo.com) 
+ Version: 1.1
+ Author: Rajkumar Mohanasundaram
  Author URI: http://www.apptivo.com/
  */
 if (!session_id()) session_start();
  if (!defined('AWP_PLUGIN_BASEPATH')) {
+ 	
+ 	if( is_admin() )
+ 	{
+ 		register_activation_hook( __FILE__, 'activate_apptivo_business' );
+ 	}
  	define('AWP_PLUGIN_BASEPATH',plugin_dir_path(__FILE__));
  	define('AWP_PLUGIN_BASEURL',plugins_url(basename( dirname(__FILE__))));
- 	//plugins_url(basename(dirname(__FILE__)))
-    /**
+ 	/**
      * Require plugin configuration
      */
     require_once dirname(__FILE__) . '/inc/define.php';
@@ -43,7 +47,11 @@ function apptivo_business_enqueue($hook) {
         	case 'apptivo_page_awp_newsletter':
         	case 'apptivo_page_awp_cases':	
             	add_filter("mce_buttons", "remove_mce_buttons");
-            	add_filter( 'wp_default_editor', create_function('', 'return "tinymce";') );  	           
+            	add_filter( 'wp_default_editor', create_function('', 'return "tinymce";') );
+				if ( is_admin() ) {
+					add_action('admin_print_scripts', 'apptivo_business_scripts');
+					add_action('admin_print_styles', 'apptivo_business_styles');					
+				}
                 break;  
         }
 }
@@ -101,21 +109,49 @@ echo '<script type="text/javascript" language="javascript" >jQuery(document).rea
     $awp_maincontroller = & AWP_MainController::instance();
     $awp_maincontroller->run();
 }
+
+function activate_apptivo_business()
+{   
+     //Update plugin version.
+	 update_option( "apptivo_business_plugin_version", '1.1' );
+     update_option( "apptivo_business_plugin_installed", 1 );
+}
+
+add_action('admin_init', 'install_apptivo_business_redirect');
+function install_apptivo_business_redirect() {
+	global $pagenow;
+	if ( is_admin() && isset( $_GET['activate'] ) && ($_GET['activate'] == true) && $pagenow == 'plugins.php' & get_option('apptivo_business_plugin_installed') == 1) :
+	update_option( "apptivo_business_plugin_installed", 0 );
+	// Redirect to general settings page.
+	wp_redirect(admin_url('admin.php?page=awp_general'));
+	exit;
+	endif;
+}
+function apptivo_business_admin_scripts()
+{
+	$screen = get_current_screen();
+	wp_register_script( 'apptivo_business_plugin', AWP_PLUGIN_BASEURL . '/assets/js/apptivo-business-plugin.js', array('jquery'), '1.0' );
+	if (in_array( $screen->id, array( 'toplevel_page_awp_general','apptivo_page_awp_cases','apptivo_page_awp_jobs','apptivo_page_awp_events','apptivo_page_awp_news','apptivo_page_awp_ip_deny','apptivo_page_awp_testimonials','apptivo_page_awp_newsletter', 'apptivo_page_awp_contactforms'))) :
+	  wp_enqueue_script( 'apptivo_business_plugin' );
+	endif;
+}
+add_action('admin_enqueue_scripts', 'apptivo_business_admin_scripts');
+
 function apptivo_business_scripts() {
-wp_enqueue_script('media-upload');
-wp_enqueue_script('thickbox');
+	wp_enqueue_script('media-upload');
+	wp_enqueue_script('thickbox');	
 }
 
 function apptivo_business_styles() {
-wp_enqueue_style('thickbox');
+	echo '<style type="text/css">
+	#wp-awp_contactform_confirmationmsg-editor-container .wp-editor-area{height:175px; width:100%;}
+	#wp-awp_cases_confirmationmsg-editor-container .wp-editor-area{height:175px; width:100%;}
+	#wp-awp_jobsform_confirmationmsg-editor-container .wp-editor-area{height:175px; width:100%;}
+	#wp-awp_newsletterform_confirmation_msg-editor-container .wp-editor-area{height:175px; width:100%;}
+	</style>';
+	wp_enqueue_style('thickbox');
 }
 
-
-if ( is_admin() ) {
-	add_action('admin_print_scripts', 'apptivo_business_scripts');
-	add_action('admin_print_styles', 'apptivo_business_styles');
-	
-}
 
 /**
  * Create auto Pages ( News, Events, Testimonials and Cobtactus ) Nedd to place theme's function.php [ do_action( 'absp_autopages'); ]
@@ -309,11 +345,17 @@ function apptivo_business_jobs_docid()
 	$size = $_POST['docsize'];
 	$name = $_POST['docname'];
 	$type = $_POST['doctype'];	
-	$params = array ( "arg0" => APPTIVO_SITE_KEY,"arg1" => null,
-	                  "arg2" => $type,"arg3" => $key,"arg4" => $size,
-	                  "arg5" => null,"arg6" => null,"arg7"=> null,"arg8"=>$name);
-	 $response = getsoapCall(APPTIVO_SITE_SERVICES,'saveDocument',$params);
+	$params = array ( "arg0" => APPTIVO_BUSINESS_API_KEY,
+                      "arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
+                      "arg2" => null,
+	                  "arg3" => $type,
+                      "arg4" => $key,
+                      "arg5" => $size,
+	                  "arg6" => null,
+                      "arg7" => null,
+                      "arg8"=> null,
+                      "arg9"=>$name);
+	 $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'saveDocument',$params);
 	 echo $response->return;
 	 die();
 }
-?>

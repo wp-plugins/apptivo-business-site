@@ -37,4 +37,3 @@ function dummy_events()
 	
 	return $default_events;
 }
-?>

@@ -1,5 +1,9 @@
 <?php
-    
+/**
+ * Error messages and Guide Link
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
+ */    
 function awp_messagelist($key='')
 {   
 	$awp_errormessage_list = array(
@@ -36,6 +40,7 @@ function awp_messagelist($key='')
 function awp_developerguide($key='')
 {
 	$developer_guide = array(
+	"api-key"                           => 'http://www.apptivo.com/where-to-find-your-apptivo-api-key-apptivo-access-key/',
 	"purchase-sitekey"                  => 'http://runapptivo.apptivo.com/purchasing-an-apptivo-wordpress-site-key-8272.html',
 	"contactform" 				 		=> 'http://runapptivo.apptivo.com/contact-forms-overview-7942.html',
 	"contactform-shortcode" 	 		=> 'http://runapptivo.apptivo.com/contact-forms-front-end-integration-7956.html',
@@ -131,5 +136,3 @@ function awp_image($key='',$imgtag=false)
 	 return $images[$key];
 	 
 }
-
-?>

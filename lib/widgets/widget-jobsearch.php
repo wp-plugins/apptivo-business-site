@@ -1,4 +1,9 @@
 <?php
+/**
+ * Apptivo Job Search form Widget
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
+ */
 class JobSearch_Widget extends WP_Widget {
         /** constructor */
         var $widget_name;
@@ -144,4 +149,3 @@ class JobSearch_Widget extends WP_Widget {
             }
 
 }
-?>

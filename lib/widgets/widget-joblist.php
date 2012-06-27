@@ -1,4 +1,9 @@
 <?php
+/**
+ * Apptivo Job Lists Widget
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
+ */
 class JobList_Widget extends WP_Widget {
     /** constructor */
 		var $widget_name;
@@ -135,4 +140,3 @@ class JobList_Widget extends WP_Widget {
             <?php
             }
 }
-?>

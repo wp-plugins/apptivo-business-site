@@ -1,6 +1,8 @@
 <?php
-/*
- * News Widget for inline view news
+/**
+ * Apptivo News Widget for inline view news
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
  */
 class AWP_News_Widget extends WP_Widget {
     /** constructor */

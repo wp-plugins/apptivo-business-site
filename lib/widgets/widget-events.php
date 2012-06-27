@@ -1,4 +1,9 @@
 <?php
+/**
+ * Apptivo Events Widget
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
+ */
 class AWP_Events_Widget extends WP_Widget {
     /** constructor */
 		var $widget_name;

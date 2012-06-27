@@ -1,5 +1,4 @@
 <?php
-
 if (!defined('PLUGIN_CACHE_FILE_EXPIRE_MAX')) {
     define('PLUGIN_CACHE_FILE_EXPIRE_MAX', 2592000);
 }
@@ -233,4 +232,3 @@ class Plugin_Cache_File
         return $path;
     }
 }
-?>

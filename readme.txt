@@ -3,7 +3,7 @@ Contributors: apptivo, rmohanasundaram
 Tags: apptivo, contact forms, crm, newsletters, testimonials
 Requires at least: 3.0
 Tested up to: 3.3.1
-Stable tag: 1.0.1
+Stable tag: 1.1
 
 Create contact forms, newsletter signups, and customer testimonials, integrated with Apptivo.
 
@@ -22,23 +22,22 @@ Apptivo Wordpress Plugins ([http://www.apptivo.com/apptivo-business-site-wordpre
 
 1. Upload the extracted archive to `wp-content/plugins/`
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Purchase a site key from Apptivo. http://www.apptivo.com/apptivo-business-site-wordpress-plug-in/
-4. Go to the "General Settings" and enter your Site Key, and Access Key
+3. Purchase a API key from Apptivo. http://www.apptivo.com/where-to-find-your-apptivo-api-key-apptivo-access-key/
+4. Go to the "General Settings" and enter your API Key, and Access Key
 5. Enjoy!
 
 == Frequently Asked Questions ==
 
 = Is this plugin free? =
+No, you'll need to purchase a API key from Apptivo to use this plugin.
 
-No, you'll need to purchase a site key from Apptivo to use this plugin.
+= Where do I get a API key? =
 
-= Where do I get a site key? =
-
-You'll need to register for an account at www.apptivo.com, then go to the Wordpress Business Site App, and purchase a Self Hosted website.
+You'll need to register for an account at www.apptivo.com. http://www.apptivo.com/where-to-find-your-apptivo-api-key-apptivo-access-key/
 
 = Where is the data stored? =
 
-The data will be stored in your local Wordpress database, but also be synced up with the Apptivo cloud.
+The plugin settings will be stored in your local Wordpress database, but content will be stored in Apptivo.
 
 = Where to get help =
 
@@ -50,8 +49,14 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 2. screenshot-2.jpg
 
 == Changelog ==
-= 1.0.1 =
+= 1.1 =
 * Jobs Upload functionality Bug fixes
+
+= 1.0.1 =
+* Updated Plugin to use Apptivo new API Key and Access Key in Firm Business settings.
+* Old Plugin users using Site key / Access key from Website App, has to update the keys in Plugin with Business settings API Key / Access Key.
+* For more information please check http://www.apptivo.com/where-to-find-your-apptivo-api-key-apptivo-access-key/
+* Improved performance of jobs plugin.
 
 = 1.0 =
 * Hot Fix to Jobs Upload features. Older version of plugin has to be updated to this release to continue uploading resumes on Jobs.

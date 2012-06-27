@@ -1,6 +1,8 @@
 <?php
 /**
- * AIP Jobs Forms Plugin
+ * Apptivo Jobs Plugin( Job Lists, Job Description, Job Search and Job Applicant )
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
  */
 require_once AWP_LIB_DIR . '/Plugin.php';
 require_once AWP_INC_DIR . '/apptivo_services/jobApplicantDetails.php';
@@ -81,7 +83,6 @@ class AWP_Jobs extends AWP_Base
 		$allJobs = awp_convertObjToArray($allJobs);
 	    $jobId = $_POST['jobId'];
 		$jobNo = $_POST['jobNo'];
-		$token = getTokenForDocumentUpload();
 		        if(!empty($hrjobsform[fields])) {
 		        foreach($hrjobsform[fields] as $field){
                     if($field[fieldid]=="country"){
@@ -139,6 +140,7 @@ function jobsearchform($atts){
                  	}
                  
                         $response = serchByJobs($keywords, $industry, $jobtype);
+                       
                         $jobDetails_Response =  $response->return->jobDetails;    
    						$JobSearchResults = awp_convertObjToArray($jobDetails_Response);
                         $jobsearchForm_Submit = TRUE;
@@ -248,7 +250,7 @@ function jobsearchform($atts){
 		 	}
 		 }	
 		 ob_start();	
-		 if(!empty($templateName) && strlen(trim($jobDescription)) != 0 && $jobDetail->statusCode == '1000'){
+		 if(!empty($templateName) && strlen(trim($jobDescription)) != 0 ){
 		 	include $template_File;
 		}else if(empty($templateName)) {
 			echo awp_messagelist('jobdescription-display-page'); //Display error Message.
@@ -713,11 +715,13 @@ if(strlen(trim($plugin_data['Apptivo Template Name'])) != 0 )
 				
 			} else {			
 				$response = createJobs($jobtitle,$content,$jobindustry,$jobtype,$isFeatured);
-				if(isset($response->statusCode) && $response->statusCode != '1000')
+				if($response == 'E_100')
+				{
+					$sucMsg = '<span style="color:#f00;">Invalid Keys</span>';
+				}else if(isset($response->statusCode) && $response->statusCode != '1000')
 				{
 					$sucMsg = '<span style="color:#f00;">'.$response->statusMessage.'</span>';
-				}				
-				else { $sucMsg = "Job Created successfully."; }
+				}else { $sucMsg = "Job Created successfully."; }
 			}
 			
 		} //End of Create Jobs.
@@ -767,13 +771,7 @@ if(strlen(trim($plugin_data['Apptivo Template Name'])) != 0 )
 	   <p>
 	   <img id="elementToResize"  src="<?php echo awp_flow_diagram('jobs');?>" alt="Jobs" title="Jobs"  />
 	   </p>
-	   <script type="text/javascript" language="javascript" >
-	    var w = document.body.offsetWidth;
-	    var wid = ( w < 950 ) ? w-170 : 950;
-	    var elem = document.getElementById("elementToResize");  
-	    elem.style.width = wid+'px'; 
-	   </script>
- 
+	 
             <span style="margin:10px;">For Complete instructions, see the - <a href="<?php echo awp_developerguide('jobs');?>" target="_blank">Developer's Guide.</a></span>
             
      <?php 
@@ -793,12 +791,13 @@ if(strlen(trim($plugin_data['Apptivo Template Name'])) != 0 )
            	$industryId = array();              
            	$jobresultsbyid = getJobByJobId($_GET['id']);
            	$selectedJobs = $jobresultsbyid->return;
+           	/*
             if($selectedJobs->statusCode != '1000')
 			 {  
 				echo '<div class="message" style="margin: 5px 0pt 15px; background-color: rgb(255, 255, 224); border: 1px solid rgb(230, 219, 85);">
 					   <p style="margin: 0.5em; padding: 2px;"><span style="color: rgb(255, 0, 0);">'.$selectedJobs->statusMessage.'</span></p></div>';
 			 }
-							         
+			*/			         
            	?>
            	<div class="wrap">
 		 <h2><?php _e('Update Jobs','apptivo-businesssite'); ?></h2>
@@ -960,37 +959,7 @@ if(strlen(trim($plugin_data['Apptivo Template Name'])) != 0 )
 
         </form>
         </div>
- <script type="text/javascript" language="javascript" >       
-function validatecreatejobs()
- {   
-	 jQuery('#message').remove();
-	 var editor = tinymce.get( 'content');
-	 editor.save();	 
-	 var job_title = jQuery('#jobs_title').val();
-	 var jobtitle = jQuery.trim( job_title );	
-	 var job_content = jQuery('#content').val();	
-	 var jobcontent = jQuery.trim( job_content );
-	 if(jobtitle == '')
-	 {
-		 jQuery('#jobs_title').css('border-color', '#f00'); 
-	 }else {
-		 jQuery('#jobs_title').css('border-color', '#CCCCCC');
-	 }
-	 if(jobcontent == '')
-	 {  
-		
-		 jQuery('#content_ifr').css('border', '1px solid #f00');
-	 }else {
-		 jQuery('#content_ifr').css('border', 'none');
-	 }
-	 if(jobtitle != '' && jobcontent != '')
-	 {    jQuery('#message').remove();
-		  return true;
-	 }	 
-	 jQuery('.wrap h2').after('<div id="message" style="width:80%;" class="updated"><p style="color:#f00;font-weight:bold;" >Please fill the mandatory fields.<p></div>');
-	 return false;
- }
-</script>
+
  
         <?php } ?>
         
@@ -1000,8 +969,7 @@ function validatecreatejobs()
 	
 	function AllJobs()
 	{ 
-	$Job_results  = getAllHrjobs();
-	    
+    $Job_results  = get_apptivojobs();//To get Jobs From Apptivo.	    
 	$JobSearchResults = awp_convertObjToArray($Job_results->jobDetails);
 	if( $Job_results->numResults != 0)
 	{
@@ -1125,45 +1093,7 @@ function validatecreatejobs()
        echo '<p>Copy and Paste this short code in your page to display this list of jobs  <input type="text" name="jobs_shortcode" id="jobs_shortcode" value="[apptivo_jobs]" readonly="true" /></p>';
        } ?>
  
- <script type="text/javascript" language="javascript" >
-
- jQuery(document).ready(function(){
-		jQuery("#jobs_shortcode").focus(function(){
-	    	this.select();
-	    });	
-	    
-	});
- function validateupdatejobs()
- {   
-	 jQuery('#message').remove();
-	 var editor = tinymce.get( 'editcontent');
-	 editor.save();
-	 var job_title = jQuery('#jobs_title').val();
-	 var jobtitle = jQuery.trim( job_title );	
-	 var job_content = jQuery('#editcontent').val();
-	 var jobcontent = jQuery.trim( job_content );
-	 if(jobtitle == '')
-	 {
-		 jQuery('#jobs_title').css('border-color', '#f00'); 
-	 }else {
-		 jQuery('#jobs_title').css('border-color', '#CCCCCC');
-	 }
-	 if(jobcontent == '')
-	 {  
-		
-		 jQuery('#editcontent_ifr').css('border', '1px solid #f00');
-	 }else {
-		 jQuery('#editcontent_ifr').css('border', 'none');
-	 }
-	 if(jobtitle != '' && jobcontent != '')
-	 {    jQuery('#message').remove();
-		  return true;
-	 }	 
-	 jQuery('.wrap h2').after('<div id="message" style="width:80%;" class="updated"><p style="color:#f00;font-weight:bold;">Please fill the mandatory fields.<p></div>');
-	 return false;
- }
-
-</script>       
+  
 <?php 
 	} 
 		
@@ -1172,7 +1102,7 @@ function validatecreatejobs()
 	 * It renders UI in Admin page
 	 */
 	function jobApplicant(){
-		$Results  = getAllHrjobs(1,0);		
+		$Results  = getAllHrjobs(1,1);		
 		 
         $updatemessage="";
 		/*if( $Results->numResults != 0) { */ 
@@ -1349,7 +1279,7 @@ function validatecreatejobs()
 				</tr>
 			</tbody>
 		</table>
-		<?php } else { echo '<span style="color: rgb(255, 0, 0);line-height:24px;"> Save the the below settings to get the Shortcode for job applicant form. </span>'; } ?>
+		<?php } else { echo '<span style="color: rgb(255, 0, 0);line-height:24px;"> Save the below settings to get the Shortcode for job applicant form. </span>'; } ?>
 	
 	<form name="awp_jobs_settings_form" method="post" action="">
 		<table class="form-table">
@@ -1384,7 +1314,7 @@ function validatecreatejobs()
 					</th>
 					<td valign="top">
 					<input type="hidden" id="awp_jobsform_name" name="awp_jobsform_name" value="<?php echo $selectedhrjobsform;?>" > 
-					<select name="awp_jobsform_templatetype" id="awp_jobsform_templatetype" onchange="changeTemplate();" > 
+					<select name="awp_jobsform_templatetype" id="awp_jobsform_templatetype" onchange="japplicant_change_template();" > 
 							<option value="awp_plugin_template" <?php selected($formproperties[tmpltype],'awp_plugin_template'); ?> > <?php _e("Plugin Templates", 'apptivo-businesssite' ); ?></option>
 							<?php if(!empty($themetemplates)) : ?>
 							<option value="theme_template" <?php selected($formproperties[tmpltype],'theme_template'); ?> > <?php _e("Templates from Current Theme", 'apptivo-businesssite' ); ?></option>
@@ -1440,9 +1370,11 @@ function validatecreatejobs()
 					<br><span valign="top" class="description"></span>
 					</th>
 
-                                        <td valign="top">
-                                            <input type="radio" value="submit" name="awp_jobsform_submit_type" <?php checked('submit',$formproperties[submit_button_type]); ?> checked="checked" /> Button
-                                            <input type="radio" value="image" name="awp_jobsform_submit_type"<?php checked('image',$formproperties[submit_button_type]); ?>/> Image
+                    <td valign="top">
+                      <input type="radio" value="submit" id="awp_jobs_cant_btn" name="awp_jobsform_submit_type" <?php checked('submit',$formproperties[submit_button_type]); ?> checked="checked" />
+                      <label for="awp_jobs_cant_btn">Button</label>
+                      <input type="radio" value="image" id="awp_jobs_cant_img" name="awp_jobsform_submit_type"<?php checked('image',$formproperties[submit_button_type]); ?>/>
+                      <label for="awp_jobs_cant_img">Image</label>
 					</td>
 				</tr>
                                  <tr valign="top">
@@ -1452,8 +1384,8 @@ function validatecreatejobs()
                     <td valign="top">
                     <input type="text" name="awp_jobsform_submit_val" id="awp_jobsform_submit_val" value="<?php echo $formproperties[submit_button_val];?>" size="52"/>
                     
-                    <span id="upload_img_button" style="display:none;">
-                    <input id="upload_image_button" type="button" value="Upload Image" />
+                    <span id="japp_upload_img_button" style="display:none;">
+                    <input id="japplicant_upload_image" type="button" value="Upload Image" />
 					<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 					</span>
 					
@@ -1713,166 +1645,13 @@ function validatecreatejobs()
 			$cnt_custom_filed = 6 + count($addtional_custom);
 		}
 		?>
-		<p> <a rel="<?php echo $cnt_custom_filed; ?>" href="javascript:void(0);" id="addcustom_field" name="addcustom_field"  >+Add Another Custom Field</a> </p>
+		<p> <a rel="<?php echo $cnt_custom_filed; ?>" href="javascript:void(0);" id="job_addcustom_field" name="job_addcustom_field"  >+Add Another Custom Field</a> </p>
 		<p class="submit">
 			<input <?php if(!$this->_plugin_activated) { echo 'disabled="disabled"'; } ?> type="submit" name="awp_jobsform_settings" id="awp_jobsform_settings" class="button-primary" value="<?php esc_attr_e('Save Configuration') ?>" />
 		</p>
 	</form>
 	
 	</div>
-	
-<script type="text/javascript" language="javascript" >
-jQuery(document).ready(function(){
-
-	jQuery('#upload_image_button').click(function() {
-		 formfield = jQuery('#upload_image').attr('name');
-		 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
-		 return false;
-		});
-	
-	window.send_to_editor = function(html) {
-		 imgurl = jQuery('img',html).attr('src');
-		 jQuery('#awp_jobsform_submit_val').val(imgurl);
-		 tb_remove();
-		}
-	
-	jQuery("#job_applicantform_shortcode").focus(function(){
-    	this.select();
-    });
-	
-    if(jQuery('input:radio[name=awp_jobsform_submit_type]:checked').val()=='submit')
-    {
-          jQuery('#awp_jobsform_submit_value').text('Button Text');
-          jQuery("#upload_img_button").hide();
-    }else{
-          jQuery('#awp_jobsform_submit_value').text('Button Image URL');
-          jQuery("#upload_img_button").show();
-    }
-    
-   jQuery('input:radio[name=awp_jobsform_submit_type]').change(function() {
-        if(jQuery('input:radio[name=awp_jobsform_submit_type]:checked').val()=='submit')
-        {
-            jQuery('#awp_jobsform_submit_value').text('Button Text');
-            jQuery("#upload_img_button").hide();
-            jQuery('#awp_jobsform_submit_val').val('');
-        }else{
-          jQuery('#awp_jobsform_submit_value').text('Button Image URL');
-        jQuery("#upload_img_button").show();
-        }
-    });
-
-   
-});
-jQuery(document).ready(function(){
-	var counter = document.getElementById("addcustom_field").getAttribute("rel");
-	jQuery("#addcustom_field").click(function ()
-	{   
-		jQuery('#hrjobs_form_fields tr:last').after('<tr><td style="border: 1px solid rgb(204, 204, 204); padding-left: 10px; width: 150px;">Custom Field '+ counter + '</td><td align="center" style="border: 1px solid rgb(204, 204, 204);">' + 
-				'<input type="checkbox" id="customfield'+ counter + '_show" name="customfield'+ counter + '_show" size="30" onclick="hrjobsform_enablefield(\'customfield'+counter+'\')">' +
-				'<input type="hidden" id="customfield'+ counter + '_newest" name="customfield'+ counter + '_newest" value=""></td>' + 
-				'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-				'<input type="checkbox" id="customfield'+ counter + '_require" name="customfield'+ counter + '_require" size="30" disabled="">' +
-				'</td>' +
-				'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-				'<input type="text" onkeypress="return isNumberKey(event)" id="customfield'+ counter + '_order" name="customfield'+ counter + '_order" value="" size="3" maxlength="2" disabled="">' +
-				'</td>' +
-				'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-				'<input type="text" id="customfield'+ counter + '_text" name="customfield5_text" value="Custom Field'+ counter + '" disabled="">' +
-				'</td>' +				
-				'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-				'<select name="customfield'+ counter + '_type" id="customfield'+ counter + '_type" onchange="hrjobsform_showoptionstextarea(\'customfield'+counter+'\');" disabled="">' +
-				'<option value="checkbox">Checkbox</option>' +
-				'<option value="radio">Radio Option</option>' +
-				'<option value="select">Select</option>' +
-				'<option value="text">Textbox</option>' +
-				'<option value="textarea">Textarea</option>' +
-				'</select>' +
-				'</td>' +
-				'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-				'<select name="customfield'+ counter + '_validation" id="customfield'+ counter + '_validation" disabled=""><option value="none">None</option>' +
-				'<option value="email">Email ID</option>' +
-				'<option value="number">Number</option>' +
-				'</select>' +
-				'</td>' +			
-				'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-				'<textarea style="display: block; width: 190px;" id="customfield'+ counter + '_options" name="customfield'+ counter + '_options" ></textarea>' +
-				'</td>' +
-				'</tr>');
-		counter++;
-	});
-	});
-            
-function isNumberKey(evt)
-{
-	
-   var charCode = (evt.which) ? evt.which : event.keyCode
-   if (charCode > 31 && (charCode < 48 || charCode > 57))
-      return false;
-
-   return true;
-}
-function changeTemplate()
-{
-	if(document.getElementById('awp_jobsform_templatetype').value == 'theme_template' )
-	{  
-		document.getElementById('awp_jobsform_plugintemplatelayout').style.display = "none";
-		document.getElementById('awp_jobsform_themetemplatelayout').style.display = "block";
-	}
-	else {
-		document.getElementById('awp_jobsform_plugintemplatelayout').style.display = "block";
-		document.getElementById('awp_jobsform_themetemplatelayout').style.display = "none";
-	}
-
-}
-
-function hrjobsform_enablefield(fieldid){
-	var checked=document.getElementById(fieldid+'_show').checked;
-	var cfield_index=fieldid.indexOf('customfield');
-	if(checked){
-		document.getElementById(fieldid+'_text').disabled=!checked;
-		document.getElementById(fieldid+'_order').disabled=!checked;
-		document.getElementById(fieldid+'_require').disabled=!checked;
-		document.getElementById(fieldid+'_validation').disabled=!checked;
-		if(cfield_index==0){
-			document.getElementById(fieldid+'_type').disabled=!checked;
-			if (document.getElementById(fieldid+'_type').value == 'checkbox' ) 
-			{
-			document.getElementById(fieldid+'_validation').disabled="disabled";
-			}
-            document.getElementById(fieldid+'_options').style.display="block";
-			document.getElementById(fieldid+'_options').disabled=!checked;
-		}
-	}else{
-		document.getElementById(fieldid+'_text').disabled="disabled";
-		document.getElementById(fieldid+'_order').disabled="disabled";
-		document.getElementById(fieldid+'_require').disabled="disabled";
-		document.getElementById(fieldid+'_validation').disabled="disabled";
-		if(cfield_index==0){
-			document.getElementById(fieldid+'_type').disabled="disabled";
-			document.getElementById(fieldid+'_options').disabled="disabled";	
-		}
-	}
-}
-
-function hrjobsform_showoptionstextarea(fieldid){
-	var type=document.getElementById(fieldid+'_type').value;
-	if ((type=="select") || (type=="radio") || (type=="checkbox")){
-		document.getElementById(fieldid+'_options').disabled=false;
-		document.getElementById(fieldid+'_options').style.display ="block";
-		document.getElementById(fieldid+'_validation').disabled="disabled";
-	}else{
-		document.getElementById(fieldid+'_validation').disabled="disabled";
-		document.getElementById(fieldid+'_options').disabled="disabled";
-		document.getElementById(fieldid+'_options').style.display ="none";
-		if(type=="text")
-		{
-			document.getElementById(fieldid+'_validation').disabled=false;
-		}
-	}
-}
-
-
-	</script>
 	<?php
 		}
 	
@@ -1972,7 +1751,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 		if(strlen(trim($jobs_settings[description_page])) != 0 )
 		{ ?>
 		<p>Copy and Paste this short code in Job Description Page  : <input type="text" readonly="readonly" id="job_description_shortcode" name="job_description_shortcode" value ="[apptivo_job_description]" /> </p>
-		<?php } else { echo '<p style="color:#f00;">Save the the below settings to get the Shortcode for job description.</p>'; } ?>
+		<?php } else { echo '<p style="color:#f00;">Save the below settings to get the Shortcode for job description.</p>'; } ?>
 		<form action="" method="post" name="awp_joblists_settings_form">
        <table class="form-table">
 			<tbody>               
@@ -1983,8 +1762,10 @@ function hrjobsform_showoptionstextarea(fieldid){
 					</th>
 
                    <td valign="top">
-                    <input type="radio" value="submit" name="awp_joblist_submit_type" <?php checked('submit',$jobs_settings[submit_type]); ?> checked="checked" /> Button
-                    <input type="radio" value="image" name="awp_joblist_submit_type"<?php checked('image',$jobs_settings[submit_type]); ?>/> Image
+                    <input type="radio" id="awp_jlists_btn" value="submit" name="awp_joblist_submit_type" <?php checked('submit',$jobs_settings[submit_type]); ?> checked="checked" />
+                    <label for="awp_jlists_btn">Button</label>
+                    <input type="radio" value="image" id="awp_jlists_img" name="awp_joblist_submit_type"<?php checked('image',$jobs_settings[submit_type]); ?>/>
+                     <label for="awp_jlists_img">Image</label>
 					</td>
 				</tr>
                 <tr valign="top">
@@ -1993,8 +1774,8 @@ function hrjobsform_showoptionstextarea(fieldid){
 					</th>
                     <td valign="top">
                     <input style="width:360px;" type="text" name="awp_joblist_submit_value" id="awp_joblist_submit_value" value="<?php echo $jobs_settings[submit_val];?>" size="52"/>
-                    <span id="upload_img_button" style="display:none;">
-                    <input id="upload_image_button" type="button" value="Upload Image" />
+                    <span id="jlist_upload_img_button" style="display:none;">
+                    <input id="jlist_upload_image" type="button" value="Upload Image" />
 					<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 					</span>
                     
@@ -2119,80 +1900,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 			<input <?php if(!$this->_plugin_activated) { echo 'disabled="disabled"'; } ?> type="submit" value="<?php _e('Save Configuration','apptivo-businesssite'); ?>" class="button-primary" id="awp_joblists_settings" name="awp_joblists_settings">
 		</p>
 	</form> 
-	<script type="text/javascript" language="javascript" >
 
-	jQuery(document).ready(function(){	
-
-		jQuery("#job_description_shortcode").focus(function(){
-	    	this.select();
-	    });
-
-		jQuery('#upload_image_button').click(function() {
-			 formfield = jQuery('#upload_image').attr('name');
-			 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
-			 return false;
-			});
-		
-		window.send_to_editor = function(html) {
-			 imgurl = jQuery('img',html).attr('src');		 
-			 jQuery('#awp_joblist_submit_value').val(imgurl);
-			 tb_remove();
-			}
-		
-	    if(jQuery('input:radio[name=awp_joblist_submit_type]:checked').val()=='submit')
-	    {		   
-	            jQuery('#awp_joblist_submit_val').text('Button Text');
-	            jQuery("#upload_img_button").hide();
-	    } else {
-	          jQuery('#awp_joblist_submit_val').text('Button Image URL');
-	          jQuery("#upload_img_button").show();
-	    }
-        
-	   jQuery('input:radio[name=awp_joblist_submit_type]').change(function() {
-		   jQuery('#awp_joblist_submit_value').val('');
-	        if(jQuery('input:radio[name=awp_joblist_submit_type]:checked').val()=='submit')
-	            {	        	 
-	            jQuery('#awp_joblist_submit_val').text('Button Text');
-	            jQuery("#upload_img_button").hide();
-	            }
-	        else
-	        {		      
-	          jQuery('#awp_joblist_submit_val').text('Button Image URL');
-	          jQuery("#upload_img_button").show();
-	        }
-	    });   
-	});
-	jQuery('#awp_jobdesc_templatetype').change(function() {
-
-		if(document.getElementById('awp_jobdesc_templatetype').value == 'theme_template' )
-		{  
-			document.getElementById('awp_jobdesc_template').style.display = "none";
-			document.getElementById('awp_jobdesc_theme_template').style.display = "block";
-		}
-		else {
-			document.getElementById('awp_jobdesc_template').style.display = "block";
-			document.getElementById('awp_jobdesc_theme_template').style.display = "none";
-		}
-		
-		});
-
-	jQuery('#awp_joblists_templatetype').change(function() {
-
-		if(document.getElementById('awp_joblists_templatetype').value == 'theme_template' )
-		{  
-			document.getElementById('awp_joblist_template').style.display = "none";
-			document.getElementById('awp_joblists_theme_template').style.display = "block";
-		}
-		else {
-			document.getElementById('awp_joblist_template').style.display = "block";
-			document.getElementById('awp_joblists_theme_template').style.display = "none";
-		}
-		
-		});
-
-	
-	
-	</script>
 	
 	 <?php 
 		
@@ -2372,7 +2080,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 			</tbody>
 		</table>
 		<?php } else { 
-	  echo '<span style="color: rgb(255, 0, 0);line-height:24px;"> Save the the below settings to get the Shortcode for job search form. </span>';	
+	  echo '<span style="color: rgb(255, 0, 0);line-height:24px;"> Save the below settings to get the Shortcode for job search form. </span>';	
 	  }?>
 	
 	<form name="awp_jobsearch_settings_form" method="post" action="">
@@ -2431,8 +2139,10 @@ function hrjobsform_showoptionstextarea(fieldid){
 					</th>
 
                    <td valign="top">
-                    <input type="radio" value="submit" name="awp_jobsearchform_submit_type" <?php checked('submit',$formproperties[submit_button_type]); ?> checked="checked" /> Button
-                    <input type="radio" value="image" name="awp_jobsearchform_submit_type"<?php checked('image',$formproperties[submit_button_type]); ?>/> Image
+                    <input type="radio" id="awp_jsrch_btn" value="submit" name="awp_jobsearchform_submit_type" <?php checked('submit',$formproperties[submit_button_type]); ?> checked="checked" />
+                     <label for="awp_jsrch_btn">Button</label>
+                    <input type="radio" id="awp_jsrch_img" value="image" name="awp_jobsearchform_submit_type"<?php checked('image',$formproperties[submit_button_type]); ?>/>
+                     <label for="awp_jsrch_img">Image</label>
 					</td>
 				</tr>
                     <tr valign="top">
@@ -2441,8 +2151,8 @@ function hrjobsform_showoptionstextarea(fieldid){
 					</th>
                     <td valign="top">
                     <input style="width:360px;" type="text" name="awp_jobsearchform_submit_value" id="awp_jobsearchform_submit_value" value="<?php echo $formproperties[submit_button_val];?>" size="52"/>
-                    <span id="upload_img_button" style="display:none;">
-                    <input id="upload_image_button" type="button" value="Upload Image" />
+                    <span id="jsearch_upload_img_button" style="display:none;">
+                    <input id="jsearch_upload_image" type="button" value="Upload Image" />
 					<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 					</span>
                     </td>
@@ -2523,7 +2233,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 					<td align="center" style="border: 1px solid rgb(204, 204, 204);">
 					<input
 					<?php  if($enabled) { ?> checked="checked" <?php } if($fieldData['fieldid']=='lastname' || $fieldData['fieldid']=='email'){?> disabled="disabled" <?php } ?> type="checkbox"  id="<?php echo $fieldData['fieldid']?>_show" name="<?php echo $fieldData['fieldid']?>_show" size="30"
-					onclick="hrjobsform_enablefield('<?php echo $fieldData['fieldid']?>')"></td> 
+					onclick="jsearch_form_enablefield('<?php echo $fieldData['fieldid']?>')"></td> 
 					
 					
 					<td align="center" style="border: 1px solid rgb(204, 204, 204);"><input
@@ -2576,7 +2286,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 						
 						if($pos===false) {?>readonly="readonly"<?php }
 						if(!$enabled || ($pos===false)) { ?> disabled="disabled" <?php } ?>
-						onChange="hrjobsform_showoptionstextarea('<?php echo $fieldData['fieldid']?>');"
+						onChange="jsearch_form_showoptionstextarea('<?php echo $fieldData['fieldid']?>');"
 					>
 					<?php  if( $fieldData['fieldname']  == 'Industry') 
 					{
@@ -2656,132 +2366,7 @@ function hrjobsform_showoptionstextarea(fieldid){
 	</form>
 	
 	</div>
-	
-<script type="text/javascript" language="javascript" >
-jQuery(document).ready(function(){
 
-	jQuery('#upload_image_button').click(function() {
-		 formfield = jQuery('#upload_image').attr('name');
-		 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
-		 return false;
-		});
-	
-	window.send_to_editor = function(html) {
-		 imgurl = jQuery('img',html).attr('src');		 
-		 jQuery('#awp_jobsearchform_submit_value').val(imgurl);
-		 tb_remove();
-		}
-	
-	jQuery("#job_searchform_shortcode").focus(function(){
-    	this.select();
-    });
-    
-    if(jQuery('input:radio[name=awp_jobsearchform_submit_type]:checked').val()=='submit')
-    {
-      jQuery('#awp_jobsearchform_submit_val').text('Button Text');
-      jQuery("#upload_img_button").hide();
-    } else {
-      jQuery('#awp_jobsearchform_submit_val').text('Button Image URL');
-      jQuery("#upload_img_button").show();
-    }
-   jQuery('input:radio[name=awp_jobsearchform_submit_type]').change(function() {
-	   jQuery('#awp_jobsearchform_submit_value').val('');
-        if(jQuery('input:radio[name=awp_jobsearchform_submit_type]:checked').val()=='submit')
-        {    
-            jQuery('#awp_jobsearchform_submit_val').text('Button Text');
-            jQuery("#upload_img_button").hide();
-        }
-        else
-        {
-          jQuery('#awp_jobsearchform_submit_val').text('Button Image URL');
-          jQuery("#upload_img_button").show();
-        }
-    });   
-});
-
-function change_searchform_Template()
-{
-	
-	if(document.getElementById('awp_jobsearchform_templatetype').value == 'theme_template' )
-	{  
-		document.getElementById('awp_jobsearchform_plugintemplatelayout').style.display = "none";
-		document.getElementById('awp_jobsearchform_themetemplatelayout').style.display = "block";
-	}
-	else {
-		document.getElementById('awp_jobsearchform_plugintemplatelayout').style.display = "block";
-		document.getElementById('awp_jobsearchform_themetemplatelayout').style.display = "none";
-	}
-
-}
-
-            
-function isNumberKey(evt)
-{
-	$shortcode
-   var charCode = (evt.which) ? evt.which : event.keyCode
-   if (charCode > 31 && (charCode < 48 || charCode > 57))
-      return false;
-
-   return true;
-}
-
-function changeTemplate()
-{
-	if(document.getElementById('awp_jobsearchform_templatetype').value == 'theme_template' )
-	{  
-		document.getElementById('awp_jobsearchform_plugintemplatelayout').style.display = "none";
-		document.getElementById('awp_jobsearchform_themetemplatelayout').style.display = "block";
-	}
-	else {
-		document.getElementById('awp_jobsearchform_plugintemplatelayout').style.display = "block";
-		document.getElementById('awp_jobsearchform_themetemplatelayout').style.display = "none";
-	}
-
-}
-
-function hrjobsform_enablefield(fieldid){
-	var checked=document.getElementById(fieldid+'_show').checked;
-	var cfield_index=fieldid.indexOf('customfield');
-	if(checked){
-		document.getElementById(fieldid+'_text').disabled=!checked;
-		document.getElementById(fieldid+'_order').disabled=!checked;
-		if(cfield_index==0){
-			document.getElementById(fieldid+'_type').disabled=!checked;
-            document.getElementById(fieldid+'_options').style.display="block";
-			document.getElementById(fieldid+'_options').disabled=!checked;
-		}
-	}else{
-		document.getElementById(fieldid+'_text').disabled="disabled";
-		document.getElementById(fieldid+'_order').disabled="disabled";
-		
-		
-		if(cfield_index==0){
-			document.getElementById(fieldid+'_type').disabled="disabled";
-			document.getElementById(fieldid+'_options').disabled="disabled";	
-		}
-	}
-}
-
-function hrjobsform_showoptionstextarea(fieldid){
-	var type=document.getElementById(fieldid+'_type').value;
-	if ((type=="select") || (type=="radio") || (type=="checkbox")){
-		document.getElementById(fieldid+'_options').disabled=false;
-		document.getElementById(fieldid+'_options').style.display ="block";
-		document.getElementById(fieldid+'_validation').disabled="disabled";
-	}else{
-		document.getElementById(fieldid+'_validation').disabled="disabled";
-		document.getElementById(fieldid+'_options').disabled="disabled";
-		document.getElementById(fieldid+'_options').style.display ="none";
-		if(type=="text")
-		{
-			document.getElementById(fieldid+'_validation').disabled=false;
-		}
-	}
-}
-
-
-
-	</script>
 	<?php
 		}
 	}
@@ -2846,13 +2431,11 @@ function hrjobsform_showoptionstextarea(fieldid){
         'cancelImg' => AWP_PLUGIN_BASEURL.'/inc/jobs/files/uploadify/cancel.png',
     
     );
-} //End localize_vars
+} 
 	
 
 /**
- * Get Country Lists
- *
- * @return unknown
+ * Country lists from Apptivo
  */
 function getAllCountryList()
       {
@@ -2864,50 +2447,41 @@ function getAllCountryList()
 } //End Class
 
 /**
- * Create Jobs
- *
- * @param unknown_type $jobTitle
- * @param unknown_type $jobDescription
- * @param unknown_type $industryId
- * @param unknown_type $jobtype
- * @param unknown_type $isFeatured
- * @return unknown
+ * Create Jobs in Apptivo.
  */
 function createJobs($jobTitle,$jobDescription,$industryId,$jobtype,$isFeatured)
 {
-	if($isFeatured == 'on')
-	{ 
+	if($isFeatured == 'on') :
 		$isFeatured = 'Y';
-	}else {
+	else:
 		$isFeatured = 'N';
-	}
+	endif;
+	
 	$jobStatusName = 'New';
 	$jobDetails = new jobDetails($fillByDate, $firmId, $industryId, $industryName, $isFeatured, $jobDescription, $jobId, $jobNumber, $jobStatusId, $jobStatusName, $jobTitle, $jobTypeId, $jobtype);
 	$params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-				"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+				"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $jobDetails
                 );
      $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createJob',$params); 
+     if($response == 'E_100')
+     {
+     	return $response;
+     }
      return $response->return;
     
 }
-
+/**
+ * Document details for upload document.
+ */
 function getDetailsForDocumentUpload(){
- $params = array ( "arg0" => APPTIVO_SITE_KEY,"arg1" => '0');
- $response = getsoapCall(APPTIVO_SITE_SERVICES,'getUploadDocumentDetails',$params);
+ $params = array ( "arg0" => APPTIVO_BUSINESS_API_KEY,"arg1"=> APPTIVO_BUSINESS_ACCESS_KEY,"arg2" => '0');
+ $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getUploadDocumentDetails',$params);
  return $response;
 }
 /**
- * Update Jobs
- *
- * @param unknown_type $jobId
- * @param unknown_type $jobTitle
- * @param unknown_type $jobDescription
- * @param unknown_type $industryId
- * @param unknown_type $jobtype
- * @param unknown_type $isFeatured
- * @return unknown
+ * Update Apptivo Jobs
  */
 function updatejobs($jobId,$jobTitle,$jobDescription,$industryId,$jobtype,$isFeatured,$jobStatusName='New')
 {
@@ -2920,8 +2494,8 @@ function updatejobs($jobId,$jobTitle,$jobDescription,$industryId,$jobtype,$isFea
 	}
 	$jobDetails = new jobDetails($fillByDate, $firmId, $industryId, $industryName, $isFeatured, $jobDescription, $jobId, $jobNumber, $jobStatusId, $jobStatusName, $jobTitle, $jobTypeId, $jobtype);
 	$params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-				"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+				"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" =>$jobDetails
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'updateJob',$params); 
@@ -2929,56 +2503,20 @@ function updatejobs($jobId,$jobTitle,$jobDescription,$industryId,$jobtype,$isFea
     
 }
 /**
- * Get JobByJobId
- *
- * @param unknown_type $jobId
- * @return unknown
+ * Job Details based on Jobs ID.
  */
 function getJobByJobId($jobId)
 {
 	$params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-				"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+				"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $jobId
-                );
-   
+                );   
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getJobByJobId',$params); 
     return $response; 
 }
-
-
-/**
- * Create Job Applicant Form
- *
- * @param string $addressId
- * @param string $addressLine1
- * @param string $addressLine2
- * @param string $applicantId
- * @param string $applicantNumber
- * @param string $city
- * @param string $comments
- * @param string $country
- * @param string $countyAndDistrict
- * @param string $emailId
- * @param string $expectedDesignation
- * @param string $expectedSalary
- * @param string $firstName
- * @param string $industryId
- * @param string $jobApplicantId
- * @param string $jobId
- * @param string $jobNumber
- * @param string $lastName
- * @param string $middleName
- * @param string $noteDetails
- * @param string $phoneNumber
- * @param string $postalCode
- * @param string $provinceAndState
- * @param string $resumeCoverLetter
- * @param string $resumeDetails
- * @param string $resumeFileName
- * @param string $resumeId
- * @param string $skills
- * @return JobApplicantDetails
+/*
+ * Job Applicant Details are stored in Apptivo Jobs apps
  */
 function createJobApplicant($addressId, $addressLine1, $addressLine2, $applicantId, $applicantNumber, $city, $comments, $country, $countyAndDistrict, $emailId, $expectedDesignation, $expectedSalary, $firstName, $industryId, $jobApplicantId, $jobId, $jobNumber, $lastName, $middleName, $noteDetails, $phoneNumber, $postalCode, $provinceAndState, $resumeCoverLetter, $resumeDetails, $resumeFileName, $resumeId, $skills,$upload_docid)
 {   
@@ -2988,8 +2526,8 @@ function createJobApplicant($addressId, $addressLine1, $addressLine2, $applicant
    }
 	$jobapplicantdetals = new JobApplicantDetails($addressId, $addressLine1, $addressLine2, $applicantId, $applicantNumber, $city, $comments, $country,$countyAndDistrict,$emailId, $expectedDesignation, $expectedSalary, $firstName, $industryId, $jobApplicantId,$jobId, $jobNumber, $lastName, $middleName, $noteDetails, $phoneNumber, $postalCode, $provinceAndState, $resumeCoverLetter, $resumeDetails, $resumeFileName, $resumeId, $skills,$upload_docid);
 	$params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-				"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+				"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $jobapplicantdetals
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createNewJobApplicant',$params);
@@ -3000,28 +2538,43 @@ function createJobApplicant($addressId, $addressLine1, $addressLine2, $applicant
    return $response->return;
 }
 /**
- * fetchAllJobsWithStatus
- *
- * @param int $maxCount
- * @param int $offset
- * @param String $getFeaturedJobsOnly
- * @param string $status
- * @return HrJobSearchResultsHelper
+ * Get ALL Jobs from Index
  */
-function getAllHrjobs($maxCount=999,$offset=0,$getFeaturedJobsOnly='false',$status = null)
+function getAllHrjobs($maxCount=999,$pageIndex=1,$getFeaturedJobsOnly='false',$status = null)
 {  
 	$sortBy = 0;
     $params_plugincall = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-    			"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+    			"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $getFeaturedJobsOnly,
-                "arg3" => $maxCount,
-                "arg4" => $offset,
+                "arg3" => $pageIndex,
+                "arg4" => $maxCount,
                 "arg5" => $sortBy,
     			"arg6" => $status
                 );
-    
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getAllJobsWithStatus',$params_plugincall);
+   
+    $response = getsoapCall(APPTIVO_BUSINESS_INDEX,'getAllJobsWithStatus',$params_plugincall);   
+    if($response == 'E_100') :
+    	echo awp_messagelist('validate-getAllJobsWithStatus');
+    endif;
+    return $response->return;
+}
+/*
+ * Get ALL Jobs  from Apptivo
+ */
+function get_apptivojobs()
+{  
+    $params_plugincall = array ( 
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+    			"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
+                "arg2" => 'false',
+                "arg3" => 999,
+                "arg4" => 0,
+                "arg5" => 0,
+    			"arg6" => null
+                );
+   
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getAllJobsWithStatus',$params_plugincall); 
     if($response == 'E_100')
     {
     echo awp_messagelist('validate-getAllJobsWithStatus');
@@ -3030,44 +2583,35 @@ function getAllHrjobs($maxCount=999,$offset=0,$getFeaturedJobsOnly='false',$stat
 }
 
 /**
- * Search By jobs.
- *
- * @param String $keyword
- * @param String $industry
- * @param ArrayLists $job_types
- * @param int $maxcount
- * @return HrJobSearchResultsHelper
+ * Serach By Jobs 
  */
-function serchByJobs($keyword,$industry,$job_types,$maxcount=999)
+function serchByJobs($keyword,$industry,$job_types,$maxcount=999,$pageIndex=1)
 {  
 	$params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-				"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+				"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $keyword,
                 "arg3" => $industry,
                 "arg4" => $job_types,
                 "arg5" => 'false',
-                "arg6" => $maxcount,
-                "arg7" => 0,
+                "arg6" => $pageIndex,
+                "arg7" => $maxcount,
                 "arg8" => 0
                 );  
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'searchJobsBySearchText',$params); //searchJobs   
+    $response = getsoapCall(APPTIVO_BUSINESS_INDEX,'searchJobsBySearchText',$params); //searchJobs  
     return $response;
 }
 /**
- * Job Description
- *
- * @param unknown_type $jobNo
- * @return unknown
+ * Job Details based on Job number.
  */
 function jobdescriptionByNumber($jobNo)
 {
 	$params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-				"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+				"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $jobNo
 	                );
-	 $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getJobByJobNo',$params); //getJobByJobNumber
+	 $response = getsoapCall(APPTIVO_BUSINESS_INDEX,'getJobByJobNo',$params); //getJobByJobNumber
 	 if( $response == 'E_100')
 	 {
 	 	return $response;
@@ -3076,17 +2620,15 @@ function jobdescriptionByNumber($jobNo)
 	                
 }
 /**
- * Get All Industries.
- *
- * @return unknown
+ * Apptivo Job Industries.
  */
 function getAllIndustries()
 {  
-	      $params = array ( "arg0" => APPTIVO_SITE_KEY, "arg1" => APPTIVO_ACCESS_KEY );
-           $data_key = APPTIVO_SITE_KEY.'-industries';
-                 if(class_exists('Memcache'))
+	      $params = array ( "arg0" => APPTIVO_BUSINESS_API_KEY, "arg1" => APPTIVO_BUSINESS_ACCESS_KEY );
+           $data_key = APPTIVO_BUSINESS_API_KEY.'-industries';
+            if(class_exists('Memcache'))
           	{
-                    $mcache_obj = new AWP_Cache_Util(); //Create Object in AWP_DataCache clss
+            $mcache_obj = new AWP_Cache_Util(); //Create Object in AWP_DataCache clss
 		    $mcacheconnect = $mcache_obj->connectmcache();
           	}
           	else {
@@ -3106,19 +2648,3 @@ function getAllIndustries()
 		    }
 		  return $response->return;
 }
-/**
- * Get Token For Upload.
- *
- * @return unknown
- */
-function getTokenForDocumentUpload()
-{
-	 $params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-	            "arg1" => '',                
-	                );
-	 $response = getsoapCall(APPTIVO_SITE_SERVICES,'getTokenForDocumentUpload',$params);
-	 return $response->return;
-	    
-}
-?>

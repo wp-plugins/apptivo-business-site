@@ -1,6 +1,8 @@
 <?php
 /**
  * IP Deny
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
  */
 require_once AWP_LIB_DIR . '/Plugin.php';
 /**
@@ -171,7 +173,7 @@ class AWP_IPDeny extends AWP_Base
                <table class="form-table"><tbody>                			
 
                 <tr valign="top">
-					<th valign="top"><label for="site_key">IP Type </label>				
+					<th valign="top"><label for="ip_type">IP Type </label>				
 					</th>
 					<td valign="top">
                      <select id="ip_type" name="ip_type">
@@ -182,7 +184,7 @@ class AWP_IPDeny extends AWP_Base
 				</tr>
 
 			   <tr valign="top" id="single_ip" >
-					<th valign="top"><label for="site_key">IP Address </label>				
+					<th valign="top"><label for="ip_address">IP Address </label>				
 					</th>
 					<td valign="top">
                      <input type="text" value="'.$ip_address.'"  id="ip_address" name="ip_address" style="width: 250px;"><span class="description" id="sample_ip">    (eg:100.100.100.100)</span>
@@ -190,7 +192,7 @@ class AWP_IPDeny extends AWP_Base
 				</tr>
 				
 				 <tr valign="top" id="range_ip" style="display:none;">
-					<th valign="top"><label for="site_key">IP Address </label>				
+					<th valign="top"><label for="ip_address1">IP Address </label>				
 					</th>
 					<td valign="top">
                      <input type="text" value="'.$ip_address1.'"  id="ip_address1" name="ip_address1" style="width: 250px;"><span class="description" >    Starting IP: (eg:100.100.100.100)</span>
@@ -212,37 +214,7 @@ class AWP_IPDeny extends AWP_Base
     	$this->list_table();
     	
     	?>
-    	<script type="text/javascript" language="javascript" >
-    	jQuery(document).ready(function(){
-    	jQuery(".error").fadeOut(10000, "linear");      		
-   		 jQuery('select:[name=ip_type]').change(function() {
-    			 if(jQuery('select:[name=ip_type]').val() == 'Range') {
-    				 jQuery('#single_ip').hide();
-    				 jQuery('#range_ip').show();
-    				 jQuery('#ip_address1').val('');
-    				 jQuery('#ip_address2').val('');
-    	        		
-    	        	}else{
-    	        		jQuery('#ip_address').val('');
-    	        		jQuery('#range_ip').hide();
-    	        		jQuery('#single_ip').show();
-    	        	}
-    		 });
-    		 
-   		if(jQuery('select:[name=ip_type]').val() == 'Range') {
-			 jQuery('#single_ip').hide();
-			 jQuery('#range_ip').show();
-       		
-       	}else{
-       		jQuery('#range_ip').hide();
-       		jQuery('#single_ip').show();
-       	}
 
-   	
-	  
-       	
-    	});	
-    	</script>
     	<?php 
     }
     
@@ -273,32 +245,7 @@ function list_table()
         </table></div>';
 	
 	?>
-	<script type="text/javascript" language="javascript" >
-	 function delete_ipbanned(ipid)
-	 {
-	   	var answer = confirm('Are you sure want to delete?');
-	 	if (answer){ 
-	 		 jQuery.ajax({
-	 		     type: "POST",
-	 		     url: "/wp-admin/admin-ajax.php",
-	 		     data: 'action=delete_ipbannedaccount&ip_id='+ipid,
-	 		     success: function(message) {
-	 		     var msg = message;
-	 		     msg = msg.split('::');
-	 			 if(msg[0] == 'Success') {
-		 			jQuery("#tr_"+msg[1]).remove();	
-		 			alert("Successfully deleted");
-		 					 				
-	 		     }
-	 		     else {
-	 		    	jQuery("#node").html('<b style="color:red;">'+message+'</b><br />');         
-	 		     }
-	 		    
-	 		     }
-	 		 });	 		
-	 	}	 	
-	  }
-	 </script>
+
 	<?php 
 	
 }
@@ -407,5 +354,3 @@ function absp_table_exists($tableName)
 	  return FALSE;
 	 } 
 }
-
-?>

@@ -1,7 +1,8 @@
 <?php
-
 /**
- * AIP Testimonials plugin
+ * Apptivo Testimonials plugin
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
  */
 require_once AWP_LIB_DIR . '/Plugin.php';
 require_once AWP_INC_DIR . '/apptivo_services/Testimonial.php';
@@ -172,12 +173,7 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
         <p>
 	   <img id="elementToResize" src="<?php echo awp_flow_diagram('testimonials');?>" alt="Testimonials" title="Testimonials"  />
 	   </p>
-	   <script type="text/javascript" language="javascript" >
-	    var w = document.body.offsetWidth;
-	    var wid = ( w < 950 ) ? w-170 : 950;
-	    var elem = document.getElementById("elementToResize");  
-	    elem.style.width = wid+'px'; 
-	   </script>	   
+	  	   
     <p style="margin:10px;">
 		For Complete instructions,see the <a href="<?php echo awp_developerguide('testimonilas');?>" target="_blank">Developer's Guide.</a>
 	</p>       
@@ -187,10 +183,13 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
         if(!$this->_plugin_activated){
 	    	echo "Testiomonials plugin is currently <span style='color:red'>disabled</span>. Please enable this in <a href='/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
 	    }else if (isset($_POST['awp_testimonial_add']) && ($_POST['nogdog'] == $_SESSION['apptivo_single_testimonials']) ) {          //Add Testimonials.
-	    	$addtestimonials_response = $this->add_testimonials();	
+	    	$addtestimonials_response = $this->add_testimonials();
 	    	if(strlen(trim($_POST['awp_testimonials_name'])) == 0 )
 	    	{
 	    	$_SESSION['awp_testmonials_messge'] = 'Please enter a testimonial name';
+            }else if($addtestimonials_response == 'E_100')
+            {
+            	$_SESSION['awp_testmonials_messge'] = '<span style=color:#f00;"> Invalid Keys </span>';
             }else if($addtestimonials_response->return->statusCode != '1000')
                     {
                     	$_SESSION['awp_testmonials_messge'] = '<span style=color:#f00;">'.$addtestimonials_response->return->statusMessage.'</span>';
@@ -250,98 +249,7 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
 <style type="text/css">
 	        .awp_testimonials_form td { width:80px;}	          
 </style>       
-<script type="text/javascript" language="javascript" >
-jQuery(document).ready(function(){
 
-	jQuery('#upload_image_button').click(function() {
-		 formfield = jQuery('#upload_image').attr('name');
-		 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
-		 return false;
-		});
-	
-	window.send_to_editor = function(html) {		
-		 imgurl = jQuery('img',html).attr('src');
-		 jQuery('#awp_testimonials_imageurl').val(imgurl);
-		 tb_remove();
-		}
-	
-	jQuery("#testimonials_fullview_shortcode").focus(function(){
-    	this.select();
-    });
-	jQuery("#testimonials_inlineview_shortcode").focus(function(){
-    	this.select();
-    });
-    
-});
-function validatetestimonialsforms()
-{    
-	 var error = '';
-	 var testimonials_name = jQuery('#awp_testimonials_name').val();
-	 var testimonilasname = jQuery.trim( testimonials_name );
-	 var awp_testimonials_link = jQuery('#awp_testimonials_website').val();
-	 var awpTestimonialsLink = jQuery.trim( awp_testimonials_link );
-
-	 var editor = tinymce.get( 'awp_testimonials_cnt');
-	 editor.save()
-	
-	 var testimonials_content = jQuery('#awp_testimonials_cnt').val();
-	 var testimonialscontent = jQuery.trim( testimonials_content );
-
-	 if(testimonials_name == '')
-	 {
-		 jQuery('#awp_testimonials_name').css('border-color', '#f00'); 
-	 }else {
-		 jQuery('#awp_testimonials_name').css('border-color', '#CCCCCC');
-	 }
-	 if(testimonialscontent == '')
-	 {  
-		 jQuery('#awp_testimonials_cnt_ifr').css('border', '1px solid #f00');
-	 }else {
-		 jQuery('#awp_testimonials_cnt_ifr').css('border', 'none');
-	 }
-	 		
-	 if(testimonilasname == '' || testimonialscontent == '')
-	 {
-		 jQuery('#message').remove(); 
-		 jQuery('#errormessage').remove();	
-		 jQuery('.testimonilas_err').before('<div id="errormessage" class="updated"><p style="color:#f00;font-weight:bold;" >Please fill the mandatory fields.<p></div>');
-		 return false;
-	 }else {
-		 jQuery('#errormessage').remove();		 
-		 jQuery('#awp_testimonials_name').css('border-color', '#CCCCCC');
-		 if(awpTestimonialsLink == '')
-         {   jQuery('#awp_testimonials_website').css('border-color', '#CCCCCC');
-             return true;
-         }else {
-        	 error += isValidURL(awpTestimonialsLink);
-         }
-		 error = jQuery.trim( error );
-		 if( error == '')	
-		 { 
-			 return true;
-		 }else 
-		 { 
-		   return false; 
-		  }
-	 }
-	
-
-}
-
-function isValidURL(url){
-	var RegExp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-    if(RegExp.test(url)){
-    	     jQuery('#awp_testimonials_website').css('border-color', '#CCCCCC'); 
-             return '';
-    }else{
-    	 jQuery('#message').remove(); 
-    	 jQuery('#errormessage').remove();	
-    	 jQuery('.testimonilas_err').before('<div id="errormessage" class="updated"><p style="color:#f00;font-weight:bold;" >Please enter a valid URL.<p></div>');
-		 jQuery('#awp_testimonials_website').css('border-color', '#f00'); 
-    	 return 'Invalid Url';
-    }
-}
-</script>
        <?php 
 	}
 	
@@ -487,23 +395,7 @@ function isValidURL(url){
 	                                        }
 	            ?> </tbody></table>
 	        </div>
-	        <script type="text/javascript" language="javascript" > 
-			function delete_testimonials(status)
-            {
-				if(status != 1)
-		           {
-			           alert('Testiomonials Plugin is currently disabled.');
-			           return false;
-		           }
-				var answer = confirm('Are you sure want to delete Testimonials?');
-				if (answer){
-					return true;
-				}
-				else{
-					return false;
-				}
-             }
-	        </script>
+	       
 	        <?php
 	                                    }
         }
@@ -547,7 +439,7 @@ function isValidURL(url){
 	        ksort($awp_tst_plugintemplates);
 			if( empty($awp_testimonials_inline_settings) )
 		        {
-		        	echo '<span style="color:#f00;"> Save the the below settings to get the Shortcode for inline view. </span>';
+		        	echo '<span style="color:#f00;"> Save the below settings to get the Shortcode for inline view. </span>';
 		        }
 	         ?>
 	        <form action="" class="awp_testimonials_form" name="awp_testimonial_inline" method="post">
@@ -555,7 +447,7 @@ function isValidURL(url){
                         <tbody>
                     <?php if(isset($awp_testimonials_inline_settings) && !empty($awp_testimonials_inline_settings)) {?>
                     <tr valign="top">
-					<td valign="top"><label for="awp_customform_shortcode">Shortcode:</label>
+					<td valign="top"><label for="testimonials_inlineview_shortcode">Shortcode:</label>
 					<br><span class="description"><?php _e('Copy and Paste this shortcode in your page to display the testimonilas.','apptivo-businesssite'); ?></span>
 					</td>
 					<td valign="top"><span id="awp_customform_shortcode" name="awp_customform_shortcode">
@@ -567,7 +459,7 @@ function isValidURL(url){
 				    
  <tr valign="top"> <td><?php _e('Template Type','apptivo-businesssite'); ?></td>
 	                                        <td valign="top">
-	                                        <select name="awp_testimonials_templatetype" id="awp_testimonials_templatetype" onchange="changeTemplate();">
+	                                        <select name="awp_testimonials_templatetype" id="awp_testimonials_templatetype" onchange="testimonials_change_template();">
 	                                                <option value="awp_plugin_template" <?php selected($awp_testimonials_inline_settings['template_type'],'awp_plugin_template'); ?> ><?php _e('Plugin Templates','apptivo-businesssite'); ?></option>
 	                                                <?php if(!empty($awp_tst_themetemplates)) :?>
 	                                                 <option value="theme_template" <?php selected($awp_testimonials_inline_settings['template_type'],'theme_template'); ?> ><?php _e('Templates from Current Theme','apptivo-businesssite'); ?></option>
@@ -623,21 +515,7 @@ function isValidURL(url){
                     </table>
 	
 	        </form>
-	        <script type="text/javascript" language="javascript">
-	                function changeTemplate()
-	                {
-	                    if(document.getElementById('awp_testimonials_templatetype').value == 'theme_template' )
-	                    {
-	                        document.getElementById('awp_testimonials_plugintemplatelayout').style.display = "none";
-	                        document.getElementById('awp_testimonials_themetemplatelayout').style.display = "block";
-	                    }
-	                    else {
-	                        document.getElementById('awp_testimonials_plugintemplatelayout').style.display = "block";
-	                        document.getElementById('awp_testimonials_themetemplatelayout').style.display = "none";
-	                    }
-	
-	                }
-	        </script>
+	      
 	        
 	        <?php
 	}
@@ -815,7 +693,7 @@ function isValidURL(url){
 	        ksort($awp_tst_plugintemplates);
 	 
 	        if( empty($awp_testimonials_settings) ) :
-        	  echo '<span style="color:#f00;"> Save the the below settings to get the Shortcode for full view. </span>';
+        	  echo '<span style="color:#f00;"> Save the below settings to get the Shortcode for full view. </span>';
             endif; // if( empty($awp_testimonials_settings) )
               
 	        ?>
@@ -824,7 +702,7 @@ function isValidURL(url){
                         <tbody>        
                     <?php if(isset($awp_testimonials_settings) && !empty($awp_testimonials_settings)) {?>
                     <tr valign="top">
-					<td valign="top"><label for="awp_customform_shortcode"><?php _e('Shortcode:','apptivo-businesssite'); ?></label>
+					<td valign="top"><label for="testimonials_fullview_shortcode"><?php _e('Shortcode:','apptivo-businesssite'); ?></label>
 					<br><span class="description"><?php _e('Copy and Paste this shortcode in your page to display the testimonials.','apptivo-businesssite'); ?></span>
 					</td>
 					<td valign="top"><span id="awp_customform_shortcode" name="awp_customform_shortcode">
@@ -836,7 +714,7 @@ function isValidURL(url){
 				    
 	                                    <tr valign="top"> <td><?php _e('Template Type','apptivo-businesssite'); ?> </td>
 	                                        <td valign="top">
-	                                        <select name="awp_testimonials_templatetype" id="awp_testimonials_templatetype" onchange="changeTemplate();">
+	                                        <select name="awp_testimonials_templatetype" id="awp_testimonials_templatetype" onchange="testimonials_change_template();">
 	                                                <option value="awp_plugin_template" <?php selected($awp_testimonials_settings['template_type'],'awp_plugin_template'); ?> ><?php _e('Plugin Templates','apptivo-businesssite'); ?></option>
 	                                                <?php if (!empty($awp_tst_themetemplates)) : ?>
 	                                                	<option value="theme_template" <?php selected($awp_testimonials_settings['template_type'],'theme_template'); ?> ><?php _e('Templates from Current Theme','apptivo-businesssite'); ?></option>
@@ -884,21 +762,7 @@ function isValidURL(url){
                     </table>
 	
 	        </form>
-	        <script type="text/javascript" language="javascript">
-	                function changeTemplate()
-	                {
-	                    if(document.getElementById('awp_testimonials_templatetype').value == 'theme_template' )
-	                    {
-	                        document.getElementById('awp_testimonials_plugintemplatelayout').style.display = "none";
-	                        document.getElementById('awp_testimonials_themetemplatelayout').style.display = "block";
-	                    }
-	                    else {
-	                        document.getElementById('awp_testimonials_plugintemplatelayout').style.display = "block";
-	                        document.getElementById('awp_testimonials_themetemplatelayout').style.display = "none";
-	                    }
-	
-	                }
-	        </script>
+	       
 	        <?php
 	}
 
@@ -958,7 +822,7 @@ function isValidURL(url){
             <h2>Add Testimonials</h2>
             <div class="testimonilas_err"></div>
             <?php $nogdog = uniqid();$_SESSION['apptivo_single_testimonials'] = $nogdog; ?>
-	        <form method="post" action="/wp-admin/admin.php?page=awp_testimonials" name="awp_testimonials_form" onsubmit="return validatetestimonialsforms(this)" >
+	        <form method="post" action="/wp-admin/admin.php?page=awp_testimonials" name="awp_testimonials_form" id="awp_testimonials_form"  onsubmit="return validatetestimonialsforms()" >
 	        <input type="hidden" name="nogdog" value="<?php echo $nogdog;?>" >
 	            <table class="form-table" width="700" cellspacing="0" cellpadding="0">
 	                                    <tr>
@@ -987,7 +851,7 @@ function isValidURL(url){
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_testimonials_imageurl" type="text" size="43" name="awp_testimonials_imageurl" value="" />
-									<input id="upload_image_button" type="button" value="Upload Image" />
+									<input id="testimonials_upload_images" type="button" value="Upload Image" />
 									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 									</label></td>
 									</tr>
@@ -1022,7 +886,7 @@ function isValidURL(url){
             ?>
 	        <div class="wrap">
 	        <h2><?php _e('Edit Testimonials','apptivo-businesssite'); ?></h2><div class="testimonilas_err"></div>
-	        <form method="post" action="/wp-admin/admin.php?page=awp_testimonials" name="awp_testimonials_form" onsubmit="return validatetestimonialsforms(this)">
+	        <form method="post" action="/wp-admin/admin.php?page=awp_testimonials" name="awp_testimonials_form" onsubmit="return validatetestimonialsforms()">
 	            <table class="form-table" width="700" cellspacing="0" cellpadding="0">
 	                                    <tr>
 	                                        <td><?php _e('Name','apptivo-businesssite'); ?> &nbsp;<span style="color:#f00;">*</span></td>
@@ -1048,7 +912,7 @@ function isValidURL(url){
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_testimonials_imageurl" type="text" size="43" name="awp_testimonials_imageurl" value="<?php echo $all_awp_testimonials->testimonialImageUrl; ?>" />
-									<input id="upload_image_button" type="button" value="Upload Image" />
+									<input id="testimonials_upload_images" type="button" value="Upload Image" />
 									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 									</label></td>
 									</tr>
@@ -1092,8 +956,8 @@ function addTestimonials($account, $accountId, $company, $contact, $contactId, $
 {
   $mktg_testimonials = new AWP_MktTestimonial($account, $accountId, $company, $contact, $contactId, $creationDate, $email, $firmId, $images, $jobTitle, $name, $returnStatus, $sequenceNumber, $siteTestimonialId, $testimonial, $testimonialImageUrl, $testimonialStatus, $website);
   $params = array (
-                "arg0" => APPTIVO_SITE_KEY,
-  				"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+  		        "arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $mktg_testimonials,
                 "arg3" => null
                 );
@@ -1108,14 +972,15 @@ function addTestimonials($account, $accountId, $company, $contact, $contactId, $
 function getAllTestimonials()
 {
 	     $pubdate_params = array ( 
-                "arg0" => APPTIVO_SITE_KEY
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+                "arg1" => APPTIVO_BUSINESS_ACCESS_KEY
 	            );
 	      $plugin_params = array ( 
-               "arg0" => APPTIVO_SITE_KEY,
-				"arg1" => APPTIVO_ACCESS_KEY,
-                "arg2" => null
+               "arg0" => APPTIVO_BUSINESS_API_KEY,
+			   "arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
+               "arg2" => null
                 );
-          $response = get_data(APPTIVO_BUSINESS_SERVICES,'-testimonials-publisheddate','-testimonials-data','getSiteLasteUpdateDate','getAllTestimonials',$pubdate_params,$plugin_params);
+          $response = get_data(APPTIVO_BUSINESS_SERVICES,'-testimonials-publisheddate','-testimonials-data','getLastPublishDate','getAllTestimonials',$pubdate_params,$plugin_params);
           return $response->return;
 }
 /**
@@ -1125,8 +990,8 @@ function getAllTestimonials()
 function getTestimonialByTestimonialId($awp_tstid)
 {
 	$params = array (
-                "arg0" => APPTIVO_SITE_KEY,
-				"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+				"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $awp_tstid
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getTestimonialByTestimonialId',$params);
@@ -1141,8 +1006,8 @@ function getTestimonialByTestimonialId($awp_tstid)
 function deleteTestimonialByTestimonialId($awp_tstid)
 {
 	$params = array (
-                "arg0" => APPTIVO_SITE_KEY,
-				"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+				"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $awp_tstid
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'deleteTestimonialByTestimonialId',$params);
@@ -1156,12 +1021,11 @@ function updateTestimonials($account, $accountId, $company, $contact, $contactId
 {
   $mktg_testimonials = new AWP_MktTestimonial($account, $accountId, $company, $contact, $contactId, $creationDate, $email, $firmId, $images, $jobTitle, $name, $returnStatus, $sequenceNumber, $siteTestimonialId, $testimonial, $testimonialImageUrl, $testimonialStatus, $website);
   $params = array (
-                "arg0" => APPTIVO_SITE_KEY,
-  				"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+  				"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $mktg_testimonials,
                 "arg3" => null
                 );
   $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'updateTestimonial',$params);
   return $response;
 }
-?>

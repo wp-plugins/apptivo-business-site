@@ -1,6 +1,8 @@
 <?php
 /**
- * AWP Contact Forms Plugin
+ * Apptivo Contact forms Plugin.
+ * @package  apptivo-business-site
+ * @author Rajkumar <rmohanasundaram[at]apptivo[dot]com>
  */
 require_once AWP_LIB_DIR . '/Plugin.php';
 require_once AWP_INC_DIR . '/apptivo_services/labelDetails.php';
@@ -706,7 +708,7 @@ function get_plugin_templates()
 	    
 	    if($contactformscount < 10){    
 	    ?>
-	<form name="awp_contactform_new" id="awp_contactform_new" method="post" action="" onsubmit="return validatecontactforms(this)" >
+	<form name="awp_contactform_new" id="awp_contactform_new" method="post" action="" >
 	 
 	   <p>
 	   <img id="elementToResize" src="<?php echo awp_flow_diagram('contactform');?>" alt="contactform" title="contactform"  />
@@ -725,33 +727,7 @@ function get_plugin_templates()
 		</p>
 	
 	</form>
-	<script type="text/javascript" language="javascript" >
-
-	    var w = document.body.offsetWidth;
-	    var wid = ( w < 950 ) ? w-170 : 950;
-	    var elem = document.getElementById("elementToResize");  
-	    elem.style.width = wid+'px';
-	    
-	function validatecontactforms()
-	{    
-		 var contact_form = jQuery('#newcontactformname').val();
-		 var contactform = jQuery.trim( contact_form );	
-		 if(contactform == '')
-		 {
-			 jQuery('#newcontactformname').css('border-color', '#f00');
-			 jQuery('#message').remove(); 
-			 jQuery('#errormessage').remove();	
-			 jQuery('.contactform_err').before('<div id="errormessage" class="updated"><p style="color:#f00;font-weight:bold;" >Contact Form Name cannot be empty.<p></div>');
-			 return false;
-		 }else {
-			 jQuery('#errormessage').remove();		 
-			 jQuery('#newcontactformname').css('border-color', '#CCCCCC');
-			 return true;
-		 }
-		
 	
-	}
-	</script>
 		<?php
 	    }
 	   	  
@@ -806,7 +782,7 @@ function get_plugin_templates()
 					<?php if($this->_plugin_activated)
 					{ ?>
 					<form name="awp_contact_delete_form" method="post" action="" style="float:left;padding-left:30px;">
-					<a  href="javascript:confirmation('<?php echo $selectedcontactform; ?>')" >Delete</a>
+					<a  href="javascript:contact_confirmation('<?php echo $selectedcontactform; ?>')" >Delete</a>
 					<input type="hidden" name="delformname" id="delformname"  />
 					</form>	
 					<?php } ?>				
@@ -821,7 +797,7 @@ function get_plugin_templates()
 			<tbody>
 			<?php if(!empty($formproperties[tmpltype])) :?>
 				<tr valign="top">
-					<th valign="top"><label for="awp_customform_shortcode"><?php _e("Form Shortcode", 'apptivo-businesssite' ); ?>:</label>
+					<th valign="top"><label for="contactform_shortcode"><?php _e("Form Shortcode", 'apptivo-businesssite' ); ?>:</label>
 					<br><span class="description"><?php _e('Copy and Paste this shortcode in your page to display this contact form.','apptivo-businesssite'); ?></span>
 					</th>
 					<td valign="top"><span id="awp_customform_shortcode" name="awp_customform_shortcode">
@@ -837,7 +813,7 @@ function get_plugin_templates()
 					<td valign="top">
 					<input type="hidden" id="awp_contactform_name" name="awp_contactform_name" value="<?php echo $selectedcontactform;?>"> 
 					
-						<select name="awp_contactform_templatetype" id="awp_contactform_templatetype" onchange="changeTemplate();">
+						<select name="awp_contactform_templatetype" id="awp_contactform_templatetype" onchange="change_contact_Template();">
 							<option value="awp_plugin_template"  <?php selected($formproperties[tmpltype],'awp_plugin_template'); ?> >Plugin Templates</option>
 							<?php if(!empty($themetemplates)) : ?>
 							<option value="theme_template"  <?php selected($formproperties[tmpltype],'theme_template'); ?> >Templates from Current Theme</option>
@@ -871,11 +847,13 @@ function get_plugin_templates()
 					</td>
 				</tr>
 				<tr valign="top">
-					<th><label for="awp_contactform_customcss"><?php _e("Confirmation message page", 'apptivo-businesssite' ); ?>:</label>
+					<th><label for="awp_contact_samepage"><?php _e("Confirmation message page", 'apptivo-businesssite' ); ?>:</label>
 					</th>
 					<td valign="top">
-                          <input type="radio" value="same" name="awp_contactform_confirm_msg_page" <?php checked('same',$formproperties[confirm_msg_page]); ?> checked="checked" /> Same Page
-                          <input type="radio" value="other" name="awp_contactform_confirm_msg_page" <?php checked('other',$formproperties[confirm_msg_page]); ?>/> Other page
+                          <input type="radio" value="same" id="awp_contact_samepage" name="awp_contactform_confirm_msg_page" <?php checked('same',$formproperties[confirm_msg_page]); ?> checked="checked" /> 
+                          <label for="awp_contact_samepage">Same Page</label>                          
+                          <input type="radio" value="other" id="awp_contact_otherpage" name="awp_contactform_confirm_msg_page" <?php checked('other',$formproperties[confirm_msg_page]); ?>/>
+                          <label for="awp_contact_otherpage">Other page</label>
                           <br />
                            <br />
                            <select id="awp_contactform_confirmmsg_pageid" name="awp_contactform_confirmmsg_pageid" <?php if($formproperties[confirm_msg_page] != 'other') echo 'style="display:none;"';?> >                      
@@ -919,18 +897,20 @@ function get_plugin_templates()
 					<br><span valign="top" class="description"></span>
 					</th>
 
-                                        <td valign="top">
-                                            <input type="radio" value="submit" name="awp_contactform_submit_type" <?php checked('submit',$formproperties[submit_button_type]); ?> checked="checked" /> Button
-                                            <input type="radio" value="image" name="awp_contactform_submit_type"<?php checked('image',$formproperties[submit_button_type]); ?>/> Image
+                    <td valign="top">
+                      <input type="radio" value="submit" id="awp_cont_btn" name="awp_contactform_submit_type" <?php checked('submit',$formproperties[submit_button_type]); ?> checked="checked" />
+                      <label for="awp_cont_btn">Button</label>
+                      <input type="radio" value="image" id="awp_cont_img" name="awp_contactform_submit_type"<?php checked('image',$formproperties[submit_button_type]); ?>/>
+                      <label for="awp_cont_img">Image</label>
 					</td>
 				</tr>
                 <tr valign="top">
-					<th><label for="awp_contactform_submit_val"  id="awp_contactform_submit_val" ><?php _e("Button Text", 'apptivo-businesssite' ); ?>:</label>
+					<th><label id="awp_contactform_submit_val" ><?php _e("Button Text", 'apptivo-businesssite' ); ?>:</label>
 					<br><span valign="top" class="description"></span>
 					</th>
                     <td valign="top"><input type="text" name="awp_contactform_submit_value" id="awp_contactform_submit_value" value="<?php echo $formproperties[submit_button_val];?>" size="52"/>
-                    <span id="upload_img_button" style="display:none;">
-                    <input id="upload_image_button" type="button" value="Upload Image" />
+                    <span id="contact_upload_img_button" style="display:none;">
+                    <input id="contact_upload_image" type="button" value="Upload Image" />
 					<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 					</span>
 					</td>
@@ -960,14 +940,15 @@ function get_plugin_templates()
 					$disbleAction = 'disabled="disabled"';
 				}
 				?>
-                                    <input <?php echo $disbleAction; ?> type="radio" name="subscribe_option" id="subscribe_option_yes" value="yes" <?php checked('yes', $formproperties[subscribe_option]); ?> /> Yes
-                                    <input <?php echo $disbleAction; ?> type="radio" name="subscribe_option" id="subscribe_option_no" value="no" <?php checked('no', $formproperties[subscribe_option]); ?> /> No
-                                    
+                 <input <?php echo $disbleAction; ?> type="radio" name="subscribe_option" id="subscribe_option_yes" value="yes" <?php checked('yes', $formproperties[subscribe_option]); ?> />
+                 <label for="subscribe_option_yes">Yes</label>
+                 <input <?php echo $disbleAction; ?> type="radio" name="subscribe_option" id="subscribe_option_no" value="no" <?php checked('no', $formproperties[subscribe_option]); ?> />
+                 <label for="subscribe_option_no">No</label>                
 				</td>
                                 </tr>
                                 
                 <tr valign="top">
-					<th><label id="awp_contactform_submit_val" for="awp_contactform_submit_val"><?php _e('Subscribe to Newsletter   (Display Text)','apptivo-businesssite'); ?></label>
+					<th><label for="awp_subscribe_to_newsletter"><?php _e('Subscribe to Newsletter   (Display Text)','apptivo-businesssite'); ?></label>
 					<br><span class="description" valign="top"></span>
 					</th>
                     <td valign="top"><input <?php echo $disbleAction; ?> type="text" size="52" value="<?php echo $formproperties[subscribe_to_newsletter_displaytext]; ?>" id="awp_subscribe_to_newsletter" name="awp_subscribe_to_newsletter"></td>
@@ -1064,7 +1045,7 @@ function get_plugin_templates()
 					<td align="center" style="border: 1px solid rgb(204, 204, 204);">
 					<input
 					<?php  if($enabled) { ?> checked="checked" <?php } if($fieldData['fieldid']=='lastname' || $fieldData['fieldid']=='email'){?> disabled="disabled" <?php } ?> type="checkbox"  id="<?php echo $fieldData['fieldid']?>_show" name="<?php echo $fieldData['fieldid']?>_show" size="30"
-					onclick="contactform_enablefield('<?php echo $fieldData['fieldid']?>')">
+					class="custom_fld" rel="<?php echo $fieldData['fieldid']?>" >
 					 
 					<?php if($index_key > 18 ) :?>
 					<input type="hidden" id="<?php echo $fieldData['fieldid']?>_newest" name="<?php echo $fieldData['fieldid']?>_newest" value="" />
@@ -1079,9 +1060,9 @@ function get_plugin_templates()
                                          <?php if($fieldData['fieldid']=='lastname' || $fieldData['fieldid']=='email'|| $fieldData['fieldid']=='captcha'){?> disabled="disabled" <?php } ?>
 						id="<?php echo $fieldData['fieldid']?>_require"
 						name="<?php echo $fieldData['fieldid']?>_require" size="30"></td>
-					<td align="center" style="border: 1px solid rgb(204, 204, 204);"><input
-						type="text"
-						onkeypress="return isNumberKey(event)"
+					<td align="center" style="border: 1px solid rgb(204, 204, 204);">
+					<input type="text"
+						class="num"
 						id="<?php echo $fieldData['fieldid']?>_order"
 						name="<?php echo $fieldData['fieldid']?>_order"
 						value="<?php echo $fieldData['order']; ?>" size="3"
@@ -1232,200 +1213,7 @@ function get_plugin_templates()
 	</form>
 	
 	</div>
-	
-	<script type="text/javascript" language="javascript" >
-	jQuery(document).ready(function(){
-	   jQuery('input:radio[name=awp_contactform_confirm_msg_page]').change(function() {
-	      if(jQuery('input:radio[name=awp_contactform_confirm_msg_page]:checked').val() == 'same')
-	       	{
-	       	jQuery('#awp_contactform_confirmmsg_pageid').hide();
-	       	jQuery('#awp_contactform_confirmationmsg_tr').show();
-	       	}	       	
-	       else{ 
-	      	jQuery('#awp_contactform_confirmmsg_pageid').show();
-	      	jQuery('#awp_contactform_confirmationmsg_tr').hide();
-	      	}
-	    });
-	});
-	
-	jQuery(document).ready(function(){
-	
-		jQuery('#upload_image_button').click(function() {
-		 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
-		 return false;
-		});
-	
-	window.send_to_editor = function(html) {
-		 imgurl = jQuery('img',html).attr('src');		 
-		 jQuery('#awp_contactform_submit_value').val(imgurl);
-		 tb_remove();
-		}
-		
-		jQuery("#contactform_shortcode").focus(function(){
-			this.select();
-		});	
-				
-	    if(jQuery('input:radio[name=awp_contactform_submit_type]:checked').val()=='submit')
-	    {
-	           jQuery('#awp_contactform_submit_val').text('Button Text');
-	           jQuery("#upload_img_button").hide();
-	    }else {	   
-	          jQuery('#awp_contactform_submit_val').text('Button Image URL');
-	          jQuery("#upload_img_button").show();
-	   }	     
-	 	                 
-	   jQuery('input:radio[name=awp_contactform_submit_type]').change(function() {
-	   jQuery('#awp_contactform_submit_value').val('');
-	        if(jQuery('input:radio[name=awp_contactform_submit_type]:checked').val()=='submit')
-	        {
-	            jQuery('#awp_contactform_submit_val').text('Button Text');
-	            jQuery("#upload_img_button").hide();
-	        }
-	        else {
-	          jQuery('#awp_contactform_submit_val').text('Button Image URL');
-	          jQuery("#upload_img_button").show();
-	        }
-	    });	    
-	});
-           
-	function isNumberKey(evt)
-	{
-		
-	   var charCode = (evt.which) ? evt.which : event.keyCode
-	   if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-	      return false;
-	      } else {
-	
-	   return true; }
-	}
-	
-	jQuery(document).ready(function(){
-	var counter = document.getElementById("addcustom_field").getAttribute("rel");
-	jQuery("#addcustom_field").click(function ()
-	{   
-		jQuery('#contact_form_fields tr:last').after('<tr><td style="border: 1px solid rgb(204, 204, 204); padding-left: 10px; width: 150px;">Custom Field '+ counter + '</td><td align="center" style="border: 1px solid rgb(204, 204, 204);">' + 
-				'<input type="checkbox" id="customfield'+ counter + '_show" name="customfield'+ counter + '_show" size="30" onclick="contactform_enablefield(\'customfield'+counter+'\')">' +
-				'<input type="hidden" id="customfield'+ counter + '_newest" name="customfield'+ counter + '_newest" value=""></td>' + 
-				'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-				'<input type="checkbox" id="customfield'+ counter + '_require" name="customfield'+ counter + '_require" size="30" disabled="">' +
-				'</td>' +
-				'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-				'<input type="text" onkeypress="return isNumberKey(event)" id="customfield'+ counter + '_order" name="customfield'+ counter + '_order" value="" size="3" maxlength="2" disabled="">' +
-				'</td>' +
-				'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-				'<input type="text" id="customfield'+ counter + '_text" name="customfield5_text" value="Custom Field'+ counter + '" disabled="">' +
-				'</td>' +				
-				'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-				'<select name="customfield'+ counter + '_type" id="customfield'+ counter + '_type" onchange="contactform_showoptionstextarea(\'customfield'+counter+'\');" disabled="">' +
-				'<option value="checkbox">Checkbox</option>' +
-				'<option value="radio">Radio Option</option>' +
-				'<option value="select">Select</option>' +
-				'<option value="text">Textbox</option>' +
-				'<option value="textarea">Textarea</option>' +
-				'</select>' +
-				'</td>' +
-				'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-				'<select name="customfield'+ counter + '_validation" id="customfield'+ counter + '_validation" disabled=""><option value="none">None</option>' +
-				'<option value="email">Email ID</option>' +
-				'<option value="number">Number</option>' +
-				'</select>' +
-				'</td>' +			
-				'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-				'<textarea style="display: block; width: 190px;" id="customfield'+ counter + '_options" name="customfield'+ counter + '_options" ></textarea>' +
-				'</td>' +
-				'</tr>');
-		counter++;
-	});
-	});
-	
-	function contactform_selectCategory(fldid)
-	{
-		var catId = document.getElementById(fldid).value;
-		if(catId == '')
-		{
-			document.getElementById('subscribe_option_yes').disabled="disabled";
-			document.getElementById('subscribe_option_no').disabled="disabled";
-			document.getElementById('awp_subscribe_to_newsletter').disabled="disabled";
-			
-		}else {
-			document.getElementById('subscribe_option_yes').disabled=false;
-			document.getElementById('subscribe_option_no').disabled=false;	
-			document.getElementById('awp_subscribe_to_newsletter').disabled=false;		
-		}
-	}
-	function changeTemplate()
-	{
-		if(document.getElementById('awp_contactform_templatetype').value == 'theme_template' )
-		{  
-			document.getElementById('awp_contactform_plugintemplatelayout').style.display = "none";
-			document.getElementById('awp_contactform_themetemplatelayout').style.display = "block";
-		}
-		else {
-			document.getElementById('awp_contactform_plugintemplatelayout').style.display = "block";
-			document.getElementById('awp_contactform_themetemplatelayout').style.display = "none";
-		}
-	
-	}
-	
-	function contactform_enablefield(fieldid){
-		var checked=document.getElementById(fieldid+'_show').checked;
-		var cfield_index=fieldid.indexOf('customfield');
-		if(checked){
-			document.getElementById(fieldid+'_text').disabled=!checked;
-			document.getElementById(fieldid+'_order').disabled=!checked;
-			document.getElementById(fieldid+'_require').disabled=!checked;
-			document.getElementById(fieldid+'_validation').disabled=!checked;
-			if(cfield_index==0){
-				document.getElementById(fieldid+'_type').disabled=!checked;
-				if (document.getElementById(fieldid+'_type').value == 'checkbox' ) 
-				{
-				document.getElementById(fieldid+'_validation').disabled="disabled";
-				}
-	            document.getElementById(fieldid+'_options').style.display="block";
-				document.getElementById(fieldid+'_options').disabled=!checked;
-			}
-		}else{
-			document.getElementById(fieldid+'_text').disabled="disabled";
-			document.getElementById(fieldid+'_order').disabled="disabled";
-			document.getElementById(fieldid+'_require').disabled="disabled";
-			document.getElementById(fieldid+'_validation').disabled="disabled";
-			if(cfield_index==0){
-				document.getElementById(fieldid+'_type').disabled="disabled";
-				document.getElementById(fieldid+'_options').disabled="disabled";	
-			}
-		}
-	}
-	
-	function contactform_showoptionstextarea(fieldid){
-		var type=document.getElementById(fieldid+'_type').value;
-		if ((type=="select") || (type=="radio") || (type=="checkbox")){
-			document.getElementById(fieldid+'_options').disabled=false;
-			document.getElementById(fieldid+'_options').style.display ="block";
-			document.getElementById(fieldid+'_validation').disabled="disabled";
-		}else{
-			document.getElementById(fieldid+'_validation').disabled="disabled";
-			document.getElementById(fieldid+'_options').disabled="disabled";
-			document.getElementById(fieldid+'_options').style.display ="none";
-			if(type=="text")
-			{
-				document.getElementById(fieldid+'_validation').disabled=false;
-			}
-		}
-	}
-	
-	
-	function confirmation(formname) {
-		var answer = confirm('Are you sure want to delete contact form: "'+formname+'"?');
-		if (answer){
-			document.getElementById('delformname').value = formname;
-			document.awp_contact_delete_form.submit();		
-		}
-		else{
-			document.getElementById('delformname').value = '';
-		}
-	}
-	
-	</script>
+
 	<?php
 		}
 	}
@@ -1478,8 +1266,8 @@ function get_plugin_templates()
 function getAllCountries()
 {
 	$params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-	            "arg1" => APPTIVO_ACCESS_KEY               
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+	            "arg1" => APPTIVO_BUSINESS_ACCESS_KEY               
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getAllCountries',$params);      
     return $response;
@@ -1493,8 +1281,8 @@ function getAllCountries()
 function getTargetListcategory()
 {
 	$params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-                "arg1" => APPTIVO_ACCESS_KEY
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+                "arg1" => APPTIVO_BUSINESS_ACCESS_KEY
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getAllTargetLists',$params);
     return $response;
@@ -1526,10 +1314,10 @@ function saveLeadDetails($firstName, $lastName, $emailId, $jobTitle, $company, $
    if($verification){
    	 return $verification;
    }
-	$leads = new AWP_LeadDetails(APPTIVO_SITE_KEY,$firstName, $lastName, $emailId, $jobTitle, $company, $address1, $address2, $city, $state, $zipCode, $bestWayToContact, $country, $leadSource, $phoneNumber, $comments, $noteDetails,$targetlistid);
+	$leads = new AWP_LeadDetails(APPTIVO_BUSINESS_API_KEY,$firstName, $lastName, $emailId, $jobTitle, $company, $address1, $address2, $city, $state, $zipCode, $bestWayToContact, $country, $leadSource, $phoneNumber, $comments, $noteDetails,$targetlistid);
     $params = array (
-                "arg0" => APPTIVO_SITE_KEY,
-                "arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+                "arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $leads
                 );    
   	$response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createLeadWithLeadSource',$params);  	

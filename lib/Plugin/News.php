@@ -1,6 +1,8 @@
 <?php  
 /**
- * AIP News plugin
+ * Apptivo News plugin
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
  */
 require_once AWP_LIB_DIR . '/Plugin.php';
 require_once AWP_INC_DIR . '/apptivo_services/News.php';
@@ -98,6 +100,10 @@ class AWP_News extends AWP_Base
         extract($awp_news_options);
         $Description = apply_filters('the_content', $Description);
         $response = addNews(null, $Title, $Description, $isFeatured, $startdate, $imageurl, $Link, $publishedat, $publishedby, $order, $enddate,null,$imageurl);
+        if($response == 'E_100')
+        {
+        	return 'E_100';
+        }
         return $response->return;
        }
     //Update news
@@ -178,12 +184,7 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
 	   <p>
 	   <img id="elementToResize" src="<?php echo awp_flow_diagram('news');?>" alt="News" title="News"  />
 	   </p>
-	    <script type="text/javascript" language="javascript" >
-	    var w = document.body.offsetWidth;
-	    var wid = ( w < 950 ) ? w-170 : 950;
-	    var elem = document.getElementById("elementToResize");  
-	    elem.style.width = wid+'px'; 
-	   </script>
+	   
     <p style="margin:10px;">
 		For Complete instructions,see the <a href="<?php echo awp_developerguide('news');?>" target="_blank">Developer's Guide.</a>
 	</p>
@@ -197,7 +198,9 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
         	if(strlen(trim($_POST['awp_news_title'])) == 0 )
 	    	{
              $_SESSION['awp_news_messge']  = 'Please enter a news title.';
-            }else if($addnews_response->statusCode != '1000') {
+            }else if($addnews_response == 'E_100') {
+	    		$_SESSION['awp_news_messge']  = '<span style=color:#f00;">Invalid Keys</span>';
+	    	}else if($addnews_response->statusCode != '1000') {
 	    		$_SESSION['awp_news_messge']  = '<span style=color:#f00;">'.$addnews_response->statusMessage.'</span>';
 	    	}else { 
 	    		 $_SESSION['awp_news_messge']  = 'News Added Successfully';
@@ -252,106 +255,7 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
 <style type="text/css">
 	        .awp_newsform td { width:80px;}	          
 </style>       
-<script type="text/javascript" language="javascript" >
 
-jQuery(document).ready(function(){
-
-	jQuery('#upload_image_button').click(function() {
-		 formfield = jQuery('#upload_image').attr('name');
-		 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
-		 return false;
-		});
-	
-	window.send_to_editor = function(html) {		
-		 imgurl = jQuery('img',html).attr('src');
-		 jQuery('#awp_news_imageurl').val(imgurl);
-		 tb_remove();
-		}
-	
-	jQuery("#news_fullview_shortcode").focus(function(){
-    	this.select();
-    });
-	jQuery("#news_inlineview_shortcode").focus(function(){
-    	this.select();
-    });    
-});
-
-function validatenews(action)
-{    
-	if(action =='add')
-	{
-		var title_id = 'awp_news_title';
-		var desc_content_id = 'awp_news_desc';
-	}else if(action =='edit')
-	{  
-		var title_id = 'awp_news_title';
-		var desc_content_id = 'awp_news_desc_update';
-	}
-	var editor = tinymce.get( desc_content_id);
-	editor.save()
-	
-	 var error = '';
-	 var news_title = jQuery('#'+title_id).val();
-	 var newstitle = jQuery.trim( news_title );
-	 var awp_news_link = jQuery('#awp_news_link').val();
-	 var awpNewsLink = jQuery.trim( awp_news_link );	
-	 var news_content = jQuery('#'+desc_content_id).val();
-	 var newscontent = jQuery.trim( news_content );
-
-	 if(newstitle == '')
-	 {
-		 jQuery('#'+title_id).css('border-color', '#f00'); 
-	 }else {
-		 jQuery('#'+title_id).css('border-color', '#CCCCCC');
-	 }
-	 if(newscontent == '')
-	 {  
-		 jQuery('#'+desc_content_id+'_ifr').css('border', ' 1px solid #f00');
-	 }else {
-		 jQuery('#'+desc_content_id+'_ifr').css('border-color', 'none');
-	 }
-	 
-	 if(newstitle == '' || newscontent == '')
-	 {
-		 jQuery('#newsmessage').remove();	
-		 jQuery('.addnews h2').after('<div id="newsmessage" class="updated"><p style="color:#f00;font-weight:bold;" >Please fill the mandatory fields.<p></div>');
-		 return false;
-	 }else {
-		 jQuery('#newsmessage').remove();		 
-		 jQuery('#'+title_id).css('border-color', '#CCCCCC');
-		 if(awpNewsLink == '')
-         {   jQuery('#awp_news_link').css('border-color', '#CCCCCC');
-             return true;
-         }else {
-        	 error += isValidURL(awpNewsLink);
-         }
-		 error = jQuery.trim( error );
-		 if( error == '')	
-		 { 
-			 return true;
-		 }else 
-		 { 
-		   return false; 
-		  }
-	 }
-	
-
-}
-
-function isValidURL(url){
-	var RegExp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-    if(RegExp.test(url)){
-    	     jQuery('#awp_news_link').css('border-color', '#CCCCCC'); 
-             return '';
-    }else{
-    	 jQuery('#newsmessage').remove();	
-		 jQuery('.addnews h2').after('<div id="newsmessage" class="updated"><p style="color:#f00;font-weight:bold;" >Please enter a valid URL.<p></div>');
-		 jQuery('#awp_news_link').css('border-color', '#f00'); 
-    	 return 'Invalid Url';
-    }
-}
-
-</script>
         <?php 
        
     }
@@ -495,24 +399,7 @@ function isValidURL(url){
            </tbody>
            </table>
         </div>
-        <script type="text/javascript" language="javascript" > 
-			function delete_news(status)
-            {
-	           if(status != 1)
-	           {
-		           alert('News Plugin is currently disabled.');
-		           return false;
-	           }
-	            
-				var answer = confirm('Are you sure want to delete News?');
-				if (answer){ 
-					return true;
-				}
-				else{
-					return false;
-				}
-             }
-	        </script>
+      
             <?php
                                     }
     }
@@ -528,7 +415,7 @@ function isValidURL(url){
         ksort($awp_tst_plugintemplates);
         if( empty($awp_news_inline_settings) )
         {
-        	echo '<span style="color:#f00;"> Save the the below settings to get the Shortcode for inline view. </span>';
+        	echo '<span style="color:#f00;"> Save the below settings to get the Shortcode for inline view. </span>';
         }
         
          ?>
@@ -536,7 +423,7 @@ function isValidURL(url){
             <table class="form-table" width="700" cellspacing="0" cellpadding="0">
                     <?php if(isset($awp_news_inline_settings) && !empty($awp_news_inline_settings)) { ?>
                     <tr valign="top">
-					<td valign="top"><label for="awp_customform_shortcode">Shortcode:</label>
+					<td valign="top"><label for="news_inlineview_shortcode">Shortcode:</label>
 					<br><span class="description"><?php _e('Copy and Paste this shortcode in your page to display the news.','apptivo-businesssite'); ?></span>
 					</td>
 					<td valign="top"><span name="awp_customform_shortcode" id="awp_customform_shortcode">
@@ -547,7 +434,7 @@ function isValidURL(url){
 				    </tr> <?php } ?>
                                    <tr valign="top"> <td><?php _e('Template Type','apptivo-businesssite'); ?> </td>
                                         <td valign="top">
-                                        <select name="awp_news_templatetype" id="awp_news_templatetype" onchange="tstchangeTemplate();">
+                                        <select name="awp_news_templatetype" id="awp_news_templatetype" onchange="news_change_template();">
                                                 <option value="awp_plugin_template" <?php selected($awp_news_inline_settings['template_type'],'awp_plugin_template'); ?> ><?php _e('Plugin Templates','apptivo-businesssite'); ?></option>
                                                 <?php if(!empty($awp_tst_themetemplates)) : ?>
                                                 <option value="theme_template" <?php selected($awp_news_inline_settings['template_type'],'theme_template'); ?> >Templates from Current Theme</option>
@@ -586,7 +473,7 @@ function isValidURL(url){
                                         </td></tr>
                                     <tr>
                                         <td><?php _e('Number of items to show','apptivo-businesssite'); ?></td>
-                                        <td><input type="text" name="itemstoshow" value="<?php echo ($awp_news_inline_settings['itemstoshow'] == '')?AWP_DEFAULT_ITEM_SHOW:$awp_news_inline_settings['itemstoshow']; ?>" size="3"/> &nbsp;&nbsp; <small>( Default : <?php echo AWP_DEFAULT_ITEM_SHOW; ?> ) </small></td>
+                                        <td><input class="num" type="text" name="itemstoshow" value="<?php echo ($awp_news_inline_settings['itemstoshow'] == '')?AWP_DEFAULT_ITEM_SHOW:$awp_news_inline_settings['itemstoshow']; ?>" size="3"/> &nbsp;&nbsp; <small>( Default : <?php echo AWP_DEFAULT_ITEM_SHOW; ?> ) </small></td>
                                     </tr>
                                     <tr><td><?php _e('More items Link title','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="more_text" value="<?php echo ($awp_news_inline_settings['more_text'] == '')? AWP_DEFAULT_MORE_TEXT:$awp_news_inline_settings['more_text']; ?>"/> &nbsp;&nbsp; <small>( Default : <?php echo AWP_DEFAULT_MORE_TEXT; ?> ) </small></td></tr>
@@ -602,21 +489,7 @@ function isValidURL(url){
                 </table>
 
         </form>
-        <script type="text/javascript" language="javascript">
-                function tstchangeTemplate()
-                {
-                    if(document.getElementById('awp_news_templatetype').value == 'theme_template' )
-                    {
-                        document.getElementById('awp_news_plugintemplatelayout').style.display = "none";
-                        document.getElementById('awp_news_themetemplatelayout').style.display = "block";
-                    }
-                    else {
-                        document.getElementById('awp_news_plugintemplatelayout').style.display = "block";
-                        document.getElementById('awp_news_themetemplatelayout').style.display = "none";
-                    }
-
-                }
-        </script>
+              
         <?php
     }
 
@@ -796,14 +669,14 @@ function isValidURL(url){
         ksort($awp_tst_plugintemplates); 
        if( empty($awp_news_settings) )
         {
-        	echo '<span style="color:#f00;"> Save the the below settings to get the Shortcode for full view. </span>';
+        	echo '<span style="color:#f00;"> Save the below settings to get the Shortcode for full view. </span>';
         }      
         ?>
         <form action="" class="awp_newsform" name="awp_news_full" method="post">
             <table class="form-table" width="700" cellspacing="0" cellpadding="0">
                 <?php if(isset($awp_news_settings) && !empty($awp_news_settings)) {?>
                 <tr valign="top">
-					<td valign="top"><label for="awp_customform_shortcode">Shortcode:</label>
+					<td valign="top"><label for="news_fullview_shortcode">Shortcode:</label>
 					<br><span class="description"><?php _e('Copy and Paste this shortcode in your page to display the news.','apptivo-businesssite'); ?></span>
 					</td>
 					<td valign="top"><span name="awp_customform_shortcode" id="awp_customform_shortcode">
@@ -818,7 +691,7 @@ function isValidURL(url){
                                     <tr valign="top"> <td><?php _e('Template Type','apptivo-businesssite'); ?> </td>
                                         <td valign="top"><select
                                                 name="awp_news_templatetype"
-                                                id="awp_news_templatetype" onchange="tstchangeTemplate();">
+                                                id="awp_news_templatetype" onchange="news_change_template();">
                                                 <option value="awp_plugin_template" <?php selected($awp_news_settings['template_type'],'awp_plugin_template'); ?> ><?php _e('Plugin Templates','apptivo-businesssite'); ?></option>
                                                 <?php if(!empty($awp_tst_themetemplates)) : ?>
                                                 	<option value="theme_template" <?php selected($awp_news_settings['template_type'],'theme_template'); ?> ><?php _e('Templates from Current Theme','apptivo-businesssite'); ?></option>
@@ -865,21 +738,7 @@ function isValidURL(url){
                                      </table>
 
         </form>
-        <script type="text/javascript" language="javascript">
-                function tstchangeTemplate()
-                {
-                    if(document.getElementById('awp_news_templatetype').value == 'theme_template' )
-                    {
-                        document.getElementById('awp_news_plugintemplatelayout').style.display = "none";
-                        document.getElementById('awp_news_themetemplatelayout').style.display = "block";
-                    }
-                    else {
-                        document.getElementById('awp_news_plugintemplatelayout').style.display = "block";
-                        document.getElementById('awp_news_themetemplatelayout').style.display = "none";
-                    }
 
-                }
-        </script>
         <?php
     }
     //Save Inline View settings
@@ -966,7 +825,7 @@ function isValidURL(url){
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_news_imageurl" type="text" size="50" name="awp_news_imageurl" value="" />
-									<input id="upload_image_button" type="button" value="Upload Image" />
+									<input id="news_upload_image" type="button" value="Upload Image" />
 									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 									</label></td>
 									</tr>
@@ -974,7 +833,7 @@ function isValidURL(url){
                                     
                                     <tr>
                                         <td><?php _e('Order to show','apptivo-businesssite'); ?></td>
-                                        <td><input type="text" name="awp_news_order" id="awp_news_order" value="" size="3" /></td>
+                                        <td><input type="text" class="num" name="awp_news_order" id="awp_news_order" value="" size="3" /></td>
                                     </tr>
                                     <tr>
                                         <td></td>
@@ -1032,14 +891,14 @@ function isValidURL(url){
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_news_imageurl" type="text" size="50" name="awp_news_imageurl" value="<?php if(!is_array($news->newsImages)){ echo $news->newsImages; } else{echo $news->newsImages[0]; } ?>" />
-									<input id="upload_image_button" type="button" value="Upload Image" />
+									<input id="news_upload_image" type="button" value="Upload Image" />
 									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 									</label></td>
 									</tr>
 									
                                     <tr>
                                         <td><?php _e('Order to show','apptivo-businesssite'); ?></td>
-                                        <td><input type="text" name="awp_news_order" id="awp_news_order" value="<?php echo $news->sequenceNumber; ?>" size="3" /></td>
+                                        <td><input type="text" class="num" name="awp_news_order" id="awp_news_order" value="<?php echo $news->sequenceNumber; ?>" size="3" /></td>
                                     </tr>
                                     <tr>
                                         <td><input type="hidden" name="startdate" value="<?php echo $news->startDate; ?>"/>
@@ -1079,14 +938,15 @@ function isValidURL(url){
 function getAllNews()
 {         
 	     $pubdate_params = array ( 
-                "arg0" => APPTIVO_SITE_KEY
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+                 "arg1" => APPTIVO_BUSINESS_ACCESS_KEY
 	            );
 	      $plugin_params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-	            "arg1" => APPTIVO_ACCESS_KEY
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+	            "arg1" => APPTIVO_BUSINESS_ACCESS_KEY
                 );
           
-           $response = get_data(APPTIVO_BUSINESS_SERVICES,'-news-publisheddate','-news-data','getSiteLasteUpdateDate','getAllNews',$pubdate_params,$plugin_params);
+           $response = get_data(APPTIVO_BUSINESS_SERVICES,'-news-publisheddate','-news-data','getLastPublishDate','getAllNews',$pubdate_params,$plugin_params);
            return $response;
 }
 
@@ -1111,8 +971,8 @@ function addNews($newsId, $newsHeadLine, $description, $isFeatured, $startDate, 
 
 	$mktg_news = new AWP_MktNews($newsId, $newsHeadLine, $description, $isFeatured, $startDate, $pageSectionImages, $link, $publishedAt, $publishedBy, $sequenceNumber, $endDate,null,$newsImages);
     $params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-                "arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+                "arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $mktg_news
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'addNews',$params);
@@ -1128,8 +988,8 @@ function addNews($newsId, $newsHeadLine, $description, $isFeatured, $startDate, 
 function getNewsById($newsId)
 {
 	$params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-				"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+				"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $newsId
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getNewsByNewsId',$params);
@@ -1155,8 +1015,8 @@ function updateNews($newsId, $newsHeadLine, $description, $isFeatured, $startDat
 {
 	$mktg_news = new AWP_MktNews($newsId, $newsHeadLine, $description, $isFeatured, $startDate, $pageSectionImages, $link, $publishedAt, $publishedBy, $sequenceNumber, $endDate, null,$newsImages);
     $params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-     			"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+     			"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $mktg_news
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'updateNews',$params);     

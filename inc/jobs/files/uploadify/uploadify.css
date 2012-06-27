@@ -4,3 +4,4 @@
 .uploadifyQueue .completed {background-color: #E5E5E5;}
 .uploadifyProgress {background-color: #E5E5E5;margin-top: 10px;width: 100%;}
 .uploadifyProgressBar {	background-color: #0099FF;height: 3px;width: 1px;}
+#cancal_upload{cursor:pointer;}

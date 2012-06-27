@@ -187,7 +187,7 @@ foreach($formfields as $field)
 						{
 						if($i>0)
 							$html.='<br>';
-						$html.='<label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><input type="radio" name="'.$fieldid.$opt.'" id="'.$fieldid.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'" '.$selected.'>';
+						$html.='<label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'" '.$selected.'>';
 						}
 						$opt++;
 				}

@@ -1,6 +1,8 @@
 <?php
 /**
- * AIP Events plugin
+ * Apptivo Events plugin
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
  */
 require_once AWP_LIB_DIR . '/Plugin.php';
 require_once AWP_INC_DIR . '/apptivo_services/MarketingEvent.php';
@@ -99,13 +101,7 @@ class AWP_Events extends AWP_Base
 	   <p>
 	   <img id="elementToResize" src="<?php echo awp_flow_diagram('events');?>" alt="Events" title="Events"  />
 	   </p>
-	   <script type="text/javascript" language="javascript" >
-	    var w = document.body.offsetWidth;
-	    var wid = ( w < 950 ) ? w-170 : 950;
-	    var elem = document.getElementById("elementToResize");  
-	    elem.style.width = wid+'px'; 
-	   </script>
-	       
+	  	       
         <p style="margin:10px;">
 		For Complete instructions,see the <a href="<?php echo awp_developerguide('events');?>" target="_blank">Developer's Guide.</a>
 		</p>          
@@ -120,6 +116,9 @@ class AWP_Events extends AWP_Base
                     {
                             $_SESSION['awp_events_messge'] = 'Please Enter a Events title';
                             
+                    }else if($addevents_response == 'E_100')
+                    {
+                    	$_SESSION['awp_events_messge'] = '<span style=color:#f00;">Invalid Keys</span>';
                     }else if($addevents_response->return->statusCode != '1000')
                     {
                     	$_SESSION['awp_events_messge'] = '<span style=color:#f00;">'.$addevents_response->return->statusMessage.'</span>';
@@ -177,110 +176,7 @@ class AWP_Events extends AWP_Base
 <style type="text/css">
 	.awp_eventsform td { width:90px;}	          
 </style>             
- <script type="text/javascript" language="javascript" >
 
- jQuery(document).ready(function(){
-		jQuery('#upload_image_button').click(function() {
-			 formfield = jQuery('#upload_image').attr('name');
-			 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
-			
-			 return false;
-			});
-		
-		window.send_to_editor = function(html) {		
-			 imgurl = jQuery('img',html).attr('src');
-			 jQuery('#awp_events_imageurl').val(imgurl);
-			 tb_remove();
-			}		
-		jQuery("#events_fullview_shortcode").focus(function(){
-	    	this.select();
-	    });
-		jQuery("#events_inlineview_shortcode").focus(function(){
-	    	this.select();
-	    });	    
-	});
-	 
-function validateevents(action)
-{    
-	if(action =='add')
-	{
-		var title_id = 'awp_events_title';
-		var desc_content_id = 'awp_events_desc';
-	}else if(action =='edit')
-	{  
-		var title_id = 'awp_events_title';
-		var desc_content_id = 'awp_events_desc_update';
-	}
-	
-	var editor = tinymce.get( desc_content_id);
-	editor.save();
-
-	
-	 var error = '';
-	 var events_title = jQuery('#'+title_id).val();
-	 var eventstitle = jQuery.trim( events_title );	
-	 var awp_events_link = jQuery('#awp_events_link').val();
-	 var awpEventsLink = jQuery.trim( awp_events_link );	
-
-	 var event_content = jQuery('#'+desc_content_id).val();
-	 var eventcontent = jQuery.trim( event_content );
-
-	 if(events_title == '')
-	 {
-		 jQuery('#'+title_id).css('border-color', '#f00'); 
-	 }else {
-		 jQuery('#'+title_id).css('border-color', '#CCCCCC');
-	 }
-	 if(event_content == '')
-	 {  
-		 jQuery('#'+desc_content_id+'_ifr').css('border', '1px solid #f00');
-	 }else {
-		 jQuery('#'+desc_content_id+'_ifr').css('border', 'none');
-	 }
-
-	 if(eventstitle == '' || event_content == '')
-	 {   error += 'event title is empty.';
-		  jQuery('#newsmessage').remove();	
-		 jQuery('.addevents h2').after('<div id="newsmessage" class="updated"><p style="color:#f00;font-weight:bold;" >Please fill the mandatory fields.<p></div>');
-		 return false;
-	 }else {
-		 jQuery('#newsmessage').remove();		 
-		 jQuery('#'+title_id).css('border-color', '#CCCCCC');
-         if(awpEventsLink == '')
-         {   jQuery('#awp_events_link').css('border-color', '#CCCCCC');
-             return true;
-         }else {
-        	 error += isValidURL(awpEventsLink);
-         }
-		 error = jQuery.trim( error );
-		 if( error == '')	
-		 { 
-			 return true;
-		 }else 
-		 { 
-		   return false; 
-		  }
-	 }
-	
-
-}
-
-function isValidURL(url){
-	var RegExp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-    if(RegExp.test(url)){
-    	     jQuery('#awp_events_link').css('border-color', '#CCCCCC'); 
-             return '';
-    }else{
-    	 jQuery('#newsmessage').remove();	
-		 jQuery('.addevents h2').after('<div id="newsmessage" class="updated"><p style="color:#f00;font-weight:bold;" >Please enter a valid URL.<p></div>');
-		 jQuery('#awp_events_link').css('border-color', '#f00'); 
-    	 return 'Invalid Url';
-    }
-}
-
-    
-
-</script>
             <?php
        
     }
@@ -387,14 +283,14 @@ function isValidURL(url){
         ksort($awp_tst_plugintemplates);
         if( empty($awp_events_settings) )
         {
-        	echo '<span style="color:#f00;"> Save the the below settings to get the Shortcode for full view. </span>';
+        	echo '<span style="color:#f00;"> Save the below settings to get the Shortcode for full view. </span>';
         }    
         ?>
         <form action="" class="awp_eventsform" name="awp_events_full" method="post">
             <table class="form-table" width="700" cellspacing="0" cellpadding="0">
                     <?php if(isset($awp_events_settings) && !empty($awp_events_settings)) {?>
                     <tr valign="top">
-					<td valign="top"><label for="awp_customform_shortcode">Shortcode:</label>
+					<td valign="top"><label for="events_fullview_shortcode">Shortcode:</label>
 					<br><span class="description"><?php _e('Copy and Paste this shortcode in your page to display the events.','apptivo-businesssite');?></span>
 					</td>
 					<td valign="top"><span id="awp_customform_shortcode" name="awp_customform_shortcode">
@@ -405,7 +301,7 @@ function isValidURL(url){
 				    </tr> <?php } ?>
                                     <tr valign="top"> <td><?php _e('Template Type','apptivo-businesssite');?></td>
                                         <td valign="top">
-                                           <select name="awp_events_templatetype" id="awp_events_templatetype" onchange="tstchangeTemplate();">
+                                           <select name="awp_events_templatetype" id="awp_events_templatetype" onchange="events_change_template();">
                                                 <option value="awp_plugin_template" <?php selected($awp_events_settings['template_type'],'awp_plugin_template'); ?> ><?php _e('Plugin Templates','apptivo-businesssite');?></option>
                                                 <?php if(!empty($awp_tst_themetemplates)) : ?>
                                                 <option value="theme_template" <?php selected($awp_events_settings['template_type'],'theme_template'); ?> >Templates from Current Theme</option>
@@ -451,21 +347,9 @@ function isValidURL(url){
                                      </table>
 
         </form>
-        <script type="text/javascript" language="javascript">
-                function tstchangeTemplate()
-                {
-                    if(document.getElementById('awp_events_templatetype').value == 'theme_template' )
-                    {
-                        document.getElementById('awp_events_plugintemplatelayout').style.display = "none";
-                        document.getElementById('awp_events_themetemplatelayout').style.display = "block";
-                    }
-                    else {
-                        document.getElementById('awp_events_plugintemplatelayout').style.display = "block";
-                        document.getElementById('awp_events_themetemplatelayout').style.display = "none";
-                    }
-
-                }
-        </script>
+      
+        
+        
         <?php
     }
     //Save Inline View settings
@@ -505,7 +389,7 @@ function isValidURL(url){
         ksort($awp_tst_plugintemplates);
         if( empty($awp_events_inline_settings) )
         {
-        	echo '<span style="color:#f00;"> Save the the below settings to get the Shortcode for inline view. </span> ';
+        	echo '<span style="color:#f00;"> Save the below settings to get the Shortcode for inline view. </span> ';
         }  
          ?>
         <form action="" class="awp_eventsform" name="awp_events_inline" method="post">
@@ -513,7 +397,7 @@ function isValidURL(url){
             <?php if(isset($awp_events_inline_settings) && !empty($awp_events_inline_settings))
             { ?>
             <tr valign="top">
-					<td valign="top"><label for="awp_customform_shortcode">Shortcode:</label>
+					<td valign="top"><label for="events_inlineview_shortcode">Shortcode:</label>
 					<br><span class="description"><?php _e('Copy and Paste this shortcode in your page to display the events.','apptivo-businesssite'); ?></span>
 					</td>
 					<td valign="top"><span id="awp_customform_shortcode" name="awp_customform_shortcode">
@@ -526,7 +410,7 @@ function isValidURL(url){
 <tr valign="top"> <td><?php _e('Template Type','apptivo-businesssite'); ?></td>
                                         <td valign="top"><select
                                                 name="awp_events_templatetype"
-                                                id="awp_events_templatetype" onchange="tstchangeTemplate();">
+                                                id="awp_events_templatetype" onchange="events_change_template();">
                                                 <option value="awp_plugin_template" <?php selected($awp_events_inline_settings['template_type'],'awp_plugin_template'); ?> ><?php _e('Plugin Templates','apptivo-businesssite'); ?></option>
                                                 <?php if(!empty($awp_tst_themetemplates)): ?>
                                                 <option value="theme_template" <?php selected($awp_events_inline_settings['template_type'],'theme_template'); ?> >Templates from Current Theme</option>
@@ -567,7 +451,7 @@ function isValidURL(url){
                                         </td></tr>
                                     <tr>
                                         <td><?php _e('Number of items to show','apptivo-businesssite'); ?></td>
-                                        <td><input type="text" name="itemstoshow" value="<?php echo ($awp_events_inline_settings['itemstoshow'] == '')?AWP_DEFAULT_ITEM_SHOW:$awp_events_inline_settings['itemstoshow'];?>" size="3"/>&nbsp;&nbsp; <small>( Default :  <?php echo AWP_DEFAULT_ITEM_SHOW; ?> ) </small></td>
+                                        <td><input type="text" class="num" name="itemstoshow" value="<?php echo ($awp_events_inline_settings['itemstoshow'] == '')?AWP_DEFAULT_ITEM_SHOW:$awp_events_inline_settings['itemstoshow'];?>" size="3"/>&nbsp;&nbsp; <small>( Default :  <?php echo AWP_DEFAULT_ITEM_SHOW; ?> ) </small></td>
                                     </tr>
                                     <tr><td><?php _e('More items Link title','apptivo-businesssite'); ?></td>
                                         <td><input type="text" name="more_text" value="<?php echo($awp_events_inline_settings['more_text'] == '')?AWP_DEFAULT_MORE_TEXT:$awp_events_inline_settings['more_text'];?>"/>&nbsp;&nbsp; <small>( Default :  <?php echo AWP_DEFAULT_MORE_TEXT;?> ) </small></td></tr>
@@ -583,21 +467,7 @@ function isValidURL(url){
                 </table>
 
         </form>
-        <script type="text/javascript" language="javascript">
-                function tstchangeTemplate()
-                {
-                    if(document.getElementById('awp_events_templatetype').value == 'theme_template' )
-                    {
-                        document.getElementById('awp_events_plugintemplatelayout').style.display = "none";
-                        document.getElementById('awp_events_themetemplatelayout').style.display = "block";
-                    }
-                    else {
-                        document.getElementById('awp_events_plugintemplatelayout').style.display = "block";
-                        document.getElementById('awp_events_themetemplatelayout').style.display = "none";
-                    }
-
-                }
-        </script>
+       
         
         <?php
     }
@@ -638,14 +508,14 @@ function isValidURL(url){
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_events_imageurl" type="text" size="50" name="awp_events_imageurl" value="" />
-									<input id="upload_image_button" type="button" value="Upload Image" />
+									<input id="events_upload_image" type="button" value="Upload Image" />
 									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 									</label></td>
 									</tr>
 									
                                     <tr>
                                         <td><?php _e('Order to show','apptivo-businesssite'); ?></td>
-                                        <td><input type="text" name="awp_events_order" id="awp_events_order" value="" size="3" /></td>
+                                        <td><input type="text" class="num" name="awp_events_order" id="awp_events_order" value="" size="3" /></td>
                                     </tr>
                                     <tr>
                                         <td></td>
@@ -696,14 +566,14 @@ function isValidURL(url){
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_events_imageurl" type="text" size="50" name="awp_events_imageurl" value="<?php if(!is_array($events->eventImages)){ echo $events->eventImages; } else{ echo $events->eventImages[0]; } ?>" />
-									<input id="upload_image_button" type="button" value="Upload Image" />
+									<input id="events_upload_image" type="button" value="Upload Image" />
 									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 									</label></td>
 									</tr>
 									
                                     <tr>
                                         <td><?php _e('Order to show','apptivo-businesssite'); ?></td>
-                                        <td><input type="text" name="awp_events_order" id="awp_events_order" value="<?php echo $events->sequenceNumber; ?>" size="3" /></td>
+                                        <td><input type="text" name="awp_events_order" class="num" id="awp_events_order" value="<?php echo $events->sequenceNumber; ?>" size="3" /></td>
                                     </tr>
                                     <tr>
                                         <td><input type="hidden" name="startdate" value="<?php echo $events->startDate; ?>"/>
@@ -808,23 +678,7 @@ function isValidURL(url){
                    
        </table>
         </div>
-        <script type="text/javascript" language="javascript" > 
-			function delete_events(status)
-            {   
-				if(status != 1)
-		           {
-			           alert('Events Plugin is currently disabled.');
-			           return false;
-		           }
-				var answer = confirm('Are you sure want to delete Events?');
-				if (answer){ 
-					return true;
-				}
-				else{
-					return false;
-				}
-             }
-	        </script>
+        
         <?php
             }
     }
@@ -1076,14 +930,15 @@ function isValidURL(url){
 function getAllEvents()
 {   
    $pubdate_params = array ( 
-                "arg0" => APPTIVO_SITE_KEY
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+                 "arg1" =>APPTIVO_BUSINESS_ACCESS_KEY
 	            );
 	            
    $plugin_params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-	            "arg1" => APPTIVO_ACCESS_KEY
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+	            "arg1" => APPTIVO_BUSINESS_ACCESS_KEY
                 );
-  $response = get_data(APPTIVO_BUSINESS_SERVICES,'-events-publisheddate','-events-data','getSiteLasteUpdateDate','getAllEvents',$pubdate_params,$plugin_params);
+  $response = get_data(APPTIVO_BUSINESS_SERVICES,'-events-publisheddate','-events-data','getLastPublishDate','getAllEvents',$pubdate_params,$plugin_params);
   return $response;
                 
 }
@@ -1124,8 +979,8 @@ function addEvents($eventName, $description, $startDate, $endDate, $displayFirst
 {   
 	$mktg_events = new AWP_MarketingEvent($eventName, $description, $startDate, $endDate, $displayFirstName, $displayLastName, $displayAddress, $displayEmailId, $displayPhoneNumber, $sendRegistrationEmail, $registrantFirstName, $registrantLastName, $registrantEmailId, $registrantPhoneNumber, $registrantAddressLine1, $registrantAddressLine2, $registrantCity, $registrantStateCode, $registrantStateName, $registrantPinCode, $registrantCountryCode, $registrantCountryName, $pageSectionImages, $link, $publishedAt, $publishedBy, $sequenceNumber, $marketingEventId,null,$newsImages);
     $params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-    			"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+    			"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $mktg_events
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'addMarketingEvent',$params);
@@ -1140,8 +995,8 @@ function addEvents($eventName, $description, $startDate, $endDate, $displayFirst
 function getMarketingEventById($eventsId)
 {
 	$params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-				"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+				"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $eventsId
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getMarketingEventById',$params);      
@@ -1184,8 +1039,8 @@ function updateEvents($eventName, $description, $startDate, $endDate, $displayFi
 {   
     $mktg_events = new AWP_MarketingEvent($eventName, $description, $startDate, $endDate, $displayFirstName, $displayLastName, $displayAddress, $displayEmailId, $displayPhoneNumber, $sendRegistrationEmail, $registrantFirstName, $registrantLastName, $registrantEmailId, $registrantPhoneNumber, $registrantAddressLine1, $registrantAddressLine2, $registrantCity, $registrantStateCode, $registrantStateName, $registrantPinCode, $registrantCountryCode, $registrantCountryName, $pageSectionImages, $link, $publishedAt, $publishedBy, $sequenceNumber, $marketingEventId,null,$newsImages);
     $params = array ( 
-                "arg0" => APPTIVO_SITE_KEY,
-    			"arg1" => APPTIVO_ACCESS_KEY,
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+    			"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
                 "arg2" => $mktg_events
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'updateEvent',$params);    

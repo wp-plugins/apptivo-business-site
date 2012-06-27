@@ -1,7 +1,8 @@
 <?php
 /**
  * AWP_Datachae(Apptivo Wordpress Datacache).
- *
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
  */
 require_once 'common-util.php';
 require_once 'File.php';
@@ -85,13 +86,13 @@ class AWP_Cache_Util extends AWP_Common_Util
 	 */
 	function storedata($key,$data)
 	{   
-		if(!defined('APPTIVO_SITE_KEY'))
+		if(!defined('APPTIVO_BUSINESS_API_KEY'))
 		{
-		$site_Key = $this->getsiteinfo();
+		$api_key = $this->getsiteinfo();
 		}else {
-		$site_Key = APPTIVO_SITE_KEY;			
+		$api_key = APPTIVO_BUSINESS_API_KEY;			
 		}
-		$key = $site_Key.$key;
+		$key = $api_key.$key;
 		return @$this->_memcache->set($key, $data);   
 	}
 	/**
@@ -101,13 +102,13 @@ class AWP_Cache_Util extends AWP_Common_Util
 	 */
 	function getdata($key)
 	{   
-	    if(!defined('APPTIVO_SITE_KEY'))
+	    if(!defined('APPTIVO_BUSINESS_API_KEY'))
 		{
-		$site_Key = $this->getsiteinfo();
+		$api_key = $this->getsiteinfo();
 		}else {
-		$site_Key = APPTIVO_SITE_KEY;			
+		$api_key = APPTIVO_BUSINESS_API_KEY;			
 		}	
-		$key = $site_Key.$key;		
+		$key = $api_key.$key;		
 		return @$this->_memcache->get($key);
 	}
     
@@ -119,13 +120,13 @@ class AWP_Cache_Util extends AWP_Common_Util
      */
     function delete($key)
     {   
-        if(!defined('APPTIVO_SITE_KEY'))
+        if(!defined('APPTIVO_BUSINESS_API_KEY'))
 		{
-		$site_Key = $this->getsiteinfo();
+		$api_key = $this->getsiteinfo();
 		}else {
-		$site_Key = APPTIVO_SITE_KEY;			
+		$api_key = APPTIVO_BUSINESS_API_KEY;			
 		}
-		$key = $site_Key.$key;
+		$key = $api_key.$key;
         return @$this->_memcache->delete($key);
     }
     
@@ -165,10 +166,10 @@ class AWP_Cache_Util extends AWP_Common_Util
                             $response = $this->set_memcache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key);
 		    	}
                         else {
-                               $publish_date = getsoapCall(APPTIVO_SITE_SERVICES,$publishdate_function,$publishdate_params);
+                               $publish_date = getsoapCall(APPTIVO_BUSINESS_SERVICES,$publishdate_function,$publishdate_params);
                                 $publish_prevDate =   $publish_date->return;
                                 if($publish_date!="E_100")
-                                {
+                                { 
 		    		if($publish_prevDate == $awp_cache_publishdate)
 		    		{   
                                     $response = $this->getdata($plugincall_key);
@@ -194,7 +195,7 @@ class AWP_Cache_Util extends AWP_Common_Util
      */
     function set_memcache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key){
         $response = getsoapCall(APPTIVO_BUSINESS_SERVICES, $plugincall_function, $plugincall_params);
-        $publish_date = getsoapCall(APPTIVO_SITE_SERVICES, $publishdate_function, $publishdate_params);
+        $publish_date = getsoapCall(APPTIVO_BUSINESS_SERVICES, $publishdate_function, $publishdate_params);
         $this->storedata($plugincall_key, $response);
         $this->storedata($publishdate_key, $publish_date->return);
         return $response;
@@ -211,11 +212,11 @@ class AWP_Cache_Util extends AWP_Common_Util
      * @return <type> 
      */
     function get_data($wsdl,$publishdate_key,$plugincall_key,$publishdate_function,$plugincall_function,$publishdate_params,$plugincall_params)
-    {         $publishdate_key = APPTIVO_SITE_KEY.$publishdate_key;
-              $plugincall_key  = APPTIVO_SITE_KEY.$plugincall_key;
+    {         $publishdate_key = APPTIVO_BUSINESS_API_KEY.$publishdate_key;
+              $plugincall_key  = APPTIVO_BUSINESS_API_KEY.$plugincall_key;
             if($this->check_memcache_enable())
           	{
-                 $response = $this->get_memache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key);
+                $response = $this->get_memache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key);
           	}
           	else {
               	 $response = $this->get_diskcache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key);
@@ -233,12 +234,12 @@ class AWP_Cache_Util extends AWP_Common_Util
      * @return <type> 
      */
     function get_diskcache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key){
-       $awp_cache_publishdate = $this->_disccache->get($publishdate_key);
+      $awp_cache_publishdate = $this->_disccache->get($publishdate_key);
        if (empty($awp_cache_publishdate)) { //Check the published date key value is set in memcahe or not.
             $response = $this->set_diskcache_data($plugincall_function, $plugincall_params, $publishdate_function, $publishdate_params, $plugincall_key, $publishdate_key);
         }
         else {
-        	$publish_date = getsoapCall(APPTIVO_SITE_SERVICES, $publishdate_function, $publishdate_params);
+        	$publish_date = getsoapCall(APPTIVO_BUSINESS_SERVICES, $publishdate_function, $publishdate_params);
             $publish_prevDate = $publish_date->return;
             if ($publish_date != "E_100") {
                 if ($publish_prevDate == $awp_cache_publishdate) {
@@ -264,7 +265,7 @@ class AWP_Cache_Util extends AWP_Common_Util
      */
      function set_diskcache_data($plugincall_function,$plugincall_params,$publishdate_function,$publishdate_params,$plugincall_key,$publishdate_key){
        $response = getsoapCall(APPTIVO_BUSINESS_SERVICES, $plugincall_function, $plugincall_params);
-       $publish_date = getsoapCall(APPTIVO_SITE_SERVICES, $publishdate_function, $publishdate_params);
+       $publish_date = getsoapCall(APPTIVO_BUSINESS_SERVICES, $publishdate_function, $publishdate_params);
        $this->_disccache->set($plugincall_key, $response);
        $this->_disccache->set($publishdate_key, $publish_date->return);
        return $response;

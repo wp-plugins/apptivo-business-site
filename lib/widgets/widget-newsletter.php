@@ -1,7 +1,9 @@
 <?php
-
-/* Apptivo Newsletter Widget */
-
+/**
+ * Apptivo Newsletter Widget
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
+ */
 class AWP_Newsletter_Widget extends WP_Widget {
     /** constructor */
 		var $widget_name;

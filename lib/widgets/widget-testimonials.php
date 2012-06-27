@@ -1,6 +1,8 @@
 <?php
-
-/* Apptivo Testimonials Widget
+/**
+ * Apptivo Testimonials Widget
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
  */
 class AWP_Testimonials_Widget extends WP_Widget {
     /** constructor */

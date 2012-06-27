@@ -1,6 +1,8 @@
 <?php
-/*
+/**
  * Apptivo Cases Apps Plugin
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
  */
 require_once AWP_LIB_DIR . '/Plugin.php';
 class AWP_Cases extends AWP_Base
@@ -195,7 +197,7 @@ echo awp_flow_diagram('cases',1);
 
 <?php if(!empty($formproperties[tmpltype])) :?>
 				<tr valign="top">
-					<th valign="top"><label for="awp_cases_shortcode"><?php _e("Form Shortcode", 'apptivo-businesssite' ); ?>:</label>
+					<th valign="top"><label for="cases_shortcode"><?php _e("Form Shortcode", 'apptivo-businesssite' ); ?>:</label>
 					<br><span class="description"><?php _e('Copy and Paste this shortcode in your page to display the cases form.','apptivo-businesssite'); ?></span>
 					</th>
 					<td valign="top"><span id="awp_cases_shortcode" name="awp_cases_shortcode">
@@ -210,7 +212,7 @@ echo awp_flow_diagram('cases',1);
 					<td valign="top">
 					<input type="hidden" id="awp_cases_name" name="awp_cases_name" value="<?php echo $selectedcontactform;?>"> 
 					
-						<select name="awp_cases_templatetype" id="awp_cases_templatetype" onchange="changeTemplate();">
+						<select name="awp_cases_templatetype" id="awp_cases_templatetype" onchange="cases_change_template();">
 							<option value="awp_plugin_template"  <?php selected($formproperties[tmpltype],'awp_plugin_template'); ?> >Plugin Templates</option>
 							<?php if(!empty($themetemplates)) : ?>
 							<option value="theme_template"  <?php selected($formproperties[tmpltype],'theme_template'); ?> >Templates from Current Theme</option>
@@ -301,7 +303,7 @@ echo awp_flow_diagram('cases',1);
 					</th>
                     <td valign="top"><input type="text" name="awp_cases_submit_value" id="awp_cases_submit_value" value="<?php echo $formproperties[submit_button_val];?>" size="52"/>
                     <span id="upload_img_button" style="display:none;">
-                    <input id="upload_image_button" type="button" value="Upload Image" />
+                    <input id="cases_upload_image" type="button" value="Upload Image" />
 					<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 					</span>
 					</td>
@@ -549,182 +551,14 @@ echo awp_flow_diagram('cases',1);
 			$cnt_custom_filed = 6 + count($addtional_custom);
 		}
 		?>
-		<p> <a rel="<?php echo $cnt_custom_filed; ?>" href="javascript:void(0);" id="addcustom_field" name="addcustom_field"  >+Add Another Custom Field</a> </p>
+		<p> <a rel="<?php echo $cnt_custom_filed; ?>" href="javascript:void(0);" id="cases_addcustom_field" name="cases_addcustom_field"  >+Add Another Custom Field</a> </p>
 		<p class="submit">
 			<input <?php if(!$this->_plugin_activated): echo 'disabled="disabled"'; endif; ?>   type="submit" name="awp_cases_settings" id="awp_cases_settings" class="button-primary" value="<?php esc_attr_e('Save Configuration','apptivo business site') ?>" />
 		</p>
 		</form>
-		<script type="text/javascript" language="javascript" >
-
-		jQuery(document).ready(function(){
-			var counter = document.getElementById("addcustom_field").getAttribute("rel");
-			jQuery("#addcustom_field").click(function ()
-			{   
-				jQuery('#cases_form_fields tr:last').after('<tr><td style="border: 1px solid rgb(204, 204, 204); padding-left: 10px; width: 150px;">Custom Field '+ counter + '</td><td align="center" style="border: 1px solid rgb(204, 204, 204);">' + 
-						'<input type="checkbox" id="customfield'+ counter + '_show" name="customfield'+ counter + '_show" size="30" onclick="casesform_enablefield(\'customfield'+counter+'\')">' +
-						'<input type="hidden" id="customfield'+ counter + '_newest" name="customfield'+ counter + '_newest" value=""></td>' + 
-						'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-						'<input type="checkbox" id="customfield'+ counter + '_require" name="customfield'+ counter + '_require" size="30" disabled="">' +
-						'</td>' +
-						'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-						'<input type="text" onkeypress="return isNumberKey(event)" id="customfield'+ counter + '_order" name="customfield'+ counter + '_order" value="" size="3" maxlength="2" disabled="">' +
-						'</td>' +
-						'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-						'<input type="text" id="customfield'+ counter + '_text" name="customfield5_text" value="Custom Field'+ counter + '" disabled="">' +
-						'</td>' +				
-						'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-						'<select name="customfield'+ counter + '_type" id="customfield'+ counter + '_type" onchange="casesform_showoptionstextarea(\'customfield'+counter+'\');" disabled="">' +
-						'<option value="checkbox">Checkbox</option>' +
-						'<option value="radio">Radio Option</option>' +
-						'<option value="select">Select</option>' +
-						'<option value="text">Textbox</option>' +
-						'<option value="textarea">Textarea</option>' +
-						'</select>' +
-						'</td>' +
-						'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-						'<select name="customfield'+ counter + '_validation" id="customfield'+ counter + '_validation" disabled=""><option value="none">None</option>' +
-						'<option value="email">Email ID</option>' +
-						'<option value="number">Number</option>' +
-						'</select>' +
-						'</td>' +			
-						'<td align="center" style="border: 1px solid rgb(204, 204, 204);">' +
-						'<textarea style="display: block; width: 190px;" id="customfield'+ counter + '_options" name="customfield'+ counter + '_options" ></textarea>' +
-						'</td>' +
-						'</tr>');
-				counter++;
-			});
-			});
-			
-	jQuery(document).ready(function(){
-	   jQuery('input:radio[name=awp_cases_confirm_msg_page]').change(function() {
-	      if(jQuery('input:radio[name=awp_cases_confirm_msg_page]:checked').val() == 'same')
-	       	{
-	       	jQuery('#awp_cases_confirmmsg_pageid').hide();
-	       	jQuery('#awp_cases_confirmationmsg_tr').show();
-	       	}	       	
-	       else{ 
-	      	jQuery('#awp_cases_confirmmsg_pageid').show();
-	      	jQuery('#awp_cases_confirmationmsg_tr').hide();
-	      	}
-	    });
-	});
-	
-	jQuery(document).ready(function(){
-	
-		jQuery('#upload_image_button').click(function() {
-		formfield = jQuery('#upload_image').attr('name');
-		tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
-		return false;
-		});
-	
-	window.send_to_editor = function(html) {
-		 imgurl = jQuery('img',html).attr('src');
-		 jQuery('#awp_cases_submit_value').val(imgurl);
-		 tb_remove();
-		}
-		
-		jQuery("#cases_shortcode").click(function(){
-			this.select();
-		});	
-				
-	    if(jQuery('input:radio[name=awp_cases_submit_type]:checked').val()=='submit')
-	    {
-	           jQuery('#awp_cases_submit_val').text('Button Text');
-	           jQuery("#upload_img_button").hide();
-	    }else {	   
-	          jQuery('#awp_cases_submit_val').text('Button Image URL');
-	          jQuery("#upload_img_button").show();
-	   }	     
-	 	                 
-	   jQuery('input:radio[name=awp_cases_submit_type]').change(function() {
-	   jQuery('#awp_cases_submit_value').val('');
-	        if(jQuery('input:radio[name=awp_cases_submit_type]:checked').val()=='submit')
-	        {
-	            jQuery('#awp_cases_submit_val').text('Button Text');
-	            jQuery("#upload_img_button").hide();
-	        }
-	        else {
-	          jQuery('#awp_cases_submit_val').text('Button Image URL');
-	          jQuery("#upload_img_button").show();
-	        }
-	    });	    
-	});
-           
-	function isNumberKey(evt)
-	{
-		
-	   var charCode = (evt.which) ? evt.which : event.keyCode
-	   if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-	      return false;
-	      } else {
-	
-	   return true; }
-	}
-
-	function changeTemplate()
-	{
-		if(document.getElementById('awp_cases_templatetype').value == 'theme_template' )
-		{  
-			document.getElementById('awp_cases_plugintemplatelayout').style.display = "none";
-			document.getElementById('awp_cases_themetemplatelayout').style.display = "block";
-		}
-		else {
-			document.getElementById('awp_cases_plugintemplatelayout').style.display = "block";
-			document.getElementById('awp_cases_themetemplatelayout').style.display = "none";
-		}
-	}
-	
-	function casesform_enablefield(fieldid){
-		var checked=document.getElementById(fieldid+'_show').checked;
-		var cfield_index=fieldid.indexOf('customfield');
-		if(checked){
-			document.getElementById(fieldid+'_text').disabled=!checked;
-			document.getElementById(fieldid+'_order').disabled=!checked;
-			document.getElementById(fieldid+'_require').disabled=!checked;
-			//document.getElementById(fieldid+'_validation').disabled=!checked;
-			if(cfield_index==0){
-				document.getElementById(fieldid+'_type').disabled=!checked;
-				if (document.getElementById(fieldid+'_type').value == 'checkbox' ) 
-				{
-				document.getElementById(fieldid+'_validation').disabled="disabled";
-				}
-	            document.getElementById(fieldid+'_options').style.display="block";
-				document.getElementById(fieldid+'_options').disabled=!checked;
-			}
-		}else{
-			document.getElementById(fieldid+'_text').disabled="disabled";
-			document.getElementById(fieldid+'_order').disabled="disabled";
-			document.getElementById(fieldid+'_require').disabled="disabled";
-			document.getElementById(fieldid+'_validation').disabled="disabled";
-			if(cfield_index==0){
-				document.getElementById(fieldid+'_type').disabled="disabled";
-				document.getElementById(fieldid+'_options').disabled="disabled";	
-			}
-		}
-	}
-	
-	function casesform_showoptionstextarea(fieldid){
-		var type=document.getElementById(fieldid+'_type').value;
-	
-		if ((type=="select") || (type=="radio") || (type=="checkbox")){
-			document.getElementById(fieldid+'_options').disabled=false;
-			document.getElementById(fieldid+'_options').style.display ="block";
-			document.getElementById(fieldid+'_validation').disabled="disabled";
-		}else{
-			document.getElementById(fieldid+'_validation').disabled="disabled";
-			document.getElementById(fieldid+'_options').disabled="disabled";
-			document.getElementById(fieldid+'_options').style.display ="none";
-			if(type=="text")
-			{
-				document.getElementById(fieldid+'_validation').disabled=false;
-			}
-		}
-	}
-		</script>
 		
 <?php 
 }
-
 
 //GEt Plugin Templates.
 function get_plugin_templates()
@@ -775,4 +609,3 @@ function createformfield_array($fieldid,$showtext,$required,$type,$validation,$o
 }
 	
 }
-?>

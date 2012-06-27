@@ -77,7 +77,7 @@ class AWP_MainController extends AWP_Base
         require_once AWP_PLUGINS_DIR . '/News.php';
         $awp_testimonials = & AWP_News::instance();
         $awp_testimonials->run();
-             /**
+         /**
          * Run Events Plugin
          */
         require_once AWP_PLUGINS_DIR . '/Events.php';
@@ -325,8 +325,8 @@ class AWP_MainController extends AWP_Base
     function options_jobs(){
     	require_once AWP_PLUGINS_DIR . '/jobs.php';
         $awp_jobsforms = & AWP_Jobs::instance();
-        $page = $_GET['keys'];
-        switch ($page){
+        $job_keys = $_GET['keys'];
+        switch ($job_keys){
         	case jobcreation:
         		$awp_jobsforms->createJobsoptions();
         		break;
@@ -421,18 +421,16 @@ class AWP_MainController extends AWP_Base
         			<br><span class="description">e.g. domain.com:22122 (or) 192.168.1.100:11211 </span>
         		</td>
         	</tr>
-                      		<tr>
+        	
+                  <tr>                      		
 					<td>
-						&nbsp;
-						
+					&nbsp;						
 					</td>
-                                        <td>
-    						
-							<input type="submit" name="awp_memcache_settings"
-								id="awp_memcache_settings" class="button-primary"
-								value="<?php esc_attr_e('Save Configuration') ?>" />
-						
+					
+                    <td>
+    				<input type="submit" name="awp_memcache_settings" id="awp_memcache_settings" class="button-primary" value="<?php esc_attr_e('Save Configuration') ?>" />
 					</td>
+					
 				</tr>
                         </tbody>
                     </table>
@@ -442,14 +440,14 @@ class AWP_MainController extends AWP_Base
  /**
      * Site Information.
      *
-     * @param unknown_type $apptivo_site_key
+     * @param unknown_type $apptivo_api_key
      */
-    function siteInformation($apptivo_site_key,$apptivo_access_key)
+    function siteInformation($apptivo_api_key,$apptivo_access_key)
     {
     	echo "<h3>" . __( 'Site Information', 'apptivo-businesssite' ) . "</h3>";
     	if(isset($_POST['awp_siteinfo_form']))
     	{ 
-    		if(strlen(trim($_POST['site_key'])) != 0 )
+    		if(strlen(trim($_POST['api_key'])) != 0 )
     	{
     		echo '<div class="updated below-h2" id="message"> <p> Updated Site Information Settings.</p></div>';
     	}else{
@@ -457,26 +455,30 @@ class AWP_MainController extends AWP_Base
     	}
     	}
     	?>
+    	<?php    	
+    	if (!defined("APPTIVO_ECOMMERCE_VERSION")){	$keys_readonly = false; }else { $keys_readonly = true; }
+    	?>
+    	
     	            <form name="awp_siteinfo_form" method="post" action="">
                     <table class="form-table">
                         <tbody>
                 <tr valign="top">
-					<th valign="top" style="width:425px;"><label for="site_key"><?php _e("Site key", 'apptivo-businesssite' ); ?> (You must <a href="<?php echo awp_developerguide('purchase-sitekey'); ?>" target="_blank" >purchase a site key</a> before using this Plugin) :</label>
-						<br><span class="description">Site key generated in Apptivo</span>
+					<th valign="top" style="width:425px;"><label for="api_key"><?php _e("API key", 'apptivo-businesssite' ); ?> ( <a href="<?php echo awp_developerguide('api-key'); ?>" target="_blank" >Get an Apptivo API Key</a> ) :</label>
+						<br><span class="description">API key generated in Apptivo</span>
 					</th>
 					<td valign="top">
-                     <input style="width:250px;" type="text" name="site_key" id="site_key" class="enabled" value="<?php echo $apptivo_site_key; ?>"/>
-                     <input type="hidden" name="prev_site_key" id="prev_site_key" value="<?php echo $apptivo_site_key; ?>"/>
+                     <input style="width:500px;" type="text" <?php if($keys_readonly) { echo 'readonly="true"';} ?>  name="api_key" id="api_key" class="enabled" value="<?php echo $apptivo_api_key; ?>"/>
+                     <input type="hidden" name="prev_api_key" id="prev_api_key" value="<?php echo $apptivo_api_key; ?>"/>
                      <input type="hidden" name="update_site_inf" id="update_site_inf" value="yes"/>
 					</td>
 				</tr>
 				
 				<tr valign="top">
-					<th valign="top"><label for="site_key"><?php _e("Access key", 'apptivo-businesssite' ); ?> </label>
+					<th valign="top"><label for="access_key"><?php _e("Access key", 'apptivo-businesssite' ); ?> </label>
 						<br><span class="description">Access key generated in Apptivo</span>
 					</th>
 					<td valign="top">
-                     <input style="width:250px;" type="text" name="access_key" id="access_key" class="enabled" value="<?php echo $apptivo_access_key; ?>"/>
+                     <input style="width:500px;" type="text" <?php if($keys_readonly) { echo 'readonly="true"';} ?>  name="access_key" id="access_key" class="enabled" value="<?php echo $apptivo_access_key; ?>"/>
                     </td>
 				</tr>
 				
@@ -511,54 +513,7 @@ class AWP_MainController extends AWP_Base
 				</tr>
                         </tbody>
                     </table>
-                </form>
-            <script type="text/javascript" language="javascript" > 
-    		function cmp_sitekey()
-            {   
-				var prev_siteKey = jQuery.trim( jQuery('#prev_site_key').val() );
-				var current_sitekey = jQuery.trim( jQuery('#site_key').val() );
-				var accessKey = jQuery.trim( jQuery('#access_key').val() );
-
-				if( current_sitekey == '' || accessKey == '') //To chk site key is empty
-				{
-					if(current_sitekey == '' && accessKey == '') {
-					jQuery('#site_key').css('border', '1px solid #f00');
-					jQuery('#access_key').css('border','1px solid #f00');
-					alert("Site Key and Access Key can not be empty.");
-					}else if(current_sitekey == '' && accessKey != '') {
-					jQuery('#site_key').css('border', '1px solid #f00');
-					jQuery('#access_key').css('border', '1px solid #dfdfdf');
-					alert("Site Key can not be empty.");
-					}else if(current_sitekey != '' && accessKey == '') {
-					jQuery('#site_key').css('border', '1px solid #dfdfdf');
-					jQuery('#access_key').css('border', '1px solid #f00');
-					alert("Access Key can not be empty.");
-						}
-					return false;
-				}else if( prev_siteKey == '' ) //To chk Previous site key is empty
-				{
-					return true;
-				}
-				else if( current_sitekey != prev_siteKey ) 
-				{
-					var answer = confirm('Are you sure  change the Site Key?');
-					if (answer){ 
-						return true;
-					}
-					else{
-						jQuery('#site_key').val(prev_siteKey);
-						jQuery('#site_key').css('border', '1px solid #dfdfdf');
-						jQuery('#access_key').css('border', '1px solid #dfdfdf');  
-						return false;
-					}
-				}else   //To chk both site keys are equal or not.
-				{
-					jQuery('#update_site_inf').val('no');   //This Site Key already configured.  update_site_inf value is set 'no'
-					return true; 
-					}
-				
-             }
-	        </script>
+                </form>           
     	<?php 
     	
     	
@@ -577,11 +532,11 @@ class AWP_MainController extends AWP_Base
 	    	{ 
 	    		echo '<div class="updated below-h2" id="message"> <p>Updated Plugins Settings.</p></div>';	    
 	    	}
-    	$apptivo_site_key = get_option('apptivo_sitekey');
-    	if (defined("APPTIVO_SITE_KEY") ){
+    	$apptivo_api_key = get_option('apptivo_apikey');
+    	if (defined("APPTIVO_BUSINESS_API_KEY") ){
 			$disable_plugin=false;
     	}
-    	else if (!empty($apptivo_site_key) || strlen(trim($apptivo_site_key)) > 0 )
+    	else if (!empty($apptivo_api_key) || strlen(trim($apptivo_api_key)) > 0 )
     	{	
     		$disable_plugin=false;
     	}
@@ -589,10 +544,7 @@ class AWP_MainController extends AWP_Base
 		{	
 			$disable_plugin=true;
 		}
-	    /* if($disable_plugin) 
-	     {
-		 	 echo '<span style="color:#f00;">Save Site Key to update settings.</span>';
-		 } */ 
+	   
      	 ?>
 	  <form name="awp_generalsettings_form" method="post" action="">
 		<table class="form-table">
@@ -600,7 +552,7 @@ class AWP_MainController extends AWP_Base
 			<!-- Contact Forms  -->
 			 <?php if(!defined('AWP_CONTACTFORM_DISABLE') || !AWP_CONTACTFORM_DISABLE) {  ?>
 			<tr valign="top">
-					<th class="titledesc" scope="row"><?php _e("Contact Forms", 'apptivo-businesssite' ); ?></th>
+					<th class="titledesc" scope="row"><label for="contactforms_enable"><?php _e("Contact Forms", 'apptivo-businesssite' ); ?></label></th>
                     <td class="forminp">
                     <input type="checkbox" name="contactforms_enable" id="contactforms_enable" class="enabled" 
 						<?php if($disable_plugin) {?>
@@ -615,7 +567,7 @@ class AWP_MainController extends AWP_Base
                <!-- Newsletter Form -->
                 <?php if(!defined('AWP_NEWSLETTER_DISABLE') || !AWP_NEWSLETTER_DISABLE) {  ?>
 			<tr valign="top">
-					<th class="titledesc" scope="row"><?php _e("Newsletters", 'apptivo-businesssite' ); ?></th>
+					<th class="titledesc" scope="row"><label for="newsletters_enable"><?php _e("Newsletters", 'apptivo-businesssite' ); ?></label></th>
                     <td class="forminp">
                    <input type="checkbox" name="newsletters_enable" id="newsletters_enable" class="enabled"
 						<?php if($disable_plugin){?>
@@ -631,7 +583,7 @@ class AWP_MainController extends AWP_Base
              <!-- Testimonials Sections -->
                   <?php if(!defined('AWP_TESTIMONIALS_DISABLE') || !AWP_TESTIMONIALS_DISABLE) {  ?>
 			<tr valign="top">
-					<th class="titledesc" scope="row"><?php _e("Testimonials", 'apptivo-businesssite' ); ?></th>
+					<th class="titledesc" scope="row"><label for="testimonials_enable"><?php _e("Testimonials", 'apptivo-businesssite' ); ?></label></th>
                     <td class="forminp">
                    <input type="checkbox" name="testimonials_enable" id="testimonials_enable" class="enabled"
 						<?php if($disable_plugin){?>
@@ -646,7 +598,7 @@ class AWP_MainController extends AWP_Base
                <!-- News Sections -->
                     <?php if(!defined('AWP_NEWS_DISABLE') || !AWP_NEWS_DISABLE) {  ?>
 			<tr valign="top">
-					<th class="titledesc" scope="row"><?php _e("News", 'apptivo-businesssite' ); ?></th>
+					<th class="titledesc" scope="row"><label for="news_enable"><?php _e("News", 'apptivo-businesssite' ); ?></label></th>
                     <td class="forminp">
                    <input type="checkbox" name="news_enable" id="news_enable" class="enabled"
 						<?php if($disable_plugin) {?>
@@ -661,7 +613,7 @@ class AWP_MainController extends AWP_Base
                <!-- Events Sections -->
 				    <?php if(!defined('AWP_EVENTS_DISABLE') || !AWP_EVENTS_DISABLE) {  ?>
 			<tr valign="top">
-					<th class="titledesc" scope="row"><?php _e("Events", 'apptivo-businesssite' ); ?></th>
+					<th class="titledesc" scope="row"><label for="events_enable"><?php _e("Events", 'apptivo-businesssite' ); ?></label></th>
                     <td class="forminp">
                    <input type="checkbox" name="events_enable" id="events_enable" class="enabled"
 						<?php if($disable_plugin){?>
@@ -677,7 +629,7 @@ class AWP_MainController extends AWP_Base
                <!-- Jobs Sections -->
                 <?php if(!defined('AWP_JOBS_DISABLE') || !AWP_JOBS_DISABLE) {  ?>
 			<tr valign="top">
-					<th class="titledesc" scope="row"><?php _e("Jobs", 'apptivo-businesssite' ); ?></th>
+					<th class="titledesc" scope="row"><label for="jobs_enable"><?php _e("Jobs", 'apptivo-businesssite' ); ?></label></th>
                     <td class="forminp">
                   <input type="checkbox" name="jobs_enable" id="jobs_enable" class="enabled" 
 						<?php if($disable_plugin){?>
@@ -692,7 +644,7 @@ class AWP_MainController extends AWP_Base
                
                  <?php if(!defined('AWP_CASES_DISABLE') || !AWP_CASES_DISABLE) {  ?>
 			<tr valign="top">
-					<th class="titledesc" scope="row"><?php _e("Cases", 'apptivo-businesssite' ); ?></th>
+					<th class="titledesc" scope="row"><label for="cases_enable"><?php _e("Cases", 'apptivo-businesssite' ); ?></label></th>
                     <td class="forminp">
                   <input type="checkbox" name="cases_enable" id="cases_enable" class="enabled" 
 						<?php if($disable_plugin){?>
@@ -761,15 +713,14 @@ class AWP_MainController extends AWP_Base
 		{   
 		  if(class_exists('Memcache'))
 		    { 
-		    $awp_datacache = new AWP_Cache_Util(); //Create Object in AWP_DataCache clss]
-		    $memcachesettings = array();
-	        $memcachesettings['memcache_enable']= AWP_Request::get_boolean("memcache_enable");
-	        $memcachesettings['hostname_portno']= AWP_Request::get_string("hostname_portno");  
-	        $test_connect = $awp_datacache->connectmcache( $memcachesettings['hostname_portno']);
-	        return $test_connect;
+		     $awp_datacache = new AWP_Cache_Util(); //Create Object in AWP_DataCache clss]
+		     $memcachesettings = array();
+	         $memcachesettings['memcache_enable']= AWP_Request::get_boolean("memcache_enable");
+	         $memcachesettings['hostname_portno']= AWP_Request::get_string("hostname_portno");  
+	         $test_connect = $awp_datacache->connectmcache( $memcachesettings['hostname_portno']);
+	         return $test_connect;
 		    }else{
-		    //echo '<span style="color:#f00;">PHP Memcache is not detected in this system. Install PHP Memcache and configure to Test Memcache connection.</span>';
-		    	return false;
+		     return false;
 		    }
 		}     
 	}
@@ -780,28 +731,32 @@ class AWP_MainController extends AWP_Base
        if(isset($_POST['awp_siteinfo_form'])){
        	    $apptivo_poweredby_status = AWP_Request::get_string('powered_status');
        	    update_option('apptivo_poweredby_status',$apptivo_poweredby_status);
-       	    $apptivo_site_key= AWP_Request::get_string("site_key");
+       	    $apptivo_api_key= AWP_Request::get_string("api_key");
             $apptivo_access_key= AWP_Request::get_string("access_key");
             $apptivo_update_site_inf= AWP_Request::get_string("update_site_inf"); // To check options or delete or not.
-            if ((!empty($apptivo_site_key) || strlen(trim($apptivo_site_key)) > 0) && (strtolower($apptivo_update_site_inf) != 'no'))
+            if ((!empty($apptivo_api_key) || strlen(trim($apptivo_api_key)) > 0) && (strtolower($apptivo_update_site_inf) != 'no'))
             {
-            if(get_option("apptivo_sitekey")!=="false"){ 
-            update_option('apptivo_sitekey',$apptivo_site_key);
+            if(get_option("apptivo_apikey")!=="false"){ 
+            update_option('apptivo_apikey',$apptivo_api_key);
+            update_option('apptivo_ecommerce_apikey',$apptivo_api_key);
             }else {
-            	add_option('apptivo_sitekey', $apptivo_site_key);
+            	add_option('apptivo_apikey', $apptivo_api_key);
+            	add_option('apptivo_ecommerce_apikey', $apptivo_api_key);
             }
             }
             
             //apptivo access Key
              if(get_option('apptivo_accesskey')!=="false") :
              	update_option('apptivo_accesskey',$apptivo_access_key);
+             	update_option('apptivo_ecommerce_accesskey',$apptivo_access_key);
              else:
                add_option('apptivo_accesskey', $apptivo_access_key);
+               add_option('apptivo_ecommerce_accesskey', $apptivo_access_key);
              endif;
                
        }
        
-       $apptivo_site_key = get_option('apptivo_sitekey');
+       $apptivo_api_key = get_option('apptivo_apikey');
        $apptivo_access_key = get_option('apptivo_accesskey');
        
 	if(trim($updatemessage)!=""){
@@ -812,11 +767,7 @@ class AWP_MainController extends AWP_Base
 	        </p>
 	    </div>
 	    <?php }
-	        if(!defined("APPTIVO_SITE_KEY") )
-            	$this->siteInformation($apptivo_site_key,$apptivo_access_key);
-            else if (!empty($apptivo_site_key)){
-            	$this->siteInformation($apptivo_site_key,$apptivo_access_key);
-            }
+	        $this->siteInformation($apptivo_api_key,$apptivo_access_key);
 	}
 	
 	function plugin_tabsettings()
@@ -840,7 +791,7 @@ class AWP_MainController extends AWP_Base
 	            'newsletters' => 1, 
 	            'jobs'=> 1
 	            );
-                   if(get_option("apptivo_sitekey") != '') :
+                   if(get_option("apptivo_apikey") != '') :
 	            	update_option("awp_plugins", $general_plugins_settings);
 	            	endif;
 	            endif;
@@ -875,20 +826,7 @@ class AWP_MainController extends AWP_Base
 		//Memcache Settings.
 		$this->memcache_tabsettings();
 		 ?>
-			<script language="javascript" type="text/javascript">
-			function genralform_enablefield(fld)
-			{
-				var checked=document.getElementById(fld).checked;
-				if(checked){
-					document.getElementById('hostname_portno').disabled=!checked;
-					document.getElementById('awp_memcache_test').disabled=!checked;
-				}
-				else {
-					document.getElementById('hostname_portno').disabled="disabled";
-					document.getElementById('awp_memcache_test').disabled="disabled";
-				}
-			}
-			</script>
+
 <?php 
 	     echo "</div>";
     }

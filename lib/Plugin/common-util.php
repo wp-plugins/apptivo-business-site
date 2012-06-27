@@ -1,7 +1,8 @@
 <?php
 /**
  * AWP_Common_Util Class.
- *
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
  */
 class AWP_Common_Util
 {
@@ -12,8 +13,8 @@ class AWP_Common_Util
 	 */
 	function getsiteinfo()
 	{
-		$apptivo_site_key= get_option('apptivo_sitekey');
-		return $apptivo_site_key;
+		$apptivo_api_key= get_option('apptivo_apikey');
+		return $apptivo_api_key;
 	}
 	/**
 	 * Get Memcache Information.
@@ -27,4 +28,3 @@ class AWP_Common_Util
 		
 	}
 }
-?>

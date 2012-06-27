@@ -1,4 +1,9 @@
 <?php
+/**
+ * Apptivo business plugin configuration
+ * @package apptivo-business-site
+ * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
+ */
 //Default values
 define('AWP_DEFAULT_ITEM_SHOW',5);
 define('AWP_DEFAULT_MORE_TEXT','More..');
@@ -16,7 +21,7 @@ define('AWP_DEFAULT_MORE_TEXT','More..');
  Changing define statements below will make plugin to not work properly.
  * */
 //Plugin Version
-define('AWP_VERSION', '1.0.1');
+define('AWP_VERSION', '1.1');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
@@ -43,21 +48,27 @@ define('AWP_TESTIMONIALS_DEFAULT_TEMPLATE','default-testimonials.php');
 define('AWP_NEWSLETTER_WIDGET_DEFAULT_TEMPLATE','widget-default-template-usphone.php');
 //Apptivo API URL's
 //Dont change this unless specified, changing to incorrect values will make plugins to not work properly.
-define('APPTIVO_API_URL','https://api.apptivo.com/app/');
-define('APPTIVO_SITE_SERVICES', APPTIVO_API_URL.'services/SiteServices?wsdl');
-define('APPTIVO_BUSINESS_SERVICES', APPTIVO_API_URL.'appservices/BusinessSiteServices?wsdl');
-define('APPTIVO_DOC_UPLOADURL','http://www.apptivo.com/app/fileuploadservlet');
-if(!defined('APPTIVO_SITE_KEY') )
+define('APPTIVO_API_URL','https://api.apptivo.com/');
+define('APPTIVO_BUSINESS_SERVICES', APPTIVO_API_URL.'app/services/v1/BusinessSiteServices?wsdl');
+define('APPTIVO_BUSINESS_INDEX', APPTIVO_API_URL.'ts/services/AppJobWebService?wsdl');
+//API Key and Access Keys Settings.
+
+$eCommerce_api_Key = get_option('apptivo_ecommerce_apikey');
+$eCommerce_access_key = get_option('apptivo_ecommerce_accesskey');
+$business_site_key = get_option('apptivo_sitekey'); 
+if(!empty($eCommerce_api_Key) )
 {
-	$apptivo_site_key = get_option('apptivo_sitekey');
-	$apptivo_accesskey = get_option('apptivo_accesskey');
-	if(empty($apptivo_site_key) || strlen(trim($apptivo_site_key)) == 0 ){
-		//No site key in DB
-	}else{
-		define('APPTIVO_SITE_KEY',trim($apptivo_site_key));
-		define('APPTIVO_ACCESS_KEY',trim($apptivo_accesskey));
-	}
+	update_option('apptivo_apikey',$eCommerce_api_Key);
+	update_option('apptivo_accesskey',$eCommerce_access_key);
+}else if(!empty($business_site_key)) {
+	update_option('apptivo_apikey',$business_site_key);
+	delete_option('apptivo_sitekey');
 }
+
+$apptivo_api_key = get_option('apptivo_apikey');
+$apptivo_accesskey = get_option('apptivo_accesskey');
+define('APPTIVO_BUSINESS_API_KEY',trim($apptivo_api_key));
+define('APPTIVO_BUSINESS_ACCESS_KEY',trim($apptivo_accesskey));
 /**
  * Loads plugins
  *
@@ -283,7 +294,8 @@ function getsoapCall($wsdl,$function,$params)
    try {
     	 $response = $client->__soapCall($function, array($params));
     }catch(Exception $e){
-    	 return 'E_100'; // Exception echo $e->getMessage();
+        $e->getMessage();
+        return 'E_100'; 
     }
    return $response;
 }
