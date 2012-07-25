@@ -3,7 +3,7 @@
  Template Name:Single Column Layout
  Template Type: Shortcode
  */ 
-$jss ='<script type="text/javascript">
+echo $jss ='<script type="text/javascript">
 jQuery(document).ready(function()
 {
    jQuery.validator.addMethod("phoneUS", function(phone_number, element) {
@@ -39,24 +39,30 @@ div.error {background-color: #FFD4D4;color: #D8000C;padding: 10px 10px 10px 32px
 label.error{padding-left: 10px;color: red;float:left;width:150px;}
 .case_input select{float:left;}
 </style>
-<?php 
-$html.= '<form class="apptivo_case" id="apptivo_business_cases" class="business_cases" name="apptivo_business_cases" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
-$html.='<input type="hidden" id="apptivo_cases_form" name="apptivo_cases_form" value="1" />';
-$html.='<div class="absp_business_main cases_outfrm">';
+<?php
+
+do_action('apptivo_business_cases_before_form'); //Before Form 
+
+echo  '<form class="apptivo_case" id="apptivo_business_cases" class="business_cases" name="apptivo_business_cases" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
+echo '<input type="hidden" id="apptivo_cases_form" name="apptivo_cases_form" value="1" />';
+echo '<div class="absp_business_main cases_outfrm">';
 $i=0;
 foreach($cases_fields as $field)
   {
   $i=$i+1;
-  $html.='<div class="case_main">';
+  echo '<div class="case_main">';
   $mandatory_symbol =    ' '.awp_mandatoryfield($field,$before='<span>',$after='</span>',$mandatory_symbol = '*');
-  $html.=    awp_create_labelfield($field['showtext'],'','','<div class="case_label"><span style="float: left; padding-top: 3px;">',$mandatory_symbol.'</span></div>'); //Label Field   
-  $html.=    cases_textfield($form_properties,$field,$countries,$valuepresent,'<div class="case_input">','</div>',true, $i,true);//Text Field
-  $html.='</div>';
+  echo awp_create_labelfield($field['showtext'],'','','<div class="case_label"><span style="float: left; padding-top: 3px;">',$mandatory_symbol.'</span></div>'); //Label Field   
+  cases_textfield($form_properties,$field,$countries,$valuepresent,'<div class="case_input">','</div>',true, $i,true,'cases');//Text Field
+  echo '</div>';
   }
+
+do_action('apptivo_business_cases_before_submit_query'); //Before submit Query  
+
 $submit = cases_submit_type($form_properties,"apptivo_casesform",'','','', $i+1); //SubMit Button Type
-$html.= '<div class="case_main"><div class="case_label"><span style="float: left; padding-top: 5px;">&nbsp;</span></div>
+  echo '<div class="case_main"><div class="case_label"><span style="float: left; padding-top: 5px;">&nbsp;</span></div>
          <div class="submit_btn">'.$submit.'</div></div>';
-$html.= '</div></form>';
-echo $jss;
-echo $html;
+echo  '</div></form>';
+
+do_action('apptivo_business_cases_after_form'); //After Form
 ?>

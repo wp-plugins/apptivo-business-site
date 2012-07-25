@@ -594,11 +594,25 @@ function get_plugin_templates()
 */
 
 function createformfield_array($fieldid,$showtext,$required,$type,$validation,$options,$displayorder){
-		if(trim($displayorder)=="")
-		$displayorder=0;
+        
+	    $displayorder = (trim($displayorder)=="")?0:trim($displayorder);
+				
+		$options = (is_array($options))?$options:stripslashes(str_replace( array('"'), '', strip_tags($options)));
+
+		if( trim($type) != 'text' && trim($type) != 'textarea')
+		{
+			$pos = strpos(trim($fieldid), 'customfield');
+			if( $pos !== false )
+			{
+				if( !is_array($options) && trim($options) == '')
+				{	
+					return '';
+				}
+			}
+		}   
 		$contactformfield= array(
 	            'fieldid'=>$fieldid,
-                'showtext' => stripslashes(str_replace( array('"', ',' , ';', '<', '>' ), ' ', $showtext)),
+                'showtext' => stripslashes(str_replace( array('"'), '', strip_tags($showtext))),
 	            'required' => $required,
 				'type' => $type,
 				'validation' => $validation,

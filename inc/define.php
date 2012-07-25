@@ -21,7 +21,7 @@ define('AWP_DEFAULT_MORE_TEXT','More..');
  Changing define statements below will make plugin to not work properly.
  * */
 //Plugin Version
-define('AWP_VERSION', '1.1');
+define('AWP_VERSION', '1.1.1');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
@@ -815,8 +815,9 @@ function awp_submit_type($forms='',$form_submitname='',$class='',$before='',$aft
  * @param unknown_type $after
  * @return unknown
  */
-function cases_textfield($forms='',$field='',$countries='',$value_present='',$before='',$after='',$placeholder=false, $tabindex='',$dafaultselect=false)
+function cases_textfield($forms='',$field='',$countries='',$value_present='',$before='',$after='',$placeholder=false, $tabindex='',$dafaultselect=false,$plugin='')
 {
+	echo $before;
 	$fieldid=$field['fieldid'];
 	$showtext=$field['showtext'];
 	$validation=$field['validation'];
@@ -878,17 +879,21 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
     switch($fieldtype)
 		{
 			case "text":
-                            $html = '<input  '.$place_text.' type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value="'.$postValue.'"  class="absp_contact_input_text'.$validateclass.'" tabindex="'.$tabindex.'">';
+               echo '<input  '.$place_text.' type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value="'.$postValue.'"  class="absp_'.$plugin.'_input_text'.$validateclass.'" tabindex="'.$tabindex.'">';
 			break;
 			case "textarea":
-				$html  =  '<textarea  '.$place_text.' name="'.$fieldid.'" id="'.$fieldid.'_id"   class="absp_contact_textarea'.$validateclass.'" size="50"  tabindex="'.$tabindex.'">'.$postValue.'</textarea>';
+			   echo '<textarea  '.$place_text.' name="'.$fieldid.'" id="'.$fieldid.'_id"   class="absp_'.$plugin.'_textarea'.$validateclass.'" size="50"  tabindex="'.$tabindex.'">'.$postValue.'</textarea>';
 			break;
 			case "select":
                 
-					$html =  '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_contact_select'.$validateclass.'"  tabindex="'.$tabindex.'">';
+					echo '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$plugin.'_select'.$validateclass.'"  tabindex="'.$tabindex.'">';
+					
 					if($dafaultselect):
-					$html .=  '<option value="" > -- Select -- </option>';
+					    $default_select = '<option value="" > -- Select -- </option>';
+					    echo apply_filters('apptivo_business_'.$plugin.'_'.$fieldid.'_default_option',$default_select);
 					endif;
+					
+					
 					foreach( $optionvalues as $optionvalue )
 					{
 	                                    if(trim($postValue) == trim($optionvalue)){
@@ -900,10 +905,10 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
 	                                     }
 						if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 							{
-						$html .=  '<option value="'.$optionvalue.'" '.$selected.'>'.$optionvalue.'</option>';
+						echo  '<option value="'.$optionvalue.'" '.$selected.'>'.$optionvalue.'</option>';
 							}
 					}
-					$html .=  '</select>';
+					echo  '</select>';
               
 			break;
 			case "radio":
@@ -920,8 +925,8 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
                       if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 						{
 					if($i>0)
-						$html .='&nbsp;';
-					$html .='<input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'" '.$selected.'  tabindex="'.$tabindex.'"><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label>';
+						echo '&nbsp;';
+					echo '<input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_'.$plugin.'_input_radio '.$validateclass.'" '.$selected.'  tabindex="'.$tabindex.'"><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label>';
 						}
 						$opt++;
 				}
@@ -941,25 +946,25 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
 					if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 					{
 					if($i>0)
-					$html .='&nbsp';
-					$html.='<input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_checkbox '.$validateclass.'"  '.$selected.'  tabindex="'.$tabindex.'"> <label for="'.$fieldid.$opt.'">'.$optionvalue.'</label>';
+					echo '&nbsp';
+					echo '<input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_'.$plugin.'_input_checkbox '.$validateclass.'"  '.$selected.'  tabindex="'.$tabindex.'"> <label for="'.$fieldid.$opt.'">'.$optionvalue.'</label>';
 					$i++;
 					}
 					$opt++;
 				}
                         break;
             case "captcha":
-                  $html ='<div class="captcha_image"><img src="'.$forms['captchaimagepath'].'" id="cases_captchaimg" style="border:1px solid #000;"/></div>
+                  echo '<div class="captcha_image"><img src="'.$forms['captchaimagepath'].'" id="'.$plugin.'_captchaimg" style="border:1px solid #000;"/></div>
                           <div class="captcha_input"><input type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value=""  class="absp_contact_input_text'.$validateclass.'"  tabindex="'.$tabindex.'" /></div>';
             break;
             
             case "file":
-			   $html ='<input type="file" id="file_upload" name="file_upload"  tabindex="'.$tabindex.'" />';
-			   $html.= '<input type="hidden" name="uploadfile_docid" id="uploadfile_docid" value="" class="absp_jobapplicant_input_text'.$validateclass.'"  />';
+			   echo '<input type="file" id="file_upload" name="file_upload"  tabindex="'.$tabindex.'" />';
+			   echo  '<input type="hidden" name="uploadfile_docid" id="uploadfile_docid" value="" class="absp_'.$plugin.'_input_text'.$validateclass.'"  />';
 			break;
 			   
 		}
-		return $before.$html.$after;           
+		echo $after;           
 }
 
 function cases_submit_type($forms='',$form_submitname='',$class='',$before='',$after='', $tabindex)

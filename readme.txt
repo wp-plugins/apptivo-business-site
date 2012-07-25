@@ -3,7 +3,7 @@ Contributors: apptivo, rmohanasundaram
 Tags: apptivo, contact forms, crm, newsletters, testimonials
 Requires at least: 3.0
 Tested up to: 3.3.1
-Stable tag: 1.1
+Stable tag: 1.1.1
 
 Create contact forms, newsletter signups, and customer testimonials, integrated with Apptivo.
 
@@ -49,6 +49,11 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 2. screenshot-2.jpg
 
 == Changelog ==
+
+= 1.1.1 =
+* Fix - Faulty html in custom field options.
+* Added hooks for contact form, newsletter, cases and job applicant form.
+
 = 1.1 =
 * Updated Plugin to use Apptivo new API Key and Access Key in Firm Business settings.
 * Old Plugin users using Site key / Access key from Website App, has to update the keys in Plugin with Business settings API Key / Access Key.

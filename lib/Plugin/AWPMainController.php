@@ -44,7 +44,7 @@ class AWP_MainController extends AWP_Base
         $awp_contactforms->run();
         
         /**
-         * Run Contact Forms Plugin
+         * Run Cases Forms Plugin
          */
         require_once AWP_PLUGINS_DIR . '/cases.php';
         $awp_cases = & AWP_Cases::instance();
