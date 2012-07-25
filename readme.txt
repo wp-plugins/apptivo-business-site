@@ -1,0 +1,91 @@
+=== Apptivo Business Site CRM ===
+Contributors: apptivo, rmohanasundaram
+Tags: apptivo, contact forms, crm, newsletters, testimonials
+Requires at least: 3.0
+Tested up to: 3.3.1
+Stable tag: 1.1.1
+
+Create contact forms, newsletter signups, and customer testimonials, integrated with Apptivo.
+
+== Description ==
+
+The Apptivo Business Site CRM makes it simple to create effective business websites with features that integrate with Apptivo.  Create customized contact forms that work with Apptivo CRM tools, create newsletter signup forms, and manage customer testimonials.
+
+All information is synced directly with your Apptivo small business management account, making it simple to keep your website in sync with your business.
+
+= Plugin's Official Site =
+
+Apptivo Wordpress Plugins ([http://www.apptivo.com/apptivo-business-site-wordpress-plug-in/](http://www.apptivo.com/apptivo-business-site-wordpress-plug-in/))
+
+
+== Installation ==
+
+1. Upload the extracted archive to `wp-content/plugins/`
+2. Activate the plugin through the 'Plugins' menu in WordPress
+3. Purchase a API key from Apptivo. http://www.apptivo.com/where-to-find-your-apptivo-api-key-apptivo-access-key/
+4. Go to the "General Settings" and enter your API Key and Access Key
+5. Enjoy!
+
+== Frequently Asked Questions ==
+
+= Is this plugin free? =
+No, you'll need to purchase a API key from Apptivo to use this plugin.
+
+= Where do I get a API key? =
+
+You'll need to register for an account at www.apptivo.com. http://www.apptivo.com/where-to-find-your-apptivo-api-key-apptivo-access-key/
+
+= Where is the data stored? =
+
+The plugin settings will be stored in your local Wordpress database, but content will be stored in Apptivo.
+
+= Where to get help =
+
+You can find the complete developer's guide here: http://runapptivo.apptivo.com/apptivo-business-site-developer-guide-7937.html
+
+== Screenshots ==
+
+1. screenshot-1.jpg
+2. screenshot-2.jpg
+
+== Changelog ==
+
+= 1.1.1 =
+* Fix - Faulty html in custom field options.
+* Added hooks for contact form, newsletter, cases and job applicant form.
+
+= 1.1 =
+* Updated Plugin to use Apptivo new API Key and Access Key in Firm Business settings.
+* Old Plugin users using Site key / Access key from Website App, has to update the keys in Plugin with Business settings API Key / Access Key.
+* For more information please check http://www.apptivo.com/where-to-find-your-apptivo-api-key-apptivo-access-key/
+* Improved performance of jobs plugin.
+
+= 1.0.1 =
+* Jobs Upload functionality Bug fixes
+
+= 1.0 =
+* Hot Fix to Jobs Upload features. Older version of plugin has to be updated to this release to continue uploading resumes on Jobs.
+* Cases feature added to Plugin. It enables customers to log a case from your website and you can manage it using Apptivo Cases App.
+* Other bug fixes.
+
+= 0.7.2 =
+* UI bug fixes for IE
+
+= 0.7.1 =
+* Security Bug fixes related to Uploadify plugin used for Jobs.
+
+= 0.7 =
+* Form Submission IP Restriction
+* Custom template API's
+* Added Powered by Apptivo options
+* Enabled Image Upload functionality
+* Bug Fixes
+
+= 0.6.1 =
+* Fixes
+
+= 0.6 =
+* Disk cache implementation
+
+= 0.5 =
+* Plugin released!
