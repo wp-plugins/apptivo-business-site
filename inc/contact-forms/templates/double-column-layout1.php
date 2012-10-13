@@ -24,7 +24,10 @@ jQuery(document).ready(function(){
 jQuery("#'.$contactform[name].'_contactforms").validate({
     rules: {
         telephonenumber: { phoneUS: true}
-       }
+       },
+    submitHandler: function(form) {
+      form.submit();
+    }
 });
 });
 </script>';
@@ -128,12 +131,7 @@ foreach($formfields as $field)
 				foreach($countries as $country)
 				{
 					$country_Code = ((trim($postValue)) == '')?'US':(trim($postValue));
-					if($country_Code == trim($country->countryCode)){
-						$selected='selected="selected"';
-					}
-					else{
-						$selected = "";
-					}
+					$selected = ($country_Code == trim($country->countryCode))?'selected="selected"':'';
 					echo  '<option value="'.$country->countryCode.'" '.$selected.'>'.$country->countryName.'</option>';
 				}
 				echo  '</select>';
@@ -145,13 +143,7 @@ foreach($formfields as $field)
 				
 				foreach( $optionvalues as $optionvalue )
 				{
-					if(trim($postValue) == trim($optionvalue)){
-
-						$selected='selected="selected"';
-					}
-					else{
-						$selected='';
-					}
+					$selected = (trim($postValue) == trim($optionvalue))?'selected="selected"':'';
 					if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 					{
 						echo  '<option value="'.$optionvalue.'" '.$selected.'>'.$optionvalue.'</option>';
@@ -164,12 +156,7 @@ foreach($formfields as $field)
 			$i=0;$opt=0;
 			foreach( $optionvalues as $optionvalue )
 			{
-				if(trim($postValue) == trim($optionvalue)){
-					$selected='checked="checked"';
-				}
-				else{
-					$selected = "";
-				}
+				$selected = (trim($postValue) == trim($optionvalue))?'checked="checked"':'';
 				if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 				{
 					if($i>0)
@@ -184,10 +171,12 @@ foreach($formfields as $field)
 			foreach( $optionvalues as $optionvalue )
 			{
 				$selected ="";
+				if(!empty($postValue)) {
 				foreach($postValue as $value){
 					if(trim($value) == trim($optionvalue)){
 						$selected='checked="checked"';
 					}
+				}
 				}
 				if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 				{

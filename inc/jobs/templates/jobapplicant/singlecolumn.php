@@ -25,7 +25,10 @@ jQuery(document).ready(function(){
 jQuery("#'.$hrjobsform[name].'_hrjobsforms").validate({
     rules: {
         telephonenumber: { phoneUS: true}
-       }
+       },
+    submitHandler: function(form) {
+      form.submit();
+    }
 });
 });
 </script>';
@@ -99,15 +102,11 @@ foreach($formfields as $field)
 			break;
 	}
 
-	echo '<div class="jobsform_section">'.
-				'<div class="jobsform_left_part">'.
-					'<span class="absp_jobapplicant_label">';
+	echo '<div class="jobsform_section"><div class="jobsform_left_part"><span class="absp_jobapplicant_label">';
 	if($required)
 	echo '<span class="absp_jobapplicant_mandatory">*</span>';
 
-	echo $showtext.'</span>'.
-                       '</div>'.
-                       '<div class="jobsform_rgt_part">';
+	echo $showtext.'</span></div><div class="jobsform_rgt_part">';
 
 	if($fieldtype=="select" || $fieldtype=="radio" || $fieldtype=="checkbox" ){
 		if(trim($fieldid) == 'industry')

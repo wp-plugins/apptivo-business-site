@@ -41,7 +41,10 @@ messages: {
          error.insertAfter("#'.$newsletterform[name].'_newsletter_phone3");
        else
         error.insertAfter(element);
-   }
+   },
+   submitHandler: function(form) {
+      form.submit();
+    }
 });
 });
 </script>';

@@ -21,7 +21,7 @@ define('AWP_DEFAULT_MORE_TEXT','More..');
  Changing define statements below will make plugin to not work properly.
  * */
 //Plugin Version
-define('AWP_VERSION', '1.1.1');
+define('AWP_VERSION', '1.1.2');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
@@ -294,7 +294,6 @@ function getsoapCall($wsdl,$function,$params)
    try {
     	 $response = $client->__soapCall($function, array($params));
     }catch(Exception $e){
-        $e->getMessage();
         return 'E_100'; 
     }
    return $response;

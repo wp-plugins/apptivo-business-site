@@ -262,13 +262,10 @@ class AWP_ContactForms extends AWP_Base
                         if(strlen(trim($firstName)) == 0 ) :
                         $firstName = null;
                         endif;
-                        if(!empty($emailId)){
+                        
                         $response = saveLeadDetails($firstName , $lastName, $emailId, $jobTitle, $company, $address1, $address2, $city, $state, $zipCode, $bestWayToContact, $country, $leadSource, $phoneNumber, $comments, $noteDetails,$targetlistid);
                         $response_msg = $response->return->statusMessage;
-                        }else{
-                        	echo 'Getting Email Failed';
-                        	exit;
-                        }
+                        
                         if($response_msg=='Success' && $response != 'E_100'){
                             if(!empty($contactform[confmsg])){
                             $confmsg = $contactform[confmsg];

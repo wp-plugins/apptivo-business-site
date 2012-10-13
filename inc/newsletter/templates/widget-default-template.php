@@ -24,7 +24,10 @@ if(!empty($newsletterformfields)){
 						jQuery("#'.$newsletterform[name].'_newsletter_widget").validate({
 						    rules: {
 						        newsletter_phone: { phoneUS: true}
-						       }
+						       },
+						    submitHandler: function(form) {
+						      form.submit();
+						    }
 						});
 						});
                 </script>';

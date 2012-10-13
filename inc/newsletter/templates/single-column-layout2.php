@@ -22,7 +22,10 @@ jQuery(document).ready(function(){
 jQuery("#'.$newsletterform[name].'_newsletter").validate({
     rules: {
         newsletter_phone: { phoneUS: true}
-       }
+       },
+    submitHandler: function(form) {
+      form.submit();
+    }
 });
 });
 </script>';

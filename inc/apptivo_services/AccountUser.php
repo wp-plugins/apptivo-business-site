@@ -1,5 +1,4 @@
 <?php
-
 class AWP_AccountUser
 {
 
