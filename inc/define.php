@@ -21,7 +21,7 @@ define('AWP_DEFAULT_MORE_TEXT','More..');
  Changing define statements below will make plugin to not work properly.
  * */
 //Plugin Version
-define('AWP_VERSION', '1.1.2');
+define('AWP_VERSION', '1.1.2.1');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
@@ -290,7 +290,9 @@ function awp_paginate($reload, $page, $tpages,$totalitems) {
  */
 function getsoapCall($wsdl,$function,$params)
 {
-  $client = new SoapClient($wsdl);
+	$context = stream_context_create();
+	$client = new SoapClient($wsdl, array('stream_context' => $context));
+//  $client = new SoapClient($wsdl);
    try {
     	 $response = $client->__soapCall($function, array($params));
     }catch(Exception $e){

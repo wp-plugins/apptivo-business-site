@@ -49,6 +49,8 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 2. screenshot-2.jpg
 
 == Changelog ==
+= 1.1.2.1 =
+* Soap Client values passed as stream context for some php versions throw Fatal exception on accessing webservice. 
 
 = 1.1.2 =
 * Fixes for forms validation
