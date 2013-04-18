@@ -113,7 +113,7 @@ echo '<script type="text/javascript" language="javascript" >jQuery(document).rea
 function activate_apptivo_business()
 {   
      //Update plugin version.
-	 update_option( "apptivo_business_plugin_version", '1.1.2' );
+	 update_option( "apptivo_business_plugin_version", '1.1.2.1' );
      update_option( "apptivo_business_plugin_installed", 1 );
 }
 
