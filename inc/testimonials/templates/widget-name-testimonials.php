@@ -38,7 +38,8 @@ if($instance['order'] == '1')
                        if(!empty($awp_all_testimonials)){
                         if ($instance['title']) echo $before_title . apply_filters('widget_title', $instance['title']) . $after_title;
                     foreach($awp_all_testimonials as $testimonial){
-                   if($count <= $numberofitems){
+                   if($testimonial->testimonialStatus=="APPROVED"){
+                        if($count <= $numberofitems){
 
                         if(strlen(strip_tags($testimonial->testimonial))>250)
                         {
@@ -59,6 +60,7 @@ if($instance['order'] == '1')
                    $count++;
 	        }
                     echo $css;
+                    }
               }
               if(!empty($awp_all_testimonials)){
               echo '<div class="normal_text">

@@ -11,8 +11,8 @@ if( $contactform[css] != '' )
 {
 	echo $css='<style type="text/css">'.$contactform[css].'</style>';
 }
-
-echo $jscript='<script type="text/javascript">
+foreach($formfields as $fscript){
+    echo $jscript='<script type="text/javascript">
 jQuery(document).ready(function(){
  jQuery.validator.addMethod("phoneUS", function(phone_number, element) {
     phone_number = phone_number.replace(/\s+/g, "");
@@ -30,18 +30,21 @@ jQuery("#'.$contactform[name].'_contactforms").validate({
 });
 });
 </script>';
-echo '<style type="text/css">
-   .awp_contactform_maindiv_'.$contactform[name].' .form_section{
-    padding-bottom:10px;
     }
-    .awp_contactform_maindiv_'.$contactform[name].' .form_section .form_left_part{
-        width:30%;
-        float:left;
-        line-height:22px;
-        }
-        .awp_contactform_maindiv_'.$contactform[name].' .form_section .captcha{
-           margin-top: 55px;
-        }
+
+    if($submitformname==$contactform[name] && $successmsg!="")
+{
+    echo $jscript='<script type="text/javascript">
+            jQuery(document).ready(function(){
+            document.getElementById("success_'.$contactform[name].'").scrollIntoView();
+            });
+        </script>';
+}
+echo '<style type="text/css">
+		.awp_contactform_maindiv_'.$contactform[name].'{float:left;width:100%;}   
+		.awp_contactform_maindiv_'.$contactform[name].' .form_section{padding-bottom:10px;float:left;width:100%;}
+    	.awp_contactform_maindiv_'.$contactform[name].' .form_section .form_left_part{width:30%;float:left;line-height:22px;}
+        .awp_contactform_maindiv_'.$contactform[name].' .form_section .form_rgt_part{width:70%;float:left;line-height:22px;}
         .submit {
         margin-left:30%;
         }
@@ -51,13 +54,23 @@ echo '<style type="text/css">
         .awp_contactform_maindiv_'.$contactform[name].' .awp_contactform_submit_'.$contactform[name].'{
           margin-left: 193px;
         }
+        
+         @media screen and (max-width:900px){
+		.awp_contactform_maindiv_'.$contactform[name].' .form_left_part {width:100% !important;float:left !important;}
+		.awp_contactform_maindiv_'.$contactform[name].' .form_rgt_part{width:100% !important;float:left !important;margin-top:5px;}
+		#recaptcha_widget_div{zoom:0.79;-moz-transform: scale(0.76);}
+		}
+		@media screen and (max-width:360px){
+		.awp_contactform_maindiv_'.$contactform[name].' .form_rgt_part input#telephonenumber1, .awp_contactform_maindiv_'.$contactform[name].' .form_rgt_part input#telephonenumber2, .awp_contactform_maindiv_'.$contactform[name].' .form_rgt_part input#telephonenumber3{width:27% !important}
+		#recaptcha_widget_div{zoom:0.59;-moz-transform: scale(0.56);}
+		}
        </style>';
 
 if($submitformname==$contactform[name] && $successmsg!=""){
-	echo  '<div id="success_'.$contactform[name].'" class="success_'.$contactform[name].'">'.$successmsg."</div>";
+	echo  '<div id="success_'.$contactform[name].'" class="absp_success_msg success_'.$contactform[name].'">'.$successmsg."</div>";
 }
 if($captch_error!="" && $submitformname==$contactform[name]){
-	echo  '<div id="error'.$contactform[name].'" class="error_'.$contactform[name].'">'.$captch_error."</div>";
+	echo  '<div id="error'.$contactform[name].'" class="absp_error error_'.$contactform[name].'">'.$captch_error."</div>";
 }
 
 do_action ('apptivo_business_contact_'.$contactform[name].'_before_form'); //Before submit form
@@ -73,7 +86,12 @@ foreach($formfields as $field)
 	$required=$field['required'];
 	$fieldtype=$field['type'];
 	$options=$field['options'];
-	$optionvalues=array();
+        $optionvalues=array();
+
+        if($validation=="string")
+        {
+            $phone_validation="_string";
+        }
 
 	if($required){
 		$mandate_property='"mandatory="true"';
@@ -95,6 +113,10 @@ foreach($formfields as $field)
 		case "number":
 			$validateclass .=" number";
 			break;
+                case "string":
+			$validateclass .=" string";
+			break;
+
 	}
 	if($fieldid=='captcha')
 	{
@@ -133,7 +155,7 @@ foreach($formfields as $field)
 	switch($fieldtype)
 	{
 		case "text":
-			echo '<input type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value="'.$postValue.'"  class="absp_contact_input_text'.$validateclass.'">';
+			echo '<input type="text" name="'.$fieldid.$phone_validation.'" id="'.$fieldid.'_id" value="'.$postValue.'"  class="absp_contact_input_text'.$validateclass.'">';
 			break;
 				
 		case "textarea":
@@ -183,6 +205,7 @@ foreach($formfields as $field)
 		case "radio":
 
 			$i=0;$opt=0;
+			echo '<div class="absp_radioval">';
 			foreach( $optionvalues as $optionvalue )
 			{
 				$selected = (trim($postValue) == trim($optionvalue))?'checked="checked"':'';
@@ -191,15 +214,15 @@ foreach($formfields as $field)
 				{
 					if($i>0)
 					echo '&nbsp;';
-					echo '<span class="custom_fields_radio"><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'" '.$selected.'></span>';
+					echo '<input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'" '.$selected.'> <label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><br/>';
 				}
 				$opt++;
 			}
-
+			echo '</div>';
 			break;
 				
 		case "checkbox":
-
+			echo '<div class="absp_checkval">';
 			$i=0;$opt=0;
 			foreach( $optionvalues as $optionvalue )
 			{
@@ -215,17 +238,15 @@ foreach($formfields as $field)
 				{
 					if($i>0)
 					echo '&nbsp;';
-					echo '<span class="custom_fields_check"><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_checkbox '.$validateclass.'"  '.$selected.'></span>';
+					echo '<input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_checkbox '.$validateclass.'"  '.$selected.'><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><br/>';
 					$i++;$opt++;
 				}
 			}
-
+			echo '</div>';
 			break;
 
 		case "captcha":
-
-			echo '<div class="captcha_image"><img src="'.$contactform['captchaimagepath'].'" id="captchaimg" style="border:1px solid #000;"/></div>
-                      <div class="captcha_input"><input type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value=""  class="absp_contact_input_text'.$validateclass.'"/></div>';
+            awp_reCaptcha();
 			break;
 			 
 	}

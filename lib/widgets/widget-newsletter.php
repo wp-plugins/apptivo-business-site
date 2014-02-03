@@ -23,7 +23,8 @@ class AWP_Newsletter_Widget extends WP_Widget {
 					$instance = wp_parse_args( (array) $instance, array(
                             'title' => '',
                             'formname' => '',
-                            'template_name' => ''
+                            'template_name' => '',
+                            'widget_style'=>''
                          ));
                     $_template_file = AWP_NEWSLETTER_TEMPLATEPATH."/".$instance['template_name'];
 		            if (!file_exists($_template_file))
@@ -112,7 +113,8 @@ class AWP_Newsletter_Widget extends WP_Widget {
                     $instance = wp_parse_args( (array)$instance, array(
                             'title' => '',
                             'formname' => '',
-                            'template_name' => ''
+                            'template_name' => '',
+                            'widget_style'=>''
                             ));
 
                     $newsletter_forms=get_option('awp_newsletterforms');
@@ -152,6 +154,10 @@ class AWP_Newsletter_Widget extends WP_Widget {
 							<?php }?>
 				  </select>
 		    </p>
+                        <p>
+                    <label for="<?php echo $this->get_field_id('widget_style'); ?>"><?php _e('Style', 'apptivo-businesssite'); ?>:</label><br/>
+	             <textarea style="width: 220px; height: 100px;" class="awp_widgetstyle" id="<?php echo $this->get_field_id('widget_style'); ?>" name="<?php echo $this->get_field_name('widget_style'); ?>"><?php echo esc_attr( $instance['widget_style'] ); ?></textarea>
+                            </p>
 		    
             <?php
             }

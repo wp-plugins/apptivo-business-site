@@ -34,8 +34,8 @@ $page_details = get_page($instance['page_id']);
                        if(!empty($awp_all_testimonials)){
                         if ($instance['title']) echo $before_title . apply_filters('widget_title', $instance['title']) . $after_title;
                     foreach($awp_all_testimonials as $testimonial){
-                   if($count <= $numberofitems){
-
+if($testimonial->testimonialStatus=="APPROVED"){
+                        if($count <= $numberofitems){
                        echo  '<div class="awp_news_inline">
                             <div class="testimonials_description awp_testimonisls_content">';
                        if(strlen(strip_tags($testimonial->testimonial))>250)
@@ -51,6 +51,7 @@ $page_details = get_page($instance['page_id']);
                         if(trim($instance['more_text']!=""))
                         echo '<div class="readmore"><span><a class="absp_testimonials_readmore" href="'.$page_details->guid.'">'.$instance['more_text'].'</a><span></div>';
                         echo '</div></div>';
+                        }
                    }
                    $count++;
 	        }

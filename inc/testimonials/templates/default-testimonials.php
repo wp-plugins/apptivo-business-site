@@ -26,7 +26,10 @@ $website = $Tesimonials->account->website;
 $imgSrc = $Tesimonials->testimonialImageUrl;
 $seperator = ',';
 $testimonial = $Tesimonials->testimonial;
-?> <div id="testimonial0">                        
+$testimonialStatus=$Tesimonials->testimonialStatus;
+if($testimonialStatus=="APPROVED")
+{
+    ?> <div id="testimonial0">
                         <div class="testimonials">
                         <div class="top"></div>
                         <div class="middle">
@@ -36,7 +39,7 @@ $testimonial = $Tesimonials->testimonial;
 
                     <div style="float: right;">
                         <?php if(strlen(trim($Name)) != 0) { ?><p><?php 
-                        echo '<span class="absp_testimonials_name">'.$Name.'</span>'; 
+                        echo '<span class="absp_testimonials_name"> Name: '.$Name.'</span>';
                         if(strlen(trim($JobTitle)) != 0 ) {
                         echo '&nbsp;<span class="absp_testimonials_jobtitle">'.$JobTitle.$seperator.'</span>';
                         }
@@ -51,4 +54,7 @@ $testimonial = $Tesimonials->testimonial;
                 <br>
              </div>
 <?php } ?>
-<?php echo $css; ?>           
+<?php  
+}
+echo $css;
+?>

@@ -31,17 +31,34 @@ jQuery("#'.$hrjobsform[name].'_hrjobsforms").validate({
 });
 });
 </script>';
+if($submitformname==$hrjobsform[name] && $successmsg!="")
+{
+    echo $jscript='<script type="text/javascript">
+            jQuery(document).ready(function(){
+                document.getElementById("success_'.$hrjobsform[name].'").scrollIntoView();
+            });
+        </script>';
+}
 echo '<style type="text/css">
-        
+        .absp_success_msg{color:green;font-weight:bold;padding-bottom:5px;}
+        .absp_error{color:red;font-weight:bold;padding-bottom:5px;}
          input.awp_hrjobsform_submit_jaform { margin-top:10px;} 
         </style>';
 if($submitformname==$hrjobsform[name] && $successmsg!=""){
-	echo  '<div id="success_'.$hrjobsform[name].'" class="success_'.$hrjobsform[name].'">'.$successmsg."</div>";
+	echo  '<div id="success_'.$hrjobsform[name].'" class="absp_success_msg success_'.$hrjobsform[name].'">'.$successmsg."</div>";
 }
 
 do_action ('apptivo_business_job_applicant_'.$hrjobsform['name'].'_before_form'); //Before submit form
-
+if($hrjobsform['confmsg_pagemode']=="same"){
 echo  '<form id="'.$hrjobsform[name].'_hrjobsforms" class="awp_hrjobs_form" name="'.$hrjobsform[name].'_hrjobsforms" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
+}
+elseif($hrjobsform['confmsg_pagemode']=="other")
+{
+    $page_redirect  =    $hrjobsform['confmsg_pageid'];
+    $post = get_post( $page_redirect);
+    $page_action    =   $post->post_name;
+    echo  '<form id="'.$hrjobsform[name].'_hrjobsforms" class="awp_hrjobs_form" name="'.$hrjobsform[name].'_hrjobsforms" action="'.SITE_URL.'/'.$page_action.'" method="post">';
+}
 echo  '<input type="hidden" value="'.$jobId.'" name="jobId" id="jobId"><input type="hidden" value="'.$jobNo.'" name="jobNo" id="jobNo">';
 echo '<input type="hidden" value="'.$hrjobsform[name].'" name="awp_jobsformname" id="awp_jobsformname">';
 echo '<div class="awp_jobsform_maindiv_'.$hrjobsform[name].'">';

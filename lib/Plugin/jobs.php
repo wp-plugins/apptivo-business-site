@@ -448,6 +448,8 @@ class AWP_Jobs extends AWP_Base
 			$hrjobsformdetails['tmpltype']=$hrjobsformproperties['tmpltype'];
 			$hrjobsformdetails['layout']=$hrjobsformproperties['layout'];
 			$hrjobsformdetails['confmsg']= stripslashes($hrjobsformproperties['confmsg']);
+            $hrjobsformdetails['confmsg_pagemode']= $hrjobsformproperties['confirm_msg_page'];
+			$hrjobsformdetails['confmsg_pageid']= $hrjobsformproperties['confirm_msg_pageid'];
 			$hrjobsformdetails['targetlist']=$hrjobsformproperties['targetlist'];
 			$hrjobsformdetails['css']=stripslashes($hrjobsformproperties['css']);
 			$hrjobsformdetails['submit_button_type']=$hrjobsformproperties['submit_button_type'];
@@ -778,19 +780,24 @@ class AWP_Jobs extends AWP_Base
 		$jobTypeLists = array('Full Time' => 'Full Time','Part Time' => 'Part Time','Contract' => 'Contract');
 		$jobTypeStatus = array('New' => 'New','Approved' => 'Approved','Closed' => 'Closed','Canceled' => 'Canceled');
 		$allIndustries = getAllIndustries();
-		?>
+                
+                ?>
+<h2 style="font-size: 23px;font-weight: normal;">Jobs Management </h2>
+<?php checkSoapextension("jobs"); 
+      checkCaptchaOption();
+?>
 <div class="icon32" style="margin-top:10px;background: url('<?php echo awp_image('jobs_icon'); ?>') " ><br>
 </div>
 <h2 class="nav-tab-wrapper"><a class="nav-tab nav-tab-active"
-	href="/wp-admin/admin.php?page=awp_jobs"><?php _e('Jobs','apptvo-businesssite'); ?></a>
+	href="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_jobs"><?php _e('Jobs','apptvo-businesssite'); ?></a>
 <a class="nav-tab"
-	href="/wp-admin/admin.php?page=awp_jobs&keys=configuration"><?php _e('Configuration','apptvo-businesssite'); ?></a>
+	href="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_jobs&keys=configuration"><?php _e('Configuration','apptvo-businesssite'); ?></a>
 <a class="nav-tab"
-	href="/wp-admin/admin.php?page=awp_jobs&keys=jobsearch"><?php _e('Job Search','apptvo-businesssite'); ?></a>
+	href="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_jobs&keys=jobsearch"><?php _e('Job Search','apptvo-businesssite'); ?></a>
 </h2>
 
 		<?php if(!$this->_plugin_activated){
-			echo "<div class='wrap'>Jobs plugin currently <span style='color:red'>disabled</span>. Please enable this in <a href='/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a></div>";
+			echo "<div class='wrap'>Jobs plugin currently <span style='color:red'>disabled</span>. Please enable this in <a href='".SITE_URL."/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a></div>";
 		}
 		?>
 <p><img id="elementToResize"
@@ -836,7 +843,7 @@ Guide.</a></span>
 </div>
 <?php } ?></div>
 <form name="awp_updatejobs"
-	action="/wp-admin/admin.php?page=awp_jobs&keys=jobcreation"
+	action="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_jobs&keys=jobcreation"
 	method="post" onsubmit="return validateupdatejobs(this)"><input
 	type="hidden" id="job_ID" value="job_ID"
 	value="<?php echo $_GET['id']; ?>" />
@@ -938,7 +945,7 @@ Guide.</a></span>
 </div>
 			<?php } ?>
 <form name="awp_events_form"
-	action="/wp-admin/admin.php?page=awp_jobs&keys=jobcreation"
+	action="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_jobs&keys=jobcreation"
 	method="post" onsubmit="return validatecreatejobs(this)"><input
 	type="hidden" name="nogdog" value="<?php echo $nogdog;?>">
 <table width="700" cellspacing="0" cellpadding="0" class="form-table">
@@ -1030,7 +1037,7 @@ Guide.</a></span>
 			$JobSearchResults = array_slice( $JobSearchResults, $start, $jobsperpage);
 			?>
 <div class="wrap"><?php if(!$this->_plugin_activated){
-	echo "Jobs plugin currently <span style='color:red'>disabled</span>. Please enable this in <a href='/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
+	echo "Jobs plugin currently <span style='color:red'>disabled</span>. Please enable this in <a href='".SITE_URL."/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
 }else {
 	$jobapplicant_settings = get_option('awp_jobsforms');
 	$job_appl_page = $jobapplicant_settings[0][properties][jobapplicant_page];
@@ -1038,13 +1045,13 @@ Guide.</a></span>
 	$list_template = $awp_jobs_settings[list_template_name];
 	if(strlen(trim($job_appl_page)) == 0 && strlen(trim($list_template)) == 0)
 	{
-		echo 'To show job list in Website. Update <a href="/wp-admin/admin.php?page=awp_jobs&keys=configuration">Job settings</a> and <a href="/wp-admin/admin.php?page=awp_jobs&keys=configuration&step=2">Job Applicant form</a> Configuration before adding Jobs list shortcode in Page or Post.';
+		echo 'To show job list in Website. Update <a href="'.SITE_URL.'/wp-admin/admin.php?page=awp_jobs&keys=configuration">Job settings</a> and <a href="'.SITE_URL.'/wp-admin/admin.php?page=awp_jobs&keys=configuration&step=2">Job Applicant form</a> Configuration before adding Jobs list shortcode in Page or Post.';
 	}else if(strlen(trim($job_appl_page)) != 0 && strlen(trim($list_template)) == 0)
 	{
-		echo 'To show job list in Website. Update <a href="/wp-admin/admin.php?page=awp_jobs&keys=configuration">Job settings</a> Configuration before adding Jobs list shortcode in Page or Post.';
+		echo 'To show job list in Website. Update <a href="'.SITE_URL.'/wp-admin/admin.php?page=awp_jobs&keys=configuration">Job settings</a> Configuration before adding Jobs list shortcode in Page or Post.';
 	}else if(strlen(trim($job_appl_page)) == 0 && strlen(trim($list_template)) != 0)
 	{
-		echo 'To show job list in Website. Update <a href="/wp-admin/admin.php?page=awp_jobs&keys=configuration&step=2">Job Applicant form</a> Configuration before adding Jobs list shortcode in Page or Post.';
+		echo 'To show job list in Website. Update <a href="'.SITE_URL.'/wp-admin/admin.php?page=awp_jobs&keys=configuration&step=2">Job Applicant form</a> Configuration before adding Jobs list shortcode in Page or Post.';
 	}
 
 }
@@ -1058,7 +1065,7 @@ if( $numberofjobs > $jobsperpage)
 }
 ?>
 <form name="awp_jos_deleteform" method="post"
-	action="/wp-admin/admin.php?page=awp_jobs"><input type="hidden"
+	action="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_jobs"><input type="hidden"
 	name="job_delete_form" id="job_delete_form" />
 <table class="widefat plugins" width="700" cellspacing="0"
 	cellpadding="0">
@@ -1120,7 +1127,7 @@ if( $numberofjobs > $jobsperpage)
 			<td style="text-align: center;"><?php 
 			if($this->_plugin_activated)
 			{ ?> <a
-				href="/wp-admin/admin.php?page=awp_jobs&keys=jobcreation&action=edit&id=<?php echo $jobs->id; ?>"><img
+				href="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_jobs&keys=jobcreation&action=edit&id=<?php echo $jobs->id; ?>"><img
 				src="<?php echo awp_image('edit_icon'); ?>"></a> <?php } else { echo 'No Action'; } ?>
 
 			</td>
@@ -1179,7 +1186,7 @@ if( $numberofjobs > $jobsperpage)
 		if(isset($_POST['awp_jobsform_settings'])){
 			$templatelayout="";
 			$newformname=$_POST['awp_jobsform_name'];
-			if($_POST['awp_jobsform_templatetype']=="awp_plugin_template")
+            if($_POST['awp_jobsform_templatetype']=="awp_plugin_template")
 			$templatelayout=$_POST['awp_jobsform_plugintemplatelayout'];
 			else
 			$templatelayout=$_POST['awp_jobsform_themetemplatelayout'];
@@ -1188,6 +1195,8 @@ if( $numberofjobs > $jobsperpage)
 	                        'layout' =>$templatelayout,
 	                        'confmsg' => stripslashes($_POST['awp_jobsform_confirmationmsg']),				
 	                        'css' => stripslashes($_POST['awp_jobsform_customcss']),
+                            'confirm_msg_page' =>  stripslashes($_POST['awp_jobsform_confirm_msg_page']),
+                            'confirm_msg_pageid' => $_POST['awp_jobsform_confirmmsg_pageid'],
                             'subscribe_option' => $_POST['subscribe_option'],
                             'submit_button_type' => $_POST['awp_jobsform_submit_type'],
                             'submit_button_val' => $_POST['awp_jobsform_submit_val'],
@@ -1401,16 +1410,45 @@ if( $numberofjobs > $jobsperpage)
 					<?php }?>
 			</select></td>
 		</tr>
-		<tr valign="top">
-			<th valign="top"><label for="awp_jobsform_confirmationmsg"><?php _e("Confirmation Message", 'apptivo-businesssite' ); ?>:</label>
-			<br>
-			<span class="description">This message will shown in your website
-			page, once jobs form submitted.</span></th>
-			<td valign="top">
-			<div style="width: 620px;"><?php the_editor($formproperties[confmsg],'awp_jobsform_confirmationmsg','',FALSE);  ?>
-			</div>
-			</td>
-		</tr>
+
+                <tr valign="top">
+					<th><label for="awp_jobs_samepage"><?php _e("Confirmation message page", 'apptivo-businesssite' ); ?>:</label>
+					</th>
+					<td valign="top">
+                          <input type="radio" value="same" id="awp_jobs_samepage" name="awp_jobsform_confirm_msg_page" <?php checked('same',$formproperties[confirm_msg_page]); ?> checked="checked" />
+                          <label for="awp_jobs_samepage">Same Page</label>
+                          <input type="radio" value="other" id="awp_jobs_otherpage" name="awp_jobsform_confirm_msg_page" <?php checked('other',$formproperties[confirm_msg_page]); ?>/>
+                          <?php // print_r($formproperties); ?>
+                          <label for="awp_jobs_otherpage">Other page</label>
+                          <br />
+                           <br />
+                           <select id="awp_jobsform_confirmmsg_pageid" name="awp_jobsform_confirmmsg_pageid" <?php if($formproperties[confirm_msg_page] != 'other') echo 'style="display:none;"';?> >
+							 <?php
+							  $pages = get_pages();
+							  foreach ($pages as $pagg) {
+							  	?>
+							  	<option value="<?php echo $pagg->ID; ?>"  <?php selected($pagg->ID, $formproperties[confirm_msg_pageid]); ?> >
+														<?php echo $pagg->post_title; ?>
+								</option>
+							  	<?php
+							  }
+							 ?>
+							 </select>
+
+					</td>
+                                        
+					</td>
+				</tr>
+                                <tr valign="top" id="awp_jobsform_confirmationmsg_tr" <?php if($formproperties[confirm_msg_page] == 'other') echo 'style="display:none;"';?> >
+					<th valign="top"><label for="awp_jobsform_confirmationmsg"><?php _e("Confirmation Message", 'apptivo-businesssite' ); ?>:</label>
+					<br><span class="description">This message will shown in your website page, once contact form submitted.</span>
+					</th>
+					<td valign="top">
+					<div style="width:620px;">
+					<?php the_editor($formproperties[confmsg],'awp_jobsform_confirmationmsg','',FALSE);  ?>
+					</div>
+					</td>
+				</tr>
 		<tr valign="top">
 			<th><label for="awp_jobsform_customcss"><?php _e("Custom CSS", 'apptivo-businesssite' ); ?>:</label>
 			<br>
@@ -1448,7 +1486,7 @@ if( $numberofjobs > $jobsperpage)
 				value="<?php echo $formproperties[submit_button_val];?>" size="52" />
 
 			<span id="japp_upload_img_button" style="display: none;"> <input
-				id="japplicant_upload_image" type="button" value="Upload Image" /> <br />
+				id="japplicant_upload_image" type="button" value="Upload Image"  class="button-primary"/> <br />
 				<?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 			</span></td>
 		</tr>
@@ -1720,15 +1758,15 @@ Field</a></p>
 <div class="icon32" style="margin-top:10px;background: url('<?php echo awp_image('jobs_icon'); ?>') " ><br>
 </div>
 <h2 class="nav-tab-wrapper"><a class="nav-tab"
-	href="/wp-admin/admin.php?page=awp_jobs"><?php _e('Jobs','apptivo-businesssite'); ?></a>
+	href="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_jobs"><?php _e('Jobs','apptivo-businesssite'); ?></a>
 <a class="nav-tab nav-tab-active"
-	href="/wp-admin/admin.php?page=awp_jobs&keys=configuration"><?php _e('Configuration','apptivo-businesssite'); ?></a>
+	href="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_jobs&keys=configuration"><?php _e('Configuration','apptivo-businesssite'); ?></a>
 <a class="nav-tab"
-	href="/wp-admin/admin.php?page=awp_jobs&keys=jobsearch"><?php _e('Job search','apptivo-businesssite'); ?></a>
+	href="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_jobs&keys=jobsearch"><?php _e('Job search','apptivo-businesssite'); ?></a>
 </h2>
 		<?php
 		if(!$this->_plugin_activated) :
-		echo "Jobs Plugin is currently <span style='color:red'>disabled</span>. Please enable this in <a href='/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
+		echo "Jobs Plugin is currently <span style='color:red'>disabled</span>. Please enable this in <a href='".SITE_URL."/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
 		endif;
 		?>
 <div style="margin-top: 30px;"><?php 
@@ -1736,12 +1774,12 @@ Field</a></p>
 if($_GET['step'] == 1 || !isset($_GET['step']) || $_GET['step'] != 2 )
 {
 	echo '<a class="nav-tab-active" >Jobs Settings</a><span style="margin:0px 25px 0px 25px;"></span>';
-	echo '<a class="" href="/wp-admin/admin.php?page=awp_jobs&keys=configuration&step=2">Jobs Applicant form</a>';
+	echo '<a class="" href="'.SITE_URL.'/wp-admin/admin.php?page=awp_jobs&keys=configuration&step=2">Jobs Applicant form</a>';
 	$this->descriptionSettings();
 }
 if($_GET['step'] == 2)
 {
-	echo '<a class="" href="/wp-admin/admin.php?page=awp_jobs&keys=configuration">Jobs Settings</a><span style="margin:0px 25px 0px 25px;"></span>';
+	echo '<a class="" href="'.SITE_URL.'/wp-admin/admin.php?page=awp_jobs&keys=configuration">Jobs Settings</a><span style="margin:0px 25px 0px 25px;"></span>';
 	echo '<a class="nav-tab-active">Jobs Applicant form</a>';
 	$this->jobApplicant();
 }
@@ -1836,7 +1874,7 @@ if($_GET['step'] == 2)
 				name="awp_joblist_submit_value" id="awp_joblist_submit_value"
 				value="<?php echo $jobs_settings[submit_val];?>" size="52" /> <span
 				id="jlist_upload_img_button" style="display: none;"> <input
-				id="jlist_upload_image" type="button" value="Upload Image" /> <br />
+				id="jlist_upload_image" type="button" value="Upload Image"  class="button-primary"/> <br />
 				<?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 			</span></td>
 		</tr>
@@ -1973,15 +2011,15 @@ if($_GET['step'] == 2)
 <div class="icon32" style="margin-top:10px;background: url('<?php echo awp_image('jobs_icon'); ?>') " ><br>
 </div>
 <h2 class="nav-tab-wrapper"><a class="nav-tab"
-	href="/wp-admin/admin.php?page=awp_jobs"><?php _e('Jobs','apptivo-businesssite'); ?></a>
+	href="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_jobs"><?php _e('Jobs','apptivo-businesssite'); ?></a>
 <a class="nav-tab"
-	href="/wp-admin/admin.php?page=awp_jobs&keys=configuration"><?php _e('Configuration','apptivo-businesssite'); ?></a>
+	href="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_jobs&keys=configuration"><?php _e('Configuration','apptivo-businesssite'); ?></a>
 <a class="nav-tab nav-tab-active"
-	href="/wp-admin/admin.php?page=awp_jobs&keys=jobsearch"><?php _e('Job Search','apptivo-businesssite'); ?></a>
+	href="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_jobs&keys=jobsearch"><?php _e('Job Search','apptivo-businesssite'); ?></a>
 </h2>
 		<?php
 		if(!$this->_plugin_activated) :
-		_e("Jobs Plugin is currently <span style='color:red'>disabled</span>. Please enable this in <a href='/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.",'apptivo-businesssite');
+		_e("Jobs Plugin is currently <span style='color:red'>disabled</span>. Please enable this in <a href='".SITE_URL."/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.",'apptivo-businesssite');
 		endif;
 		?>
 		<?php
@@ -2009,12 +2047,11 @@ if($_GET['step'] == 2)
 			$templatelayout=$_POST['awp_jobsearchform_plugintemplatelayout'];
 			else
 			$templatelayout=$_POST['awp_jobsearchform_themetemplatelayout'];
-
-			$hrjobsformproperties=array(
+                    	$hrjobsformproperties=array(
 							'tmpltype' =>$_POST['awp_jobsearchform_templatetype'],
 	                        'layout' =>$templatelayout,
-	                        'confmsg' => stripslashes($_POST['awp_jobsearchform_confirmationmsg']),				
-	                        'css' => stripslashes($_POST['awp_jobsearchform_customcss']),
+	                        'confmsg' => stripslashes($_POST['awp_jobsearchform_confirmationmsg']),
+                            'css' => stripslashes($_POST['awp_jobsearchform_customcss']),
                             'subscribe_option' => $_POST['subscribe_option'],
                             'submit_button_type' => $_POST['awp_jobsearchform_submit_type'],
                             'submit_button_val' => $_POST['awp_jobsearchform_submit_value'],
@@ -2229,7 +2266,7 @@ if($_GET['step'] == 2)
 				id="awp_jobsearchform_submit_value"
 				value="<?php echo $formproperties[submit_button_val];?>" size="52" />
 			<span id="jsearch_upload_img_button" style="display: none;"> <input
-				id="jsearch_upload_image" type="button" value="Upload Image" /> <br />
+				id="jsearch_upload_image" type="button" value="Upload Image"  class="button-primary"/> <br />
 				<?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 			</span></td>
 		</tr>

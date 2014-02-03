@@ -16,15 +16,19 @@ define('AWP_DEFAULT_MORE_TEXT','More..');
 //define('AWP_TESTIMONIALS_DISABLE',1);
 //define('AWP_JOBS_DISABLE',1);
 //define('AWP_CASES_DISABLE',1);
-/* 
+/*
  User updateable define statements ends here..
  Changing define statements below will make plugin to not work properly.
  * */
+// Site Url
+define('SITE_URL', site_url());
+
 //Plugin Version
 define('AWP_VERSION', '1.1.2.1');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
+define('AWP_ASSETS_DIR', AWP_PLUGIN_BASEPATH . '/assets');
 define('AWP_INC_DIR', AWP_PLUGIN_BASEPATH . '/inc');
 define('AWP_PLUGINS_DIR', AWP_LIB_DIR . '/Plugin');
 define('AWP_WIDGETS_DIR', AWP_LIB_DIR . '/widgets');
@@ -36,6 +40,7 @@ define('AWP_NEWSLETTER_TEMPLATEPATH',AWP_INC_DIR.'/newsletter/templates');
 define('AWP_NEWS_TEMPLATEPATH',AWP_INC_DIR.'/news/templates');
 define('AWP_EVENTS_TEMPLATEPATH',AWP_INC_DIR.'/events/templates');
 define('AWP_TESTIMONIALS_TEMPLATEPATH',AWP_INC_DIR.'/testimonials/templates');
+define('AWP_TESTIMONIALS_FORM_TEMPLATEPATH',AWP_INC_DIR.'/testimonials/templates/frontend');
 define('AWP_JOBSFORM_TEMPLATEPATH',AWP_INC_DIR.'/jobs/templates/jobapplicant');
 define('AWP_JOBSEARCHFORM_TEMPLATEPATH',AWP_INC_DIR.'/jobs/templates/jobsearch');
 define('AWP_JOBDESCRIPTION_TEMPLATEPATH',AWP_INC_DIR.'/jobs/templates/jobdescription');
@@ -51,11 +56,23 @@ define('AWP_NEWSLETTER_WIDGET_DEFAULT_TEMPLATE','widget-default-template-usphone
 define('APPTIVO_API_URL','https://api.apptivo.com/');
 define('APPTIVO_BUSINESS_SERVICES', APPTIVO_API_URL.'app/services/v1/BusinessSiteServices?wsdl');
 define('APPTIVO_BUSINESS_INDEX', APPTIVO_API_URL.'ts/services/AppJobWebService?wsdl');
+
+define('APPTIVO_LEAD_SOURCE_API',APPTIVO_API_URL.'app/dao/lead');
+define('APPTIVO_LEAD_API', APPTIVO_API_URL.'app/dao/leads');
+define('APPTIVO_CASES_API', APPTIVO_API_URL. 'app/dao/case');
+define('APPTIVO_NOTES_API', APPTIVO_API_URL.'app/dao/note');
+define('APPTIVO_TESTIMONIALS_STATUS_API', APPTIVO_API_URL. 'app/dao/testimonial');
+define('APPTIVO_TARGETS_API',APPTIVO_API_URL.'app/dao/targets');
+define('APPTIVO_SIGNUP_API',APPTIVO_API_URL.'app/dao/signup');
+
+define('APPTIVO_LEAD_OBJECT_ID','4');
+define('APPTIVO_CASES_OBJECT_ID','59');
+
 //API Key and Access Keys Settings.
 
 $eCommerce_api_Key = get_option('apptivo_ecommerce_apikey');
 $eCommerce_access_key = get_option('apptivo_ecommerce_accesskey');
-$business_site_key = get_option('apptivo_sitekey'); 
+$business_site_key = get_option('apptivo_sitekey');
 if(!empty($eCommerce_api_Key) )
 {
 	update_option('apptivo_apikey',$eCommerce_api_Key);
@@ -87,8 +104,8 @@ function awp_load_plugins()
         }
         @closedir($plugin_dir);
     }
-   
-    
+
+
 }
 /**
  * Load Widgets
@@ -97,9 +114,9 @@ function awp_load_plugins()
 function awp_load_widgets()
 {
 
- //include widget files 
+ //include widget files
    $widget_dir = @opendir(AWP_WIDGETS_DIR);
-   
+
     if ($widget_dir) {
         while (($entry = @readdir($widget_dir)) !== false) {
             if (strrchr($entry, '.') === '.php') {
@@ -122,37 +139,44 @@ function awp_stripslashes($var)
     } elseif (is_array($var)) {
         $var = array_map('awp_stripslashes', $var);
     }
-    
+
     return $var;
 }
-	
+
 /**
  * Sort customformfields by order
  */
 function awp_sort_by_order($a, $b) {
+	if(is_array($a) && is_array($b))
+	{
 	return $a["order"] - $b["order"];
+	}
+	else
+	{
+		return;
+	}
 }
 /**
  * Search for value using key in multi-dimensional array
  * returns index if value found
  * returns false if no value is found
  */
-function awp_recursive_array_search($haystack, $needle, $index = null) 
-{ 
-    $aIt = new RecursiveArrayIterator($haystack); 
-    $it = new RecursiveIteratorIterator($aIt); 
-    
-    while($it->valid()) 
-    {        
-        if (((isset($index) AND ($it->key() == $index)) OR (!isset($index))) AND ($it->current() == $needle)) { 
-            return $aIt->key(); 
-        } 
-        
-        $it->next(); 
-    } 
-    
-    return false; 
-} 
+function awp_recursive_array_search($haystack, $needle, $index = null)
+{
+    $aIt = new RecursiveArrayIterator($haystack);
+    $it = new RecursiveIteratorIterator($aIt);
+
+    while($it->valid())
+    {
+        if (((isset($index) AND ($it->key() == $index)) OR (!isset($index))) AND ($it->current() == $needle)) {
+            return $aIt->key();
+        }
+
+        $it->next();
+    }
+
+    return false;
+}
 
 /**
  * Add contact form scripts and styles, only when short code is present in page/posts
@@ -162,7 +186,7 @@ function awp_check_for_shortcode($posts,$shortcode) {
         return $posts;
     // false because we have to search through the posts first
     $found = false;
- 
+
     // search through each post
     foreach ($posts as $post) {
         // check the post content for the short code
@@ -194,7 +218,7 @@ function awp_to_boolean($value)
             case 'true':
             case 'enabled':
                 return true;
-            
+
             case '-':
             case '0':
             case 'n':
@@ -205,7 +229,7 @@ function awp_to_boolean($value)
                 return false;
         }
     }
-    
+
     return (boolean) $value;
 }
 function awp_date_compare($a, $b)
@@ -231,7 +255,7 @@ function awp_sort_by_sequence($a, $b) {
  * @param unknown_type $tpages
  * @return unknown
  */
-function awp_paginate($reload, $page, $tpages,$totalitems) {	
+function awp_paginate($reload, $page, $tpages,$totalitems) {
 	$firstlabel = "<<";
 	$prevlabel  = "<";
 	$nextlabel  = ">";
@@ -245,7 +269,7 @@ function awp_paginate($reload, $page, $tpages,$totalitems) {
 	else {
 		$out.= "<a class=\"first-page disabled\" >" . $firstlabel . "</a>\n";
 	}
-	
+
 	// previous
 	if($page==1) {
 		$out.= "<a class=\"first-page disabled\" >" . $prevlabel . "</a>\n";
@@ -256,10 +280,10 @@ function awp_paginate($reload, $page, $tpages,$totalitems) {
 	else {
 		$out.= "<a class=\"prev-page\" href=\"" . $reload . "&amp;pageno=" . ($page-1) . "\">" . $prevlabel . "</a>\n";
 	}
-	
+
 	// current
 	$out .='<span class="paging-input"><input type="text" class="current-page" title="Current page" name="paged" value="'.$page.'" size="1"> of <span class="total-pages">'.$tpages.'&nbsp;&nbsp;</span></span>';
-	
+
 	// next
 	if($page<$tpages) {
 		$out.= "<a class=\"next-page\" href=\"" . $reload . "&amp;pageno=" .($page+1) . "\">" . $nextlabel . "</a>\n";
@@ -267,7 +291,7 @@ function awp_paginate($reload, $page, $tpages,$totalitems) {
 	else {
 		$out.= "<a class=\"last-page disabled\" >" . $nextlabel . "</a>\n";
 	}
-	
+
 	// last
 	if($page<$tpages) {
 		$out.= "<a class=\"last-page\" href=\"" . $reload . "&amp;pageno=" . $tpages . "\">" . $lastlabel . "</a>\n";
@@ -275,9 +299,9 @@ function awp_paginate($reload, $page, $tpages,$totalitems) {
 	else {
 		$out.= "<a class=\"last-page disabled\" >" . $lastlabel . "</a>\n";
 	}
-	
+
 	$out.= "</div></div>";
-	
+
 	return $out;
 }
 /**
@@ -296,7 +320,7 @@ function getsoapCall($wsdl,$function,$params)
    try {
     	 $response = $client->__soapCall($function, array($params));
     }catch(Exception $e){
-        return 'E_100'; 
+        return 'E_100';
     }
    return $response;
 }
@@ -320,48 +344,48 @@ function getsoapCall($wsdl,$function,$params)
      * @return Template Array Lists.
      */
     function get_awpTemplates($dir,$type)
-    {  
+    {
         $default_headers = array(
 		'Template Name' => 'Template Name',
-        'Template Type' => 'Template Type'	
+        'Template Type' => 'Template Type'
 	    );
-	    $templates = array();	 
+	    $templates = array();
 		$dir_news = $dir;
 		// Open a known directory, and proceed to read its contents
 		if (is_dir($dir_news)) {
 		    if ($dh = opendir($dir_news)) {
 		        while (($file = readdir($dh)) !== false) {
 		        	if ( substr( $file, -4 ) == '.php' )
-		        	{		        		        	
+		        	{
 					$plugin_data = get_file_data( $dir_news."/".$file, $default_headers, '' );
 					if(strlen(trim($plugin_data['Template Name'])) != 0 )
-					{  
+					{
 					   if(strtolower(trim($plugin_data['Template Type'])) == 'widget' && strtolower($type) == 'widget' )
 					   {
 						$templates[$plugin_data['Template Name']] = $file;
 					   }else if(strtolower(trim($plugin_data['Template Type'])) == 'shortcode' && strtolower($type) == 'plugin')
 					   {
-					   	$templates[$plugin_data['Template Name']] = $file;						
+					   	$templates[$plugin_data['Template Name']] = $file;
 					   }else if(strtolower(trim($plugin_data['Template Type'])) == 'inline' && strtolower($type) == 'inline')
                        {
-                         $templates[$plugin_data['Template Name']] = $file;	
+                         $templates[$plugin_data['Template Name']] = $file;
                        }
                     }
-					
+
 		        	}
-		        }		        
+		        }
 		        closedir($dh);
 		    }
 		}
-		return $templates; 
-    }  
+		return $templates;
+    }
 
 /**
  * Remove html tags from string
  *
  * @param string $str
  * @return string
- */    
+ */
 function html_remove($str){
 	return $str;
     return preg_replace("/<[^>]*>/","",$str);
@@ -393,7 +417,7 @@ function awp_convertObjToArray($objectValue)
  * @param <type> $plugincall_function
  * @param <type> $publishdate_params
  * @param <type> $plugincall_params
- * @return <type> 
+ * @return <type>
  */
 function get_data($wsdl,$publishdate_key,$plugincall_key,$publishdate_function,$plugincall_function,$publishdate_params,$plugincall_params)
     {
@@ -517,19 +541,19 @@ function awp_labelfield($field='',$class='contactform_field_label',$before='',$a
 	$fieldid=$field['fieldid'];
 	$showtext=$field['showtext'];
 	return $before.'<label for="'.$fieldid.'" class="'.$class.'">'.$showtext.'</label>'.$after;
-	
+
 }
 
 function awp_jobsearch_textfield ($field='',$class='',$before='',$after='')
 {
-	
+
 	$fieldid   = $field['fieldid'];
 	$showtext  = $field['showtext'];
 	$required  = $field['required'];
 	$fieldtype = $field['type'];
 	$options   = $field['options'];
-	
-	switch( $fieldid ) 
+
+	switch( $fieldid )
 	{
 		case "keywords" :
 			$html = '<input type="text" value="" class="absp_jobsearch_input_text '.$class.'"  name="'.$fieldid.'" id="'.$fieldid.'">';
@@ -540,7 +564,7 @@ function awp_jobsearch_textfield ($field='',$class='',$before='',$after='')
 			     $html .= '<select class="absp_jobsearch_select '.$class.'" value="" name="'.$fieldid.'" id="'.$fieldid.'"  > ';
                  $html .= '<option selected="selected" value="All" style="">Select  '.$showtext.'</option>';
                  foreach($options as $opt_val)
-                   { 
+                   {
                    	$option_arr = explode('::',$opt_val);
                     $html .= '<option value="'.$option_arr[0].'" >'.$option_arr[1].'</option>';
                    }
@@ -549,30 +573,30 @@ function awp_jobsearch_textfield ($field='',$class='',$before='',$after='')
         break;
 
         case "customfield2" :
-        	
+
 			if($fieldtype == 'checkbox') :
 			   foreach($options as $opt_val)
-                   {   $opt_value = strtoupper(trim($opt_val)); 
-                       $opt_value = str_replace(" ","_",$opt_value);    
+                   {   $opt_value = strtoupper(trim($opt_val));
+                       $opt_value = str_replace(" ","_",$opt_value);
                        $html .= '<input class="absp_jobsearch_input_checkbox '.$class.'" value="'.$opt_value.'" type="checkbox" name="'.$fieldid.'[]'.'" /> &nbsp;&nbsp;<label>'.$opt_val.'</label><br />';
-                    } 
+                    }
             endif;
-            
+
             if($fieldtype == 'select') :
 	            $html .= '<select class="absp_jobsearch_select '.$class.'" value="" name="'.$fieldid.'" id="'.$fieldid.'"  >';
 	            $html .= '<option value="" style="">Select  '.$showtext.'</option>';
 	            foreach($optionvalues as $opt_val)
-	                   {   $opt_value = strtoupper(trim($opt_val)); 
+	                   {   $opt_value = strtoupper(trim($opt_val));
 	                       $opt_value = str_replace(" ","_",$opt_value);
 	     				   $html .= '<option value="'.$opt_value.'" style="">'.$opt_val.'</option>';
-	                    } 
+	                    }
 	            $html .='</select>';
             endif;
-            
+
         break;
-        
-        
-       
+
+
+
 	}
 	 return $html;
 }
@@ -603,26 +627,26 @@ function awp_textfield($forms='',$field='',$countries='',$value_present='',$befo
 		$place_text = 'placeholder="'.$showtext.'"';
 	}
 	    if($fieldtype=="select" || $fieldtype=="radio" || $fieldtype=="checkbox" ){
-	     
+
 	       if(trim($fieldid) == 'industry')
 				{
 				$optionvalues=$options;
 				$fieldtype = 'select';
 				} else if(trim($options)!=""){
-				$optionvalues=split("[\n]",trim($options));//Split the String line by line.	
+				$optionvalues=split("[\n]",trim($options));//Split the String line by line.
 		   }
-		   
+
 		}
-		
-		
+
+
 		  if ($value_present) :
 		    $postValue = $_REQUEST[$fieldid];
-          else : 
+          else :
            	$postValue="";
            endif;
-           
-                    
-		//Required Class	
+
+
+		//Required Class
 		if($required){
 			$mandate_property='"mandatory="true"';
 			$validateclass=" required";
@@ -645,7 +669,7 @@ function awp_textfield($forms='',$field='',$countries='',$value_present='',$befo
 				$validateclass .=" number";
 			break;
 		}
-		
+
 		//Captcha Class
 		if($fieldid=='captcha')
          {
@@ -666,8 +690,8 @@ function awp_textfield($forms='',$field='',$countries='',$value_present='',$befo
                 if($fieldid == 'country'){
                  $html =  '<select  name="'.$fieldid.'" id="'.$fieldid.'"  class="absp_contact_select'.$validateclass.'"  tabindex="'.$tabindex.'">';
 				foreach($countries as $country)
-				{                   
-					$country_Code = ((trim($postValue)) == '')?'US':(trim($postValue));  
+				{
+					$country_Code = ((trim($postValue)) == '')?'US':(trim($postValue));
                     if($country_Code == trim($country->countryCode)){
                       $selected='selected="selected"';
                      }
@@ -691,7 +715,7 @@ function awp_textfield($forms='',$field='',$countries='',$value_present='',$befo
 							}
 						$html .=  '</select>';
 		                }else {
-		                	
+
 		                	 $html .=  '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_jobapplicant_select'.$validateclass.'"  tabindex="'.$tabindex.'">';
 		                	 $html .=  '<option value="0">Default</option>';
 							 $html .=  '</select>';
@@ -702,7 +726,7 @@ function awp_textfield($forms='',$field='',$countries='',$value_present='',$befo
 					foreach( $optionvalues as $optionvalue )
 					{
 	                                    if(trim($postValue) == trim($optionvalue)){
-	
+
 	                                       $selected='selected="selected"';
 	                                     }
 	                                     else{
@@ -719,7 +743,7 @@ function awp_textfield($forms='',$field='',$countries='',$value_present='',$befo
 			case "radio":
 				$i=0;$opt=0;
 				foreach( $optionvalues as $optionvalue )
-				{                                      
+				{
                                      if(trim($postValue) == trim($optionvalue)){
                                       $selected='checked="checked"';
                                      }
@@ -758,14 +782,14 @@ function awp_textfield($forms='',$field='',$countries='',$value_present='',$befo
                   $html ='<div class="captcha_image"><img src="'.$forms['captchaimagepath'].'" id="captchaimg" style="border:1px solid #000;"/></div>
                           <div class="captcha_input"><input type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value=""  class="absp_contact_input_text'.$validateclass.'"  tabindex="'.$tabindex.'" /></div>';
             break;
-            
+
             case "file":
 			   $html ='<input type="file" id="file_upload" name="file_upload"  tabindex="'.$tabindex.'" />';
 			   $html.= '<input type="hidden" name="uploadfile_docid" id="uploadfile_docid" value="" class="absp_jobapplicant_input_text'.$validateclass.'"  />';
 			break;
-			   
+
 		}
-		return $before.$html.$after;           
+		return $before.$html.$after;
 }
 
 /**
@@ -776,11 +800,11 @@ function awp_textfield($forms='',$field='',$countries='',$value_present='',$befo
  */
 
 function awp_submit_type($forms='',$form_submitname='',$class='',$before='',$after='', $tabindex)
-{   
+{
 	if(strlen(trim($form_submitname)) != 0 ) :
 	  $html ='<input type="hidden" name="'.$form_submitname.'"/>';
 	endif;
-	
+
       if($forms[submit_button_type] == "submit" ){
       	if(strlen(trim($forms[submit_button_val])) != 0)
       	{
@@ -799,7 +823,7 @@ function awp_submit_type($forms='',$form_submitname='',$class='',$before='',$aft
       	}
          $button_value = 'src="'.$imgSrc.'"';
       }
-      
+
       $html .= '<input type="'.$forms[submit_button_type].'" class="'.$class.'" '.$button_value.' name="awp_contactform_submit_'.$forms[name].'"  id="awp_contactform_submit_'.$forms[name].'"  tabindex="'.$tabindex.'"/>';
       return $before.$html.$after;
 }
@@ -816,7 +840,7 @@ function awp_submit_type($forms='',$form_submitname='',$class='',$before='',$aft
  * @param unknown_type $after
  * @return unknown
  */
-function cases_textfield($forms='',$field='',$countries='',$value_present='',$before='',$after='',$placeholder=false, $tabindex='',$dafaultselect=false,$plugin='')
+function cases_textfield($forms='',$field='',$countries='',$value_present='',$before='',$after='',$placeholder=false, $tabindex='',$dafaultselect=false,$plugin='',$postValue)
 {
 	echo $before;
 	$fieldid=$field['fieldid'];
@@ -825,24 +849,25 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
 	$required=$field['required'];
 	$fieldtype=$field['type'];
 	$options=$field['options'];
+        $values=$field['value'];
 	$optionvalues=array();
+        $selectvalues=array();
     $place_text = '';
+    if($postValue=="")
+    {
+    $postValue[$fieldid]="";
+    }
 	if($placeholder)
 	{
 		$place_text = 'placeholder="'.$showtext.'"';
 	}
 	    if($fieldtype=="select" || $fieldtype=="radio" || $fieldtype=="checkbox" ){
-	    		$optionvalues=split("[\n]",trim($options));//Split the String line by line.	
+	    		$optionvalues=split("[\n]",trim($options));/*Split the String line by line.*/
+                        $selectvalues=split("[\n]",trim($values)); /*Split the String line by line. */
 		}
-		
-		  if ($value_present) :
-		    $postValue = $_REQUEST[$fieldid];
-          else : 
-           	$postValue="";
-           endif;
-           
-                    
-		//Required Class	
+
+
+		//Required Class
 		if($required){
 			$mandate_property='"mandatory="true"';
 			$validateclass=" required";
@@ -868,7 +893,7 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
 				$validateclass .=" phonenumber";
 			break;
 		}
-		
+
 		//Captcha Class
 		if($fieldid=='captcha')
          {
@@ -880,14 +905,64 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
     switch($fieldtype)
 		{
 			case "text":
-               echo '<input  '.$place_text.' type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value="'.$postValue.'"  class="absp_'.$plugin.'_input_text'.$validateclass.'" tabindex="'.$tabindex.'">';
+               echo '<input  '.$place_text.' type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value="'.$postValue[$fieldid].'"  class="absp_'.$plugin.'_input_text'.$validateclass.'" tabindex="'.$tabindex.'">';
 			break;
 			case "textarea":
-			   echo '<textarea  '.$place_text.' name="'.$fieldid.'" id="'.$fieldid.'_id"   class="absp_'.$plugin.'_textarea'.$validateclass.'" size="50"  tabindex="'.$tabindex.'">'.$postValue.'</textarea>';
+			   echo '<textarea  '.$place_text.' name="'.$fieldid.'" id="'.$fieldid.'_id"   class="absp_'.$plugin.'_textarea'.$validateclass.'" size="50"  tabindex="'.$tabindex.'">'.$postValue[$fieldid].'</textarea>';
 			break;
 			case "select":
-                
-					echo '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$plugin.'_select'.$validateclass.'"  tabindex="'.$tabindex.'">';
+if(_isCurl())
+{				
+if($fieldid=="priority" || $fieldid=="type")
+{
+if($fieldid=="priority")
+{
+    $js_script="onchange='sendText(".$fieldid.");'";
+    $input_text='<input type="hidden" id="priority_name" name="priority_name" value=""/>';
+    
+}
+if($fieldid=="type")
+{
+    $js_script="";
+    $input_text="";
+    $js_script="onchange='sendText(".$fieldid.");'";
+    $input_text='<input type="hidden" id="type_name" name="type_name" value=""/>';
+    
+}
+					echo '<select '.$js_script.'  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$plugin.'_select'.$validateclass.'"  tabindex="'.$tabindex.'">';
+
+					if($dafaultselect):
+					    $default_select = '<option value="" > -- Select -- </option>';
+					    echo apply_filters('apptivo_business_'.$plugin.'_'.$fieldid.'_default_option',$default_select);
+					endif;
+
+$j=0;
+					foreach( $optionvalues as $optionvalue )
+					{
+	                                    if(trim($postValue[$fieldid]) == trim($optionvalue)){
+
+	                                       $selected='selected="selected"';
+	                                     }
+	                                     else{
+	                                         $selected='';
+	                                     }
+						if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
+							{
+                                                    if($js_script!="")
+                                                    {
+                                                        $attr_name='rel="'.$optionvalue.'"';
+                                                    }
+                                                    echo  '<option value="'.$selectvalues[$j].'" '.$selected.' '.$attr_name.'>'.$optionvalue.'</option>';
+						$j++;
+                                                        }
+
+					}
+					echo  '</select>';
+                                        echo $input_text;
+}
+else 
+{
+echo '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$plugin.'_select'.$validateclass.'"  tabindex="'.$tabindex.'">';
 					
 					if($dafaultselect):
 					    $default_select = '<option value="" > -- Select -- </option>';
@@ -910,14 +985,42 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
 							}
 					}
 					echo  '</select>';
-              
+}
+}
+else 
+{
+echo '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$plugin.'_select'.$validateclass.'"  tabindex="'.$tabindex.'">';
+					
+					if($dafaultselect):
+					    $default_select = '<option value="" > -- Select -- </option>';
+					    echo apply_filters('apptivo_business_'.$plugin.'_'.$fieldid.'_default_option',$default_select);
+					endif;
+					
+					
+					foreach( $optionvalues as $optionvalue )
+					{
+	                                    if(trim($postValue) == trim($optionvalue)){
+	
+	                                       $selected='selected="selected"';
+	                                     }
+	                                     else{
+	                                         $selected='';
+	                                     }
+						if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
+							{
+						echo  '<option value="'.$optionvalue.'" '.$selected.'>'.$optionvalue.'</option>';
+							}
+					}
+					echo  '</select>';
+}
+
 			break;
 			case "radio":
-                                
+
 				$i=0;$opt=0;
 				foreach( $optionvalues as $optionvalue )
-				{                                      
-                                     if(trim($postValue) == trim($optionvalue)){
+				{
+                                     if(trim($postValue[$fieldid]) == trim($optionvalue)){
                                       $selected='checked="checked"';
                                      }
                                      else{
@@ -927,7 +1030,7 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
 						{
 					if($i>0)
 						echo '&nbsp;';
-					echo '<input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_'.$plugin.'_input_radio '.$validateclass.'" '.$selected.'  tabindex="'.$tabindex.'"><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label>';
+					echo '<input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_'.$plugin.'_input_radio '.$validateclass.'" '.$selected.'  tabindex="'.$tabindex.'"><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><br/>';
 						}
 						$opt++;
 				}
@@ -937,40 +1040,39 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
 				foreach( $optionvalues as $optionvalue )
 				{
                                      $selected ="";
-                   if(!empty($postValue))  :                                   
-                   foreach($postValue as $value){
+				if(isset($postValue)!="" && count($postValue) >1)  {
+                   foreach($postValue[$fieldid] as $value){
                         if(trim($value) == trim($optionvalue)){
                         $selected='checked="checked"';
                          }
                     }
-                    endif;
+                   }
 					if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 					{
 					if($i>0)
 					echo '&nbsp';
-					echo '<input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_'.$plugin.'_input_checkbox '.$validateclass.'"  '.$selected.'  tabindex="'.$tabindex.'"> <label for="'.$fieldid.$opt.'">'.$optionvalue.'</label>';
+					echo '<input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_'.$plugin.'_input_checkbox '.$validateclass.'"  '.$selected.'  tabindex="'.$tabindex.'"> <label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><br/>';
 					$i++;
 					}
 					$opt++;
 				}
                         break;
             case "captcha":
-                  echo '<div class="captcha_image"><img src="'.$forms['captchaimagepath'].'" id="'.$plugin.'_captchaimg" style="border:1px solid #000;"/></div>
-                          <div class="captcha_input"><input type="text" name="'.$fieldid.'" id="'.$fieldid.'_id" value=""  class="absp_contact_input_text'.$validateclass.'"  tabindex="'.$tabindex.'" /></div>';
+                awp_reCaptcha();
             break;
-            
+
             case "file":
 			   echo '<input type="file" id="file_upload" name="file_upload"  tabindex="'.$tabindex.'" />';
 			   echo  '<input type="hidden" name="uploadfile_docid" id="uploadfile_docid" value="" class="absp_'.$plugin.'_input_text'.$validateclass.'"  />';
 			break;
-			   
+
 		}
-		echo $after;           
+		echo $after;
 }
 
 function cases_submit_type($forms='',$form_submitname='',$class='',$before='',$after='', $tabindex)
-{   
-	
+{
+
       if($forms[submit_button_type] == "submit" ){
       	if(strlen(trim($forms[submit_button_val])) != 0)
       	{
@@ -989,7 +1091,7 @@ function cases_submit_type($forms='',$form_submitname='',$class='',$before='',$a
       	}
          $button_value = 'src="'.$imgSrc.'"';
       }
-      
+
       $html .= '<input type="'.$forms[submit_button_type].'" class="'.$class.'" '.$button_value.' name="'.$form_submitname.'"  id="'.$form_submitname.'"   tabindex="'.$tabindex.'"/>';
       return $before.$html.$after;
 }
@@ -1011,7 +1113,7 @@ function awp_create_labelfield($showtext='',$customtext='',$class='',$before='',
     	$showtext = $customtext;
     endif;
 	return $before.'<label for="'.$fieldid.'" class="'.$class.'">'.$showtext.'</label>'.$after;
-	
+
 }
 
 function awp_create_textfiled($type='',$fieldid='',$class='',$before='',$after='')
@@ -1023,7 +1125,7 @@ function awp_create_textfiled($type='',$fieldid='',$class='',$before='',$after='
 	    break;
 	}
 	return $html;
-	
+
 }
 
 //Mandatory Field.
@@ -1032,13 +1134,273 @@ function awp_mandatoryfield($field='',$before='',$after='',$mandatory_symbol = '
 	$required=$field['required'];
 	if($required):
 	 return $before.$mandatory_symbol.$after;
-	endif;    
+	endif;
 }
 //Powered By Apptivo.
 function poweredby_apptivo()
-{	
-$apptivo_logo = '<a target="_blank" href="http://www.apptivo.com/e-commerce">
-<img style="border: medium none;" alt="Apptivo.com is the best free way to run your business. Apptivo.com powers ecommerce websites, provides free CMS, free CRM, free ERP, free Project Management and free Invoicing to small businesses." title="Apptivo.com is the best free way to run your business. Apptivo.com powers ecommerce websites, provides free CMS, free CRM, free ERP, free Project Management and free Invoicing to small businesses." src="http://cdn18.apptivo.com/templates/app/footer/apptivo.png"> 
+{
+$apptivo_logo = '<a target="_blank" href="http://www.apptivo.com/">
+<img style="border: medium none;" alt="Apptivo.com is the best free way to run your business. Apptivo.com powers ecommerce websites, provides free CMS, free CRM, free ERP, free Project Management and free Invoicing to small businesses." title="Apptivo.com is the best free way to run your business. Apptivo.com powers ecommerce websites, provides free CMS, free CRM, free ERP, free Project Management and free Invoicing to small businesses." src="http://cdn18.apptivo.com/templates/app/footer/apptivo.png">
 </a>';
 return $apptivo_logo;
+}
+
+/*
+ * Apptivo REST API CALL
+ */
+
+function _isCurl(){
+    return function_exists('curl_version');
+}
+
+function getRestAPICall($method, $url, $data = false)
+{
+    $proxysettings = array();
+    $proxysettings = get_option('awp_proxy_settings');
+    
+    if(!_isCurl()){ echo '<b style="color:red;">CURL disabled in your server. please enable through php.ini</b>';  exit; }
+
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type: application/x-www-form-urlencoded;charset=utf-8"));
+
+    if($method == "POST")
+    {
+        curl_setopt($ch, CURLOPT_POST, 1);
+        if ($data) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+        }
+    }
+    else{
+        if ($data) $url = sprintf("%s?%s", $url, http_build_query($data));
+    }
+    curl_setopt($ch,CURLOPT_URL, $url);
+
+        if(isset($proxysettings['proxy_enable'])){
+        if(isset($proxysettings['proxy_hostname_portno'])){
+            curl_setopt($ch, CURLOPT_PROXY, $proxysettings['proxy_hostname_portno']);
+        }
+        if(isset($proxysettings['proxy_loginuser_pwd'])){
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxysettings['proxy_loginuser_pwd']);
+        }
+    }
+    
+    curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+    $response = curl_exec($ch);
+    curl_close($ch);
+	$result = json_decode($response);
+    return $result;
+}
+
+function getCaseValues($option)
+{
+            $params = array (
+                "a"         => "getCaseLookupValues",
+                "lookupType"=> $option,
+                "apiKey"    => APPTIVO_BUSINESS_API_KEY,
+                "accessKey" => APPTIVO_BUSINESS_ACCESS_KEY
+                );
+$response=getRestAPICall("POST",APPTIVO_CASES_API,$params);
+return $response;
+}
+
+/* Generate Captcha */
+function awp_reCaptcha()
+{
+     if(get_option ('apptivo_business_recaptcha_mode')=="yes")
+{
+    $option=get_option('apptivo_business_recaptcha_settings');
+    $option=json_decode($option);
+if($option->recaptcha_publickey!="" && $option->recaptcha_privatekey!="")
+{    
+echo " <script type='text/javascript'>
+	     var RecaptchaOptions = {
+		    theme : '".$option->recaptcha_theme."',
+			lang : '".$option->recaptcha_language."',
+             };
+	</script>
+<style type='text/css'>
+#recaptcha_image{width: 226px;}
+#recaptcha_area{width: 245px !important;}
+#recaptcha_widget_div{xzoom:0.75;x-moz-transform: scale(0.72);text-align: center;}
+#recaptcha_response_field{width:160px !important;height:32px;font-size:18px !important;}
+#recaptcha_image img{width:300px !important;}
+#recaptcha_privacy{display: none;}
+#recaptcha_widget_div label.error{display: none !important;}
+.recaptcha_source{width:40%;}
+.captcha_key_error{clear:both;text-align:center;width:58%;margin:0 auto;padding:0px;display:block;}
+</style>";
+require_once AWP_ASSETS_DIR.'/captcha/recaptchalib.php';
+echo "<div class='recaptcha_source'>";
+echo recaptcha_get_html($option->recaptcha_publickey);
+echo "</div><div class='awp_recaptcha_error'><label for='recaptcha_response_field' generated='true' class='error'></label></div>";
+echo "<script type='text/javascript'>
+jQuery(document).ready(function($) {
+			if (jQuery('.recaptcha_source #recaptcha_response_field').length == '0') { 
+					jQuery('.recaptcha_source').html('');
+					jQuery('.recaptcha_source').html('<p> Invalid ReCaptcha Keys. </p>');
+					jQuery('.recaptcha_source').addClass('captcha_key_error').removeClass('recaptcha_source');
+					} 
+});</script>";
+return;
+}
+}
+else
+{
+    echo '<div class="captcha_image">Please Enable reCaptcha in Plugin Settings.</div>';
+    return;
+}
+}
+
+/* Get Captcha Response */
+function captchaValidation($privatekey,$challenge_field,$response_field)
+{
+require_once(AWP_ASSETS_DIR.'/captcha/recaptchalib.php');
+  $resp = recaptcha_check_answer ($privatekey,
+                                $_SERVER["REMOTE_ADDR"],
+                                $challenge_field,
+                                $response_field);
+
+  if (!$resp->is_valid) {
+    $response= $resp->error;
+
+  }
+  else{
+      $response =$resp->is_valid;
+  }
+  return $response;
+}
+
+/* Check's Captcha if enabled or disabled  */
+function checkCaptchaOption()
+{
+	 if(get_option ('apptivo_business_recaptcha_mode')!="yes")
+{
+	echo '<script type="text/javascript">
+	jQuery(document).ready(function($) {
+	jQuery("#captcha_show").attr("disabled", true).prop("checked", false).attr("title","Please Enable Recaptcha in Plugin settings.");
+		});
+	</script>';
+}
+}
+
+/* Create Lead Source */
+
+function CreateContactFormLeads($sourceName)
+{
+
+    $params = array (
+                "a"=>"checkLookupNameExist",
+                "from"=>"Create",
+                "lookupName"=>$sourceName,
+                "lookupType"=>"LEAD_SOURCE_TYPE",
+                "apiKey"=> APPTIVO_BUSINESS_API_KEY,
+                "accessKey"=> APPTIVO_BUSINESS_ACCESS_KEY
+                );
+$respone=getRestAPICall("POST",APPTIVO_LEAD_SOURCE_API,$params);
+ $checkLead=$respone->meaning;
+ if($checkLead=="yes")
+ {
+     $leadSource = "present";
+     return $leadSource;
+ }
+if($checkLead=="no" && $checkLead!='')
+{
+    $details='{"meaning":"'.$sourceName.'","notifyEmailId":"","description":"'.$sourceName.'"}';
+    $params = array (
+                "a"     =>"createNewLeadByLookupType",
+                "details"=>$details,
+                "lookupType"=>"LEAD_SOURCE_TYPE",
+                "displayInDashboard"=>"N",
+                "apiKey"=> APPTIVO_BUSINESS_API_KEY,
+                "accessKey"=> APPTIVO_BUSINESS_ACCESS_KEY
+                );
+    $respone=getRestAPICall("POST",APPTIVO_LEAD_SOURCE_API,$params);
+    return $respone;
+}
+}
+
+function checkSoapextension($currentOption) {
+if (!extension_loaded('soap')) {
+echo '<div class="awp_updated" id="errormessage">
+<p style="color:#f00;font-weight:bold;text-align:center;"> SOAP extension required to run Apptivo Business Site CRM  plugin- ' . $currentOption . '. </p>
+</div>
+<style type="text/css">
+.awp_updated{background-color: #FFFFE0;border-color: #E6DB55;border-radius: 5px 5px 5px 5px;border-style: solid;border-width: 1px;line-height: 0.9em;}
+</style>'
+    ;
+    echo '<script type="text/javascript">
+	jQuery(document).ready(function($) {
+	jQuery(".awp_updated").fadeOut(10000);
+		});
+	</script>';
+    }
+}
+
+/**
+ * Create TargetLists.
+ *
+ * @param unknown_type $category
+ * @param unknown_type $fname
+ * @param unknown_type $lname
+ * @param unknown_type $email
+ * @param unknown_type $userId
+ * @return unknown
+ */
+function createTargetList($category,$fname,$lname,$email,$phoneNumber,$comments,$userId=null)
+{
+   
+   $target_category = target_lists_category(trim($category));
+   if(trim($category) != $target_category )
+   {
+   	return $target_category;
+   }
+   
+   $verification = check_blockip();
+   if($verification){
+   	 return $verification;
+   }
+	$appParam = new AWP_appParam('PHONE',$phoneNumber);	
+	$params = array ( 
+                "arg0" => APPTIVO_BUSINESS_API_KEY,
+                "arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
+	            "arg2" => $category,
+	            "arg3" => $fname,
+	            "arg4" => $lname,
+	            "arg5" => $email,
+	            "arg6" => $comments,
+	            "arg7" => $userId,
+		        "arg8" => $appParam
+                 );
+    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createTargetWithCommunicationDetailsAndAddToTargetList',$params);
+    return $response;
+}
+
+/*
+ * 
+ * To get Current Browser
+ */
+
+function get_current_browser()
+{
+if(isset($_SERVER['HTTP_USER_AGENT'])){
+    $agent = $_SERVER['HTTP_USER_AGENT'];
+}
+if(strlen(strstr($agent,"Firefox")) > 0 ){ 
+	$browser = 'firefox';
+}
+else if(strlen(strstr($agent,"Chrome")) > 0 ){ 
+
+    $browser = 'chrome';
+
+}
+else
+{
+   $browser = 'other';
+}
+return $browser;
 }

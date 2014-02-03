@@ -18,8 +18,8 @@ function delete_ipbannedaccount()
 	$id = $_POST['ip_id']; 
 	$table_name=$wpdb->prefix.'absp_ipdeny';
 	$result = $wpdb->query($wpdb->prepare("DELETE  FROM " .$table_name
-	            . "  WHERE ID = " .$id  ));
-	if($result)
+	            . "  WHERE ID =%d ",$id  ));
+    if($result)
 	{
 	 echo "Success::".$id;
 	 ?>
@@ -169,7 +169,7 @@ class AWP_IPDeny extends AWP_Base
     	/* Create Table */
     	$this->create_table();
     	echo '<div class="wrap"><h2>Block IP Addresses</h2></div>';
-    	echo '<form action="" method="post" name="absp_ip_address">
+        echo '<form action="" method="post" name="absp_ip_address">
                <table class="form-table"><tbody>                			
 
                 <tr valign="top">

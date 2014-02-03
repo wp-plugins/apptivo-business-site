@@ -267,7 +267,7 @@ class AWP_Cache_Util extends AWP_Common_Util
        $response = getsoapCall(APPTIVO_BUSINESS_SERVICES, $plugincall_function, $plugincall_params);
        $publish_date = getsoapCall(APPTIVO_BUSINESS_SERVICES, $publishdate_function, $publishdate_params);
        $this->_disccache->set($plugincall_key, $response);
-       $this->_disccache->set($publishdate_key, $publish_date->return);
+       $this->_disccache->set($publishdate_key, $publish_date);
        return $response;
     }
 }

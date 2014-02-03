@@ -64,11 +64,15 @@ margin-top:10px;
 
 
  echo '<div id="testimonials">';
-  $awp_all_testimonials = array_slice($awp_all_testimonials, 0, $numberofitems);
+//$awp_all_testimonials = array_slice($awp_all_testimonials, 0, $numberofitems+1);
+$count="1";
  foreach($awp_all_testimonials as $testimonial) {
 			$accountName = '';
 			$jobTitle = '';
 			$companyName = ''; 	
+ $testimonialStatus=$testimonial->testimonialStatus;
+        if($testimonialStatus=="APPROVED")
+        {
 		 if( $testimonial->account->accountName != '' )
 		{
 			$accountName = '<cite>&ndash;'.$testimonial->account->accountName.'</cite>';
@@ -87,15 +91,19 @@ margin-top:10px;
  	
  	echo ' <blockquote><p>';
  	if(strlen($testimonial->testimonialImageUrl) != 0 ) { echo '<img src="'.$testimonial->testimonialImageUrl.'" alt="image" width="120" height="90" class="absp_testimonails_image" />'; }
-	      	   if(strlen(strip_tags($testimonial->testimonial))>500)
-      echo '<span class="absp_testimonials_descrption">'.substr(strip_tags($testimonial->testimonial),0,500).'</span>&nbsp;&nbsp;<span class="read"><a class="absp_testimonials_readmore" href="'.$awp_testimonials[pagelink].'" >'.$awp_testimonials[more_text].'</a></span>';
+	      	   if(strlen(strip_tags($testimonial->testimonial))>400)
+      echo '<span class="absp_testimonials_descrption">'.substr(strip_tags($testimonial->testimonial),0,400).'</span>&nbsp;&nbsp;<span class="read"><a class="absp_testimonials_readmore" href="'.$awp_testimonials[pagelink].'" >'.$awp_testimonials[more_text].'</a></span>';
    else
        echo '<span class="absp_testimonials_descrption">'.strip_tags($testimonial->testimonial).'</span>';
  	
     echo $accountName;
     echo '<cite>'.'<span class="absp_testimonials_jobtitle">'.$jobTitle.'</span>'.'&nbsp;&nbsp;'.'<span class="absp_testimonials_company">'.$companyName.'</span>'.'</cite></p></blockquote>';
- }
+        if($count==$numberofitems){ echo '</div>';
+ echo $css; break; }
+    $count++;
+        
+	    } 
+}
  
-echo '</div>';
- echo $css;
+
 ?>

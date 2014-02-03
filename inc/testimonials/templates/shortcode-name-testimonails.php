@@ -13,6 +13,9 @@ if( $awp_testimonials[custom_css] != '' )
 <?php 
 foreach($awp_all_testimonials as $Tesimonials)
 { 
+$testimonialStatus=$Tesimonials->testimonialStatus;
+if($testimonialStatus=="APPROVED")
+{
 $Name = $Tesimonials->account->accountName;
 $JobTitle = $Tesimonials->contact->jobTitle;
 $companyName = $Tesimonials->contact->companyName;
@@ -27,6 +30,8 @@ $testimonial = $Tesimonials->testimonial;
              </div>
              <div align="left" class="bdr"></div>
              
-<?php } ?>
+<?php }
+}
+?>
 </div>
 <?php echo $css; ?>            

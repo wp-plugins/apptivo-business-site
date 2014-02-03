@@ -7,11 +7,11 @@ echo $before_widget;
 if(!empty($newsletterformfields)){
 	if ($instance['title']) echo $before_title . apply_filters('widget_title', $instance['title']) . $after_title;
 	
-	if( $newsletterproperties[css] != '' )
+	if( $instance[widget_style] != '' )
 	{
-	 echo $css='<style type="text/css">'.$newsletterproperties[css].'</style>';
+	 echo $css='<style type="text/css">'.$instance[widget_style].'</style>';
 	}
-	wp_register_script('jquery_validation',AWP_PLUGIN_BASEURL. '/assets/js/validator-min.js',array('jquery'));
+        wp_register_script('jquery_validation',AWP_PLUGIN_BASEURL. '/assets/js/validator-min.js',array('jquery'));
 	wp_print_scripts('jquery_validation');
 	echo $jscript='<script type="text/javascript">
 			jQuery(document).ready(function(){
@@ -46,16 +46,27 @@ if(!empty($newsletterformfields)){
 			   },
 			   submitHandler: function(form) {
 			      form.submit();
-			    }
-			});
-			});
-			</script>';
+                            }
+			});'
+                          ;
+if($successmsg!="" && $newsletterform[properties][confmsg]!="")
+{
+    echo ' document.getElementById("success_'.$newsletterform[name].'").scrollIntoView();
+});
+</script>';
+}
+else
+{
+    echo ' }); </script>';
+}
 	if($successmsg!=""){
-		echo  '<div>'.$successmsg."</div>";
+            echo '<div id="awp_focusmsg">';
+            echo  '<div id="success_'.$newsletterform[name].'" class="absp_success_msg success_'.$newsletterform[name].'">'.$successmsg."</div>";
+            echo '</div>';
 	}
 	
 	do_action('apptivo_business_newsletter_widget_before_form');//Before Newsletter form
-	
+	echo '<style type="text/css"> .absp_success_msg{color:green;font-weight:bold;padding-bottom:5px;}.absp_error,.error_message{color:red;font-weight:bold;padding-bottom:5px;}</style>';
 	echo '<form id="'.$newsletterform[name].'_newsletter_widget" name="'.$newsletterform[name].'_newsletter_widget" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
 	echo '<input type="hidden" value="'.$newsletterform[name].'" name="awp_newsletterwidgetname" id="awp_newsletterwidgetname">';
 	echo '<input type="hidden" value="'.$newsletterproperties[category].'" name="newsletter_category" id="newsletter_category">';

@@ -130,7 +130,7 @@ class AWP_MainController extends AWP_Base
             case ($this->_page == 'awp_news'):
             case ($this->_page == 'awp_events'):
             case ($this->_page == 'awp_jobs'):   
-             case ($this->_page == 'awp_cases'):                    
+            case ($this->_page == 'awp_cases'):                    
             break;
                         
             default:
@@ -255,7 +255,7 @@ class AWP_MainController extends AWP_Base
             case 'awp_ip_deny':
             	$this->options_ipdeny();
             	break;  
-            	  
+           	  
             case 'awp_contactforms':
                 $this->options_contactforms();
                 break;
@@ -467,7 +467,7 @@ class AWP_MainController extends AWP_Base
 						<br><span class="description">API key generated in Apptivo</span>
 					</th>
 					<td valign="top">
-                     <input style="width:500px;" type="text" <?php if($keys_readonly) { echo 'readonly="true"';} ?>  name="api_key" id="api_key" class="enabled" value="<?php echo $apptivo_api_key; ?>"/>
+                     <input style="width:520px;" type="text" <?php if($keys_readonly) { echo 'readonly="true"';} ?>  name="api_key" id="api_key" class="enabled" value="<?php echo $apptivo_api_key; ?>"/>
                      <input type="hidden" name="prev_api_key" id="prev_api_key" value="<?php echo $apptivo_api_key; ?>"/>
                      <input type="hidden" name="update_site_inf" id="update_site_inf" value="yes"/>
 					</td>
@@ -478,7 +478,7 @@ class AWP_MainController extends AWP_Base
 						<br><span class="description">Access key generated in Apptivo</span>
 					</th>
 					<td valign="top">
-                     <input style="width:500px;" type="text" <?php if($keys_readonly) { echo 'readonly="true"';} ?>  name="access_key" id="access_key" class="enabled" value="<?php echo $apptivo_access_key; ?>"/>
+                     <input style="width:520px;" type="text" <?php if($keys_readonly) { echo 'readonly="true"';} ?>  name="access_key" id="access_key" class="enabled" value="<?php echo $apptivo_access_key; ?>"/>
                     </td>
 				</tr>
 				
@@ -799,7 +799,107 @@ class AWP_MainController extends AWP_Base
             
             $this->pluginsSettings($general_plugins_settings);
 	}
-	
+	function captcha_tabsettings()
+    {
+	if(isset($_REQUEST['captcha_option']))
+	{
+    	$apptivo_recapthca['recaptcha_mode']   =   $_POST['apptivo_business_recaptcha_mode'];
+    	$apptivo_recapthca['recaptcha_publickey']= $_POST['apptivo_business_recaptcha_publickey'];
+    	$apptivo_recapthca['recaptcha_publickey'] = preg_replace('/\s+/', '', $apptivo_recapthca['recaptcha_publickey']);
+    	$apptivo_recapthca['recaptcha_privatekey']= $_POST['apptivo_business_recaptcha_privatekey'];
+    	$apptivo_recapthca['recaptcha_privatekey'] = preg_replace('/\s+/', '', $apptivo_recapthca['recaptcha_privatekey']);
+    	$apptivo_recapthca['recaptcha_theme']  =  $_POST['apptivo_business_recaptcha_theme'];
+    	$apptivo_recapthca['recaptcha_language']=$_POST['apptivo_business_recaptcha_language'];
+    	echo '<div style="margin:5px 0 15px; background-color: #FFFFE0 ;border: 1px solid #E6DB55;" class="message">
+        <p style="margin: 0.5em;padding: 2px;">reCaptcha configuration successfully saved.</p></div>';
+    	$apptivo_recapthca=json_encode($apptivo_recapthca);
+    	if(get_option ('apptivo_business_recaptcha_settings')=="")
+    	{
+   			add_option( 'apptivo_business_recaptcha_settings', "$apptivo_recapthca");
+    	}
+    	else
+    	{
+        	update_option( 'apptivo_business_recaptcha_settings', "$apptivo_recapthca");
+    	}
+    	if(get_option('apptivo_business_recaptcha_mode')=="")
+    	{
+    		add_option('apptivo_business_recaptcha_mode',"$_POST[apptivo_business_recaptcha_mode]");
+    	}
+    	else
+    	{
+        	update_option('apptivo_business_recaptcha_mode',"$_POST[apptivo_business_recaptcha_mode]");
+    	}
+	}
+$option=get_option('apptivo_business_recaptcha_settings') ;
+$option=json_decode($option);
+    ?>
+<form name="capthca" method="post" action="">
+<h3>reCaptcha in Forms </h3>
+            <table class="form-table">
+
+<tbody><tr valign="top">
+					<th class="titledesc" scope="row">Enable reCaptcha</th>
+                    <td class="forminp"><select style="width:185px;" id="apptivo_business_recaptcha_mode" name="apptivo_business_recaptcha_mode">
+                                                    <option <?php if($option->recaptcha_mode=="yes"){echo 'selected="selected"'; }?> value="yes">Enabled</option>
+                                                    <option <?php if($option->recaptcha_mode=="no"){echo 'selected="selected"'; }?> value="no">Disabled</option>
+                                        </select>
+    <span class="description"><a href="https://www.google.com/recaptcha/admin/create" title="Create a reCAPTCHA key" target="_blank">Create a reCAPTCHA key</a></span>
+                    </td>
+                </tr><tr valign="top">
+                <?php $privateKey = trim(get_option( 'apptivo_ecommerce_recaptcha_privatekey' ));
+					  $publicKey = trim(get_option( 'apptivo_ecommerce_recaptcha_publickey' ));
+					  if($privateKey!="" && $publicKey !="")
+					  {
+					  	$absp_privatekey= $privateKey;
+					  	$absp_pubickey= $publicKey;
+					  	$disable	=	'readonly="true"';
+					  }
+					  else 
+					  {
+					  		$absp_pubickey	=	$option->recaptcha_publickey;
+					  		$absp_privatekey=	$option->recaptcha_privatekey;
+					  		$disable	=	"";
+					  }
+                 ?>
+    <th class="titledesc" scope="row">reCaptcha - Public Key</th>
+    <td class="forminp">
+    <input type="text" value="<?php echo $absp_pubickey; ?>" <?php echo $disable; ?> style="width:500px;" id="apptivo_business_recaptcha_publickey" name="apptivo_business_recaptcha_publickey">
+
+                    <span class="description"></span></td>
+                </tr><tr valign="top">
+					<th class="titledesc" scope="row">reCaptcha - Private Key</th>
+                    <td class="forminp">
+                    <input type="text" value="<?php echo $absp_privatekey; ?>" <?php echo $disable; ?> style="width:500px;" id="apptivo_business_recaptcha_privatekey" name="apptivo_business_recaptcha_privatekey">
+
+                    <span class="description"></span></td>
+                </tr><tr valign="top">
+					<th class="titledesc" scope="row">reCaptcha - Theme</th>
+                    <td class="forminp"><select style="width:185px;" id="apptivo_business_recaptcha_theme" name="apptivo_business_recaptcha_theme">
+                                                    <option <?php if($option->recaptcha_theme=="red"){echo 'selected="selected"'; }?> value="red">Red</option>
+                                                    <option <?php if($option->recaptcha_theme=="white"){echo 'selected="selected"'; }?> value="white">White</option>
+                                                    <option <?php if($option->recaptcha_theme=="blackglass"){echo 'selected="selected"'; }?> value="blackglass">Black Glass</option>
+                                               </select> <span class="description"></span>
+                    </td>
+                </tr><tr valign="top">
+					<th class="titledesc" scope="row">reCaptcha - Language</th>
+                    <td class="forminp"><select style="width:185px;" id="apptivo_business_recaptcha_language" name="apptivo_business_recaptcha_language">
+                                                    <option <?php if($option->recaptcha_language=="en"){echo 'selected="selected"'; }?> value="en">English</option>
+                                                    <option <?php if($option->recaptcha_language=="nl"){echo 'selected="selected"'; }?> value="nl">Dutch</option>
+                                                    <option <?php if($option->recaptcha_language=="fr"){echo 'selected="selected"'; }?> value="fr">French</option>
+                                                    <option <?php if($option->recaptcha_language=="de"){echo 'selected="selected"'; }?> value="de">German</option>
+                                                    <option <?php if($option->recaptcha_language=="pt"){echo 'selected="selected"'; }?> value="pt">Portuguese</option>
+                                                    <option <?php if($option->recaptcha_language=="ru"){echo 'selected="selected"'; }?> value="ru">Russian</option>
+                                                    <option <?php if($option->recaptcha_language=="es"){echo 'selected="selected"'; }?> value="es">Spanish</option>
+                                                    <option <?php if($option->recaptcha_language=="tr"){echo 'selected="selected"'; }?> value="tr">Turkish</option>
+                                               </select> <span class="description"></span>
+                    </td>
+                </tr></tbody></table>
+<input type="submit" name="captcha_option" value="Save Changes" class="button-primary"/>
+</form>
+<br/><br/>
+
+<?php
+        }
 	function memcache_tabsettings()
 	{
 	 
@@ -811,20 +911,99 @@ class AWP_MainController extends AWP_Base
                 $this->memCacheSettings($memcachesettings,$test_m_cacheconnect);
 	        }
 	}
+
+        /*
+         * Configuration for Proxy settings
+         */
+        function proxy_tabsettings()
+	{
+                $proxysettings = array();
+	        if(isset($_POST['awp_proxy_settings'])){
+                    $proxysettings['proxy_enable']= AWP_Request::get_boolean("proxy_enable");
+                    $proxysettings['proxy_hostname_portno']= AWP_Request::get_string("proxy_hostname_portno");
+                    $proxysettings['proxy_loginuser_pwd']= AWP_Request::get_string("proxy_loginuser_pwd");
+	            if(get_option("awp_proxy_settings")!=="false"){
+	               update_option('awp_proxy_settings',$proxysettings);
+	            }
+	            else{
+	               add_option('awp_proxy_settings', $proxysettings);
+	            }
+	            if(!$proxysettings['proxy_enable'])
+	            {
+	            	update_option('awp_proxy_settings','');
+	            }
+	            echo '<div class="message" style="margin:5px 0 15px; background-color: #FFFFE0 ;border: 1px solid #E6DB55;"><p style="margin: 0.5em;padding: 2px;">Proxy configuration successfully saved.
+	                </p></div>';
+	        }
+
+            $proxysettings = get_option('awp_proxy_settings');
+            echo "<h3>" . __( 'Proxy Settings', 'apptivo-businesssite' ) . "</h3>"; ?>
+
+            <form name="awp_proxy_settings" method="post" action="">
+                    <table class="form-table">
+                        <tbody>
+                            <tr valign="top">
+					<th valign="top"><label for="memcache_enable"><?php _e("Enable Proxy", 'apptivo-businesssite' ); ?>:</label>
+						<br><span class="description">Enable if you need proxy settings to reach Apptivo from your server</span>
+					</th>
+					<td valign="top">
+						<input <?php  if(isset($proxysettings['proxy_enable'])){ echo 'checked="checked"'; } ?>  type="checkbox" name="proxy_enable" id="proxy_enable" onclick="proxy_enablefield('proxy_enable')" class="enabled" />
+					</td>
+				</tr>
+                    <tr>
+        		<th><label for="proxy_hostname_portno">Proxy hostname:port / <acronym title="Internet Protocol">IP</acronym>:port:</label></th>
+        		<td>
+        			<input <?php  if(!isset($proxysettings['proxy_enable'])){ echo 'disabled="disabled"'; } ?>  type="text" size="30" value="<?php if(isset($proxysettings['proxy_hostname_portno'])){ echo $proxysettings['proxy_hostname_portno']; } ?>" name="proxy_hostname_portno" id="proxy_hostname_portno">
+        			<br><span class="description">e.g. domain.com:22122 (or) 192.168.1.100:11211 </span>
+        		</td>
+                    </tr>
+                    <tr>
+        		<th><label for="proxy_loginuser_pwd">Proxy login username:password </label></th>
+        		<td>
+        			<input <?php  if(!isset($proxysettings['proxy_enable'])){ echo 'disabled="disabled"'; } ?>  type="text" size="30" value="<?php if(isset($proxysettings['proxy_loginuser_pwd'])) { echo $proxysettings['proxy_loginuser_pwd'];  } ?>" name="proxy_loginuser_pwd" id="proxy_loginuser_pwd">
+        			
+        			<br><span class="description">e.g. username:password </span>
+        		</td>
+                    </tr>
+
+                  <tr>
+					<td>
+					&nbsp;
+					</td>
+
+                    <td>
+    				<input type="submit" name="awp_proxy_settings" id="awp_proxy_settings" class="button-primary" value="<?php esc_attr_e('Save Configuration') ?>" />
+					</td>
+
+				</tr>
+                        </tbody>
+                    </table>
+                </form>
+                <?php
+	}
+
 	/**
      * Render Apptivo General Settings page
      */
     function show_general_settings(){
-    	echo '<div class="wrap">';
+        echo '<div class="wrap">';
 	    echo "<h2>" . __( 'Apptivo General Settings', 'apptivo-businesssite' ) . "</h2></ br>";
 		?>
     	<?php 
-       //General Settings
+       /* General Settings */
 		$this->general_tabssettings();
-		//Plugin Settings
+		/* Plugin Settings */
 		$this->plugin_tabsettings();
-		//Memcache Settings.
+        /* Capthcha Settings */
+        $this->captcha_tabsettings();
+		if(_isCurl())
+		{
+		/* Proxy Settings */
+        $this->proxy_tabsettings();
+		}
+		/* Memcache Settings. */
 		$this->memcache_tabsettings();
+                
 		 ?>
 
 <?php 

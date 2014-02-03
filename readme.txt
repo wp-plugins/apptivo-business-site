@@ -1,9 +1,9 @@
 === Apptivo Business Site CRM ===
-Contributors: apptivo, rmohanasundaram
+Contributors: apptivo, rmohanasundaram, prabhuganapathy
 Tags: apptivo, contact forms, crm, newsletters, testimonials
 Requires at least: 3.0
-Tested up to: 3.4.2
-Stable tag: 1.1.2.1
+Tested up to: 3.8
+Stable tag: 1.2.1
 
 Create contact forms, newsletter signups, and customer testimonials, integrated with Apptivo.
 
@@ -49,6 +49,12 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 2. screenshot-2.jpg
 
 == Changelog ==
+= 1.2.1 =
+* REST API updated for contact forms and Cases forms
+* Google ReCaptcha added
+* Added Responsive support forms
+* Added web Testimonial forms
+
 = 1.1.2.1 =
 * Soap Client values passed as stream context for some php versions throw Fatal exception on accessing webservice. 
 

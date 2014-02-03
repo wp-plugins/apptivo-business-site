@@ -27,6 +27,7 @@
 								c=b.addMenu({title:"Testimonials"});
 										a.addImmediate(c,"Full View","[apptivo_testimonials_fullview]" );
 										a.addImmediate(c,"Inline View","[apptivo_testimonials_inline]" );
+                                        a.addImmediate(c,"Testimonial Form",'[apptivo_testimonials_form name="testimonialform"]' );
                                
 								c=b.addMenu({title:"News"});
 										a.addImmediate(c,"Full View","[apptivo_news_fullview]" );

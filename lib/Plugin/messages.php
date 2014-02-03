@@ -18,6 +18,7 @@ function awp_messagelist($key='')
         "testimonialsconfigure-display-page"  	=> '<span class="error_message">Testimonials is not configured.</span>',
 		"news-display-page" 					=> '<span class="error_message">News are not found.</span>',
 		"testimonials-display-page" 			=> '<span class="error_message">Testimonials are not found.</span>',
+		"testimonials-form-page" 			    => '<span class="error_message">Testimonial form is not configured.</span>',
         "jobapplicant-form-display-page"		=> '<span class="error_message">Job applicant form is not configured.</span>',
         "joblists-noresults-display-page"    	=> '<span class="error_message">No jobs are found</span>',
         "joblists-display-page"             	=> '<span class="error_message">Job List page is not configured.</span>',
@@ -31,7 +32,9 @@ function awp_messagelist($key='')
 		"jobapplicant-display-page"             => '<span class="error_message">Your request was not sent.Please try again after 10 mins.</span>',
 		"validate-getJobsByNo"                  => '<span class="error_message">Selected jobs are not found.Please try again after 10 mins.</span>',
 		"jobsearch-noresult"                    => '<span class="error_message">No jobs are found. Please modify your search and try again</span>',
-	    "IP_banned"                             => '<span class="error_message">Your IP Banned.</span>'
+	    "IP_banned"                             => '<span class="error_message">Your IP Banned.</span>',
+        "recaptcha_error"                       => '<span class="error_message">Please enter correct Verification code.</span>',
+        "soap_error"                       => '<div class="updated" id="errormessage"><p style="color:#f00;font-weight:bold;text-align:center;"> SOAP extension required to run Apptivo Business Site CRM  plugin. </p></div>'
     );
 	
 	return $awp_errormessage_list[$key];	
@@ -100,13 +103,13 @@ function awp_developerguide($key='')
 function awp_flow_diagram($key='',$imgtag=false)
 {
 	$flow_diagrams = array(
-	"contactform" 	=> AWP_PLUGIN_BASEURL."/assets/images/contact.jpg",
-	"newsletter" 	=> AWP_PLUGIN_BASEURL."/assets/images/newsletter.jpg",
-	"news" 		 	=> AWP_PLUGIN_BASEURL."/assets/images/news.jpg",
-	"events"  	 	=> AWP_PLUGIN_BASEURL."/assets/images/events.jpg",
-	"testimonials"  => AWP_PLUGIN_BASEURL."/assets/images/testimonials.jpg",
-	"jobs"   		=> AWP_PLUGIN_BASEURL."/assets/images/jobs.jpg",
-	"cases"   		=> AWP_PLUGIN_BASEURL."/assets/images/cases.jpg"
+	"contactform" 	=> AWP_PLUGIN_BASEURL."/assets/images/contact.png",
+	"newsletter" 	=> AWP_PLUGIN_BASEURL."/assets/images/newsletter.png",
+	"news" 		 	=> AWP_PLUGIN_BASEURL."/assets/images/news.png",
+	"events"  	 	=> AWP_PLUGIN_BASEURL."/assets/images/events.png",
+	"testimonials"  => AWP_PLUGIN_BASEURL."/assets/images/testimonials.png",
+	"jobs"   		=> AWP_PLUGIN_BASEURL."/assets/images/jobs.png",
+	"cases"   		=> AWP_PLUGIN_BASEURL."/assets/images/cases.png"
 	
 	);
 	if($imgtag):
@@ -126,9 +129,12 @@ function awp_image($key='',$imgtag=false)
 	 "jobs_icon"           => AWP_PLUGIN_BASEURL."/assets/images/jobs_icon.jpeg",
 	 "edit_icon"           => AWP_PLUGIN_BASEURL."/assets/images/edit.jpeg",
 	 "delete_icon"         => AWP_PLUGIN_BASEURL."/assets/images/del.jpeg",
+     "approve_icon"        => AWP_PLUGIN_BASEURL."/assets/images/approve.png",
+     "reject_icon"         => AWP_PLUGIN_BASEURL."/assets/images/reject.gif",
 	 "apptivo_icon"        => AWP_PLUGIN_BASEURL."/assets/images/apptivo.png",
 	 "success"             => AWP_PLUGIN_BASEURL."/assets/images/success.gif",
-	 "success-off"         => AWP_PLUGIN_BASEURL."/assets/images/success-off.gif"
+	 "success-off"         => AWP_PLUGIN_BASEURL."/assets/images/success-off.gif",
+     "close-popup"        => AWP_PLUGIN_BASEURL."/assets/images/close_pop.png"
 	 );
 	 if($imgtag):
 	 	return '<img src="'.$images[$key].'" alt="" />'; 

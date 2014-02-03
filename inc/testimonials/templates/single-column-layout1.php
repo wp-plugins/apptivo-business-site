@@ -18,6 +18,9 @@ pic_1{display:inline-block;}
 
 foreach($awp_all_testimonials as $testimonial)
 {
+$testimonialStatus=$testimonial->testimonialStatus;
+    if($testimonialStatus=="APPROVED")
+{
 echo '<div class="whl_testimonials">
 <div class="testimonials">
 <p class="absp_testimonials_description" >'.$testimonial->testimonial.'</p>
@@ -31,6 +34,7 @@ echo '<div class="testimonials">
 </div>
 </div>
 ';
+}
 }
 
 echo $css;

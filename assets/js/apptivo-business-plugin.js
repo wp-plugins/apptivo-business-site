@@ -14,14 +14,14 @@ jQuery(document).ready(function($) {
 	            }, 2000);
 		 return false;
 		});
-		if($("#contact_upload_image").size() > 0 ) {
+		if(jQuery("#contact_upload_image").size() > 0 ) {
 	window.send_to_editor = function(html) {
 		 imgurl = jQuery('img',html).attr('src');	
 		 jQuery('#awp_contactform_submit_value').val(imgurl);
 		 tb_remove();
 		}
 		}
-		
+            
 		
 	$('form#awp_contactform_new').submit(function(){
 		 var contact_form = jQuery('#newcontactformname').val();
@@ -70,9 +70,17 @@ jQuery(document).ready(function($) {
 	      	}
 	    });
 
-	
-			
-	        
+        jQuery('input:radio[name=awp_jobsform_confirm_msg_page]').change(function() {
+	      if(jQuery('input:radio[name=awp_jobsform_confirm_msg_page]:checked').val() == 'same')
+	       	{
+	       	jQuery('#awp_jobsform_confirmmsg_pageid').hide();
+	       	jQuery('#awp_jobsform_confirmationmsg_tr').show();
+	       	}
+	       else{
+	      	jQuery('#awp_jobsform_confirmmsg_pageid').show();
+	      	jQuery('#awp_jobsform_confirmationmsg_tr').hide();
+	      	}
+	    });
 	 	                 
 	   jQuery('input:radio[name=awp_contactform_submit_type]').change(function() {
 	   jQuery('#awp_contactform_submit_value').val('');
@@ -237,7 +245,7 @@ jQuery(document).ready(function($) {
 			 tb_remove();
 			}
 	   }
-		
+     
 		jQuery("#testimonials_fullview_shortcode").focus(function(){
 	    	this.select();
 	    });
@@ -290,8 +298,10 @@ jQuery(document).ready(function($) {
 	    	this.select();
 	    });	  
 		
-		
-		
+		addTestimonials();
+		jQuery("#captcha_show").click(function(){
+			jQuery("#captcha_require").attr("checked","checked").attr("disabled","disabled");
+		});
 });
 
 function isNumberKey(evt)
@@ -489,7 +499,7 @@ function validatetestimonialsforms()
 function validate_testimonials_email(awp_testimonialsemail)
 {
 	if(awp_testimonialsemail == '')
-    {   jQuery('#awp_testimonials_email').css('border-color', '#CCCCCC');
+    { jQuery('#awp_testimonials_email').css('border-color', '#CCCCCC');
         return true;
     }else {
    	 var is_valid_address = validateEmail(awp_testimonialsemail);
@@ -896,9 +906,8 @@ jQuery(document).ready(function($) {
 			}
 			
 			});
-
-	
-		jQuery('#jlist_upload_image').click(function() {
+                      
+            jQuery('#jlist_upload_image').click(function() {
 			 formfield = jQuery('#upload_image').attr('name');
 			 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
 			 tbframe_interval = setInterval(function() {
@@ -1147,13 +1156,12 @@ function hrjobsform_showoptionstextarea(fieldid){
 
 jQuery(document).ready(function($) {
 	jQuery(".error").fadeOut(10000, "linear");      		
-		 jQuery('select:[name=ip_type]').change(function() {
-			 if(jQuery('select:[name=ip_type]').val() == 'Range') {
+		 jQuery('select#ip_type').change(function() {
+			 if(jQuery('select#ip_type').val() == 'Range') {
 				 jQuery('#single_ip').hide();
 				 jQuery('#range_ip').show();
 				 jQuery('#ip_address1').val('');
 				 jQuery('#ip_address2').val('');
-	        		
 	        	}else{
 	        		jQuery('#ip_address').val('');
 	        		jQuery('#range_ip').hide();
@@ -1161,7 +1169,7 @@ jQuery(document).ready(function($) {
 	        	}
 		 });
 		 
-	if(jQuery('select:[name=ip_type]').val() == 'Range') {
+	if(jQuery('select#ip_type').val() == 'Range') {
 		 jQuery('#single_ip').hide();
 		 jQuery('#range_ip').show();
    		
@@ -1169,7 +1177,6 @@ jQuery(document).ready(function($) {
    		jQuery('#range_ip').hide();
    		jQuery('#single_ip').show();
    	}
-
 });	
 function delete_ipbanned(ipid)
 {
@@ -1359,6 +1366,17 @@ function genralform_enablefield(fld)
 		document.getElementById('awp_memcache_test').disabled="disabled";
 	}
 }
+function proxy_enablefield(fld){
+        var checked=document.getElementById(fld).checked;
+	if(checked){
+		document.getElementById('proxy_hostname_portno').disabled=!checked;
+		document.getElementById('proxy_loginuser_pwd').disabled=!checked;
+	}
+	else {
+		document.getElementById('proxy_hostname_portno').disabled="disabled";
+		document.getElementById('proxy_loginuser_pwd').disabled="disabled";
+	}
+}
 function cmp_sitekey()
 {   
 	var prev_apiKey = jQuery.trim( jQuery('#prev_api_key').val() );
@@ -1404,3 +1422,32 @@ function cmp_sitekey()
 		}
 	
  }
+ function addTestimonials()
+ {
+     var templateName= jQuery('#awp_testimonialform_plugintemplatelayout option:selected').text();
+     var templateFile= jQuery('#awp_testimonialform_plugintemplatelayout option:selected').val();
+
+     if(templateFile=='popup-template.php' || templateFile=="toggle-template.php")
+         {
+     jQuery(".testimonials_button").show();
+     jQuery(".testimonials_button_option").show();
+         }
+     else
+         {
+             jQuery(".testimonials_button").hide();
+             jQuery(".testimonials_button_option").hide();
+         }
+ }
+function uploadImage(imageUrl)
+{
+		 formfield = jQuery('#upload_image').attr('name');
+                 tb_show('Upload Image', 'media-upload.php?type=image&amp;TB_iframe=true');
+		 tbframe_interval = setInterval(function() {
+	            jQuery('#TB_iframeContent').contents().find('.savesend .button').val('Use as Button Image');
+	            }, 2000);
+		 window.send_to_editor = function(html) {
+		 imgurl = jQuery('img',html).attr('src');
+                 jQuery('#'+imageUrl).val(imgurl);
+		 tb_remove();
+		}
+}

@@ -27,6 +27,7 @@ jQuery("#'.$newsletterform[name].'_newsletter").validate({
       form.submit();
     }
 });
+document.getElementById("success_'.$newsletterform[name].'").scrollIntoView();
 });
 </script>';
 echo '<style type="text/css">
@@ -47,11 +48,11 @@ echo '<style type="text/css">
         }
       </style>';
 if($submitformname==$newsletterform[name] && $successmsg!=""){
-	echo  '<div id="success_'.$newsletterform[name].'" class="success_'.$newsletterform[name].'">'.$successmsg."</div>";
+	echo  '<div id="success_'.$newsletterform[name].'" class="absp_success_msg success_'.$newsletterform[name].'">'.$successmsg."</div>";
 }
 
 do_action('apptivo_business_newsletter_'.$newsletterform[name].'_before_form'); //Before Form
-
+echo '<style type="text/css"> .absp_success_msg{color:green;font-weight:bold;padding-bottom:5px;}.absp_error,.error_message{color:red;font-weight:bold;padding-bottom:5px;}</style>';
 echo  '<form id="'.$newsletterform[name].'_newsletter" name="'.$newsletterform[name].'_newsletter" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
 echo '<input type="hidden" value="'.$newsletterform[name].'" name="awp_newsletterformname" id="awp_newsletterformname">';
 echo '<input type="hidden" value="'.$newsletterform[category].'" name="newsletter_category" id="newsletter_category">';

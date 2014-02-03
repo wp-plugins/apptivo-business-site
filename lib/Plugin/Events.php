@@ -73,6 +73,9 @@ class AWP_Events extends AWP_Base
         ?>
             <div class="wrap">
             <h2><?php _e('Events Management','apptivo-businesssite');?></h2>
+            <?php checkSoapextension("Events"); 
+            checkCaptchaOption();
+            ?>
             </div>
             <?php
             if( $_REQUEST['keys'] == 'fullviewsetting')
@@ -92,9 +95,9 @@ class AWP_Events extends AWP_Base
              ?>
             <div class="icon32" style="margin-top:10px;background: url('<?php echo awp_image('events_icon'); ?>') " ><br></div> 
             <h2 class="nav-tab-wrapper">
-            <a class="<?php echo $eventsClass; ?>" href="/wp-admin/admin.php?page=awp_events"><?php _e('Events','apptivo-businesssite');?></a>
-            <a class="<?php echo $fullviewsettingClass; ?>" href="/wp-admin/admin.php?page=awp_events&keys=fullviewsetting"><?php _e('Full View Settings','apptivo-businesssite');?></a>
-            <a class="<?php echo $inlineviewsettingClass; ?>" href="/wp-admin/admin.php?page=awp_events&keys=inlineviewsetting"><?php _e('Inline View Settings','apptivo-businesssite');?></a>
+            <a class="<?php echo $eventsClass; ?>" href="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_events"><?php _e('Events','apptivo-businesssite');?></a>
+            <a class="<?php echo $fullviewsettingClass; ?>" href="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_events&keys=fullviewsetting"><?php _e('Full View Settings','apptivo-businesssite');?></a>
+            <a class="<?php echo $inlineviewsettingClass; ?>" href="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_events&keys=inlineviewsetting"><?php _e('Inline View Settings','apptivo-businesssite');?></a>
             </h2>
             
        
@@ -107,7 +110,7 @@ class AWP_Events extends AWP_Base
 		</p>          
          <?php
              if(!$this->_plugin_activated){
-                    echo "Events Plugin is currently <span style='color:red'>disabled</span>. Please enable this in <a href='/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
+                    echo "Events Plugin is currently <span style='color:red'>disabled</span>. Please enable this in <a href='".SITE_URL."/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
                 }
             if (isset($_POST['awp_events_add']) && ($_POST['nogdog'] == $_SESSION['apptivo_single_events']) ) {          //Events Add.
             	    $addevents_response = $this->add_events(); 
@@ -508,7 +511,7 @@ class AWP_Events extends AWP_Base
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_events_imageurl" type="text" size="50" name="awp_events_imageurl" value="" />
-									<input id="events_upload_image" type="button" value="Upload Image" />
+									<input id="events_upload_image" type="button" value="Upload Image"  class="button-primary" />
 									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 									</label></td>
 									</tr>
@@ -533,7 +536,7 @@ class AWP_Events extends AWP_Base
          ?>
         <div class="wrap addevents">
         <h2>Edit Events</h2>
-        <form method="post" action="/wp-admin/admin.php?page=awp_events" name="awp_events_form" onsubmit="return validateevents('edit')" >
+        <form method="post" action="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_events" name="awp_events_form" onsubmit="return validateevents('edit')" >
             <table class="form-table" width="700" cellspacing="0" cellpadding="0">
                                     <tr>
                                         <td><?php _e('Title','apptivo-businesssite'); ?><span style="color:#f00;">*</span></td>
@@ -669,8 +672,8 @@ class AWP_Events extends AWP_Base
                                             <td><?php echo $events->publishedAt; ?></td>
                                             <td><?php echo $events->publishedBy; ?></td>
                                             <td><?php echo $events->sequenceNumber; ?></td>
-                                            <td><a href="/wp-admin/admin.php?page=awp_events&amp;tstmode=edit&amp;tstid=<?php echo $events->marketingEventId;?>&amp;pageno=<?php echo $currentpage;?>"><img src="<?php echo awp_image('edit_icon'); ?>"/></a></td>
-                                            <td><a href="/wp-admin/admin.php?page=awp_events&amp;tstmode=delete&amp;tstid=<?php echo $events->marketingEventId;?>" onclick="return delete_events('<?php echo $this->_plugin_activated; ?>')" ><img src="<?php echo awp_image('delete_icon'); ?>"/></a></td>
+                                            <td><a href="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_events&amp;tstmode=edit&amp;tstid=<?php echo $events->marketingEventId;?>&amp;pageno=<?php echo $currentpage;?>"><img src="<?php echo awp_image('edit_icon'); ?>"/></a></td>
+                                            <td><a href="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_events&amp;tstmode=delete&amp;tstid=<?php echo $events->marketingEventId;?>" onclick="return delete_events('<?php echo $this->_plugin_activated; ?>')" ><img src="<?php echo awp_image('delete_icon'); ?>"/></a></td>
                                     </tr>
                                     <?php
                                      }

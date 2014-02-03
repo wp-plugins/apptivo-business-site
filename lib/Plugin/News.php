@@ -173,12 +173,14 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
  $fullviewsettingClass  = 'nav-tab';
  $inlineviewsettingClass = 'nav-tab';
 }
+checkSoapextension("News");
+checkCaptchaOption();
 ?>
 <div class="icon32" style="margin-top:10px;background: url('<?php echo awp_image('news_icon'); ?>') " ><br></div>             
 <h2 class="nav-tab-wrapper">
-<a class="<?php echo $generalClass; ?>" href="/wp-admin/admin.php?page=awp_news"><?php _e('News','apptivo-businesssite'); ?></a>
-<a class="<?php echo $fullviewsettingClass; ?>" href="/wp-admin/admin.php?page=awp_news&keys=fullviewsetting"><?php _e('Full View Settings','apptivo-businesssite'); ?></a>
-<a class="<?php echo $inlineviewsettingClass; ?>" href="/wp-admin/admin.php?page=awp_news&keys=inlineviewsetting"><?php _e('Inline View Settings','apptivo-businesssite'); ?></a>
+<a class="<?php echo $generalClass; ?>" href="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_news"><?php _e('News','apptivo-businesssite'); ?></a>
+<a class="<?php echo $fullviewsettingClass; ?>" href="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_news&keys=fullviewsetting"><?php _e('Full View Settings','apptivo-businesssite'); ?></a>
+<a class="<?php echo $inlineviewsettingClass; ?>" href="<?php echo SITE_URL;?>/wp-admin/admin.php?page=awp_news&keys=inlineviewsetting"><?php _e('Inline View Settings','apptivo-businesssite'); ?></a>
 </h2>
 
 	   <p>
@@ -191,7 +193,7 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
 	
         <?php
          if(!$this->_plugin_activated){
-	    	echo "News Plugin is currently <span style='color:red'>disabled</span>. Please enable this in <a href='/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
+	    	echo "News Plugin is currently <span style='color:red'>disabled</span>. Please enable this in <a href='".SITE_URL."/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
 	    }
         if (isset($_POST['awp_news_add']) && ($_POST['nogdog'] == $_SESSION['apptivo_single_news'])) {   //ADD News.
         	$addnews_response = $this->add_news();
@@ -390,8 +392,8 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
                                             <td><?php echo $news->publishedAt; ?></td>
                                             <td><?php echo $news->publishedBy; ?></td>
                                             <td><?php echo $news->sequenceNumber; ?></td>
-                                            <td><a href="/wp-admin/admin.php?page=awp_news&amp;tstmode=edit&amp;tstid=<?php echo $news->newsId;?>&amp;pageno=<?php echo intval($_GET['pageno']);?>"><img src="<?php echo awp_image('edit_icon'); ?>"/></a></td>
-                                            <td><a href="/wp-admin/admin.php?page=awp_news&amp;tstmode=delete&amp;tstid=<?php echo $news->newsId;?>" onclick="return delete_news('<?php echo $this->_plugin_activated; ?>')" ><img src="<?php echo awp_image('delete_icon'); ?>"/></a></td>
+                                            <td><a href="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_news&amp;tstmode=edit&amp;tstid=<?php echo $news->newsId;?>&amp;pageno=<?php echo intval($_GET['pageno']);?>"><img src="<?php echo awp_image('edit_icon'); ?>"/></a></td>
+                                            <td><a href="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_news&amp;tstmode=delete&amp;tstid=<?php echo $news->newsId;?>" onclick="return delete_news('<?php echo $this->_plugin_activated; ?>')" ><img src="<?php echo awp_image('delete_icon'); ?>"/></a></td>
                                     </tr>
                                     <?php
                                      }
@@ -791,7 +793,7 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
          <div class="wrap addnews">
          <h2>Add News</h2>
          <?php $nogdog = uniqid();$_SESSION['apptivo_single_news'] = $nogdog; ?>
-         <form method="post" action="/wp-admin/admin.php?page=awp_news" name="awp_news_form" onsubmit="return validatenews('add')" >
+         <form method="post" action="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_news" name="awp_news_form" onsubmit="return validatenews('add')" >
          <input type="hidden" name="nogdog" value="<?php echo $nogdog;?>" >
             <table class="form-table" width="700" cellspacing="0" cellpadding="0">
                                     <tr>
@@ -825,7 +827,7 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_news_imageurl" type="text" size="50" name="awp_news_imageurl" value="" />
-									<input id="news_upload_image" type="button" value="Upload Image" />
+									<input id="news_upload_image" type="button" value="Upload Image"  class="button-primary"/>
 									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 									</label></td>
 									</tr>
@@ -852,7 +854,7 @@ if( $_REQUEST['keys'] == 'fullviewsetting')
         ?>
         <div class="wrap addnews">
         <h2><?php _e('Edit News','apptivo-businesssite'); ?></h2>
-        <form method="post" action="/wp-admin/admin.php?page=awp_news" name="awp_news_form" onsubmit="return validatenews('edit')" >
+        <form method="post" action="<?php echo SITE_URL; ?>/wp-admin/admin.php?page=awp_news" name="awp_news_form" onsubmit="return validatenews('edit')" >
             <table class="form-table" width="700" cellspacing="0" cellpadding="0">
                                     <tr>
                                         <td><?php _e('Title','apptivo-businesssite'); ?>&nbsp;<span style="color:#f00;">*</span></td>

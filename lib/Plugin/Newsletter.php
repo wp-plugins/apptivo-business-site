@@ -105,7 +105,7 @@ function save_newsletter($formname){
                 $phoneNumber = $submittedformvalues[newsletter_phone];
                 $comments = $submittedformvalues[newsletter_comments];
                 if(!empty($email)){
-                   $response = createTargetList($category, $firstname, $lastname,$email,$phoneNumber,$comments);
+                	$response = createTargetList($category, $firstname, $lastname,$email,$phoneNumber,$comments);
                    $confmsg = $response->return->statusMessage;
                 }
                 if($response == 'E_100')
@@ -155,6 +155,7 @@ function get_newsletterform_fields($formname){
         $newsletterformdetails['category']=$newsletterformproperties['category'];
         $newsletterformdetails['submit_button_type']=$newsletterformproperties['submit_button_type'];
         $newsletterformdetails['submit_button_val']=$newsletterformproperties['submit_button_val'];
+        echo '<style> label.error{color:#FF0400;} </style>';
         //include newsletter template files.
         if($newsletterformproperties['tmpltype']=="awp_plugin_template") :
 			$templatefile=AWP_NEWSLETTER_TEMPLATEPATH."/".$newsletterformproperties['layout']; //plugin template
@@ -401,7 +402,8 @@ if($_POST['awp_newsletterform_settings']){
 	
 	
 	echo "<h2>" . __( 'Apptivo Newsletter Forms', 'awp_newsletterform' ) . "</h2>";
-	echo '<div class="newsletterform_err"></div>';
+        checkSoapextension("Newsletter");
+    echo '<div class="newsletterform_err"></div>';
 if(trim($updatemessage)!=""){
 	?>
 	<div id="message" class="updated">
@@ -413,7 +415,7 @@ if(trim($updatemessage)!=""){
     <?php }
         if(!$this->_plugin_activated){
         	$disabledForm = 'disabled="disabled"';
-	    	echo "Newsletter Forms is currently <span style='color:red'>disabled</span>. Please enable this in <a href='/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
+	    	echo "Newsletter Forms is currently <span style='color:red'>disabled</span>. Please enable this in <a href='".SITE_URL."/wp-admin/admin.php?page=awp_general'>Apptivo General Settings</a>.";
 	    }
     
 	?>
@@ -604,7 +606,7 @@ arsort($plugintemplates_newsletter);
                       <td valign="top">
                       <input type="text" name="awp_newsletterform_submit_value" id="awp_newsletterform_submit_value" value="<?php echo $newsletter_formproperties[submit_button_val];?>" size="52"/>
                       <span id="newsletter_upload_img_button" style="display:none;"  >
-                    <input id="newsletter_image_button" type="button" value="Upload Image" />
+                    <input id="newsletter_image_button" type="button" value="Upload Image" class="button-primary"/>
 					<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 					</span>
 					</td>
@@ -629,7 +631,7 @@ arsort($plugintemplates_newsletter);
 <br>
 	<?php
 	echo "<h3>" . __( 'Newsletter Form Fields', 'awp_newsletterform' ) . "</h3>";?>
-	<div style="margin:10px;>
+	<div style="margin:10px;">
 	<span class="description"><?php _e('Select and configure list of fields from below table to show in your Newsletter form.','apptivo-businesssite'); ?></span>
 	<span style="margin-left:30px;">*Developers Guide - <a href="<?php echo awp_developerguide('newsletter-basicconfig');?>" target="_blank">Basic Newsletter Form Config.</a></span>
 	</div>
@@ -803,44 +805,6 @@ function getAllTargetListcategory()
                 "arg1" => APPTIVO_BUSINESS_ACCESS_KEY
                 );
     $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getAllTargetLists',$params);
-    return $response;
-}
-/**
- * Create TargetLists.
- *
- * @param unknown_type $category
- * @param unknown_type $fname
- * @param unknown_type $lname
- * @param unknown_type $email
- * @param unknown_type $userId
- * @return unknown
- */
-function createTargetList($category,$fname,$lname,$email,$phoneNumber,$comments,$userId=null)
-{
-   
-   $target_category = target_lists_category(trim($category));
-   if(trim($category) != $target_category )
-   {
-   	return $target_category;
-   }
-   
-   $verification = check_blockip();
-   if($verification){
-   	 return $verification;
-   }
-	$appParam = new AWP_appParam('PHONE',$phoneNumber);	
-	$params = array ( 
-                "arg0" => APPTIVO_BUSINESS_API_KEY,
-                "arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
-	            "arg2" => $category,
-	            "arg3" => $fname,
-	            "arg4" => $lname,
-	            "arg5" => $email,
-	            "arg6" => $comments,
-	            "arg7" => $userId,
-		        "arg8" => $appParam
-                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createTargetWithCommunicationDetailsAndAddToTargetList',$params);
     return $response;
 }
 
