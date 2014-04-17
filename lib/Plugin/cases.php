@@ -389,8 +389,8 @@ $verification = check_blockip();
             {
                 if($casestatus->meaning=="New")
                 {
-                $status_type[]= $casestatus->meaning;
-                $status_type_value[]=$casestatus->lookupId;
+                    $status_type[]= $casestatus->meaning;
+                    $status_type_value[]=$casestatus->lookupId;
                 }
             }
             $formnames =implode("\n", $status_type);
@@ -406,8 +406,11 @@ $verification = check_blockip();
             $case_type  = json_decode($case_type);
             foreach ($case_type as $casetype)
             {
-                $type[]= $casetype->meaning;
-                $type_value[]=$casetype->lookupId;
+                if($casetype->disabled != 'Y')
+                {
+                    $type[]= $casetype->meaning;
+                    $type_value[]=$casetype->lookupId;
+                }
             }
             $formnames =implode("\n", $type);
             $formvalues =implode("\n", $type_value);
@@ -422,8 +425,10 @@ $verification = check_blockip();
             $case_priority  = json_decode($case_priority);
             foreach ($case_priority as $casepriority)
             {
-                $type[]= $casepriority->meaning;
-                $type_value[]=$casepriority->lookupId;
+                if($casepriority->disabled != 'Y'){
+                    $type[]= $casepriority->meaning;
+                    $type_value[]=$casepriority->lookupId;
+                }
             }
             $formnames =implode("\n", $type);
             $formvalues =implode("\n", $type_value);

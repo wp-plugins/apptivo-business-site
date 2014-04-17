@@ -2545,7 +2545,7 @@ if($_GET['step'] == 2)
 	function getAllCountryList()
 	{
 		$countrylist = getAllCountries();
-		return $countrylist->return;
+		return $countrylist;
 	}
 
 
