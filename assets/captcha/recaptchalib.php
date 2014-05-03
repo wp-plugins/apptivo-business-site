@@ -121,7 +121,9 @@ function recaptcha_get_html ($pubkey, $error = null, $use_ssl = false)
         }
         return '<script type="text/javascript" src="'. $server . '/challenge?k=' . $pubkey . $errorpart . '"></script>
 <script type="text/javascript">
-jQuery("#recaptcha_response_field").addClass("required");
+setTimeout(function() {
+      jQuery("#recaptcha_response_field").addClass("required");
+}, 1000);
 </script>
 	<noscript>
   		<iframe src="'. $server . '/noscript?k=' . $pubkey . $errorpart . '" height="300" width="500" frameborder="0"></iframe><br/>

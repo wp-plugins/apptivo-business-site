@@ -24,7 +24,7 @@ define('AWP_DEFAULT_MORE_TEXT','More..');
 define('SITE_URL', site_url());
 
 //Plugin Version
-define('AWP_VERSION', '1.1.2.1');
+define('AWP_VERSION', '1.2.1.2');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
@@ -1238,14 +1238,6 @@ require_once AWP_ASSETS_DIR.'/captcha/recaptchalib.php';
 echo "<div class='recaptcha_source'>";
 echo recaptcha_get_html($option->recaptcha_publickey);
 echo "</div><div class='awp_recaptcha_error'><label for='recaptcha_response_field' generated='true' class='error'></label></div>";
-echo "<script type='text/javascript'>
-jQuery(document).ready(function($) {
-			if (jQuery('.recaptcha_source #recaptcha_response_field').length == '0') { 
-					jQuery('.recaptcha_source').html('');
-					jQuery('.recaptcha_source').html('<p> Invalid ReCaptcha Keys. </p>');
-					jQuery('.recaptcha_source').addClass('captcha_key_error').removeClass('recaptcha_source');
-					} 
-});</script>";
 return;
 }
 }
