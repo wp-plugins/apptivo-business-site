@@ -810,8 +810,14 @@ class AWP_MainController extends AWP_Base
     	$apptivo_recapthca['recaptcha_privatekey'] = preg_replace('/\s+/', '', $apptivo_recapthca['recaptcha_privatekey']);
     	$apptivo_recapthca['recaptcha_theme']  =  $_POST['apptivo_business_recaptcha_theme'];
     	$apptivo_recapthca['recaptcha_language']=$_POST['apptivo_business_recaptcha_language'];
+    	$apptivo_recapthca['awp_captcha_type']=$_POST['awp_captcha_type'];
+    	$apptivo_recapthca['awp_fg_color']=$_POST['awp_fg_color'];
+    	$apptivo_recapthca['awp_bg_color']=$_POST['awp_bg_color'];
+    	if ($apptivo_recapthca['awp_captcha_type'] == 'simplecaptcha') { $captcha_success_msg = 'Simple Captcha'; }
+    	else if($apptivo_recapthca['awp_captcha_type'] == 'recaptcha') { $captcha_success_msg = 'reCaptcha'; }
+    		
     	echo '<div style="margin:5px 0 15px; background-color: #FFFFE0 ;border: 1px solid #E6DB55;" class="message">
-        <p style="margin: 0.5em;padding: 2px;">reCaptcha configuration successfully saved.</p></div>';
+        <p style="margin: 0.5em;padding: 2px;">'.$captcha_success_msg.' configuration successfully saved.</p></div>';
     	$apptivo_recapthca=json_encode($apptivo_recapthca);
     	if(get_option ('apptivo_business_recaptcha_settings')=="")
     	{
@@ -832,10 +838,41 @@ class AWP_MainController extends AWP_Base
 	}
 $option=get_option('apptivo_business_recaptcha_settings') ;
 $option=json_decode($option);
+if($option->awp_captcha_type=="recaptcha"){
+	$display="block";
+	$display_color="none";
+}elseif ($option->awp_captcha_type=="simplecaptcha"){
+	$display="none";$display_color="block";
+}else{
+	$display="block";
+    $display_color="none";
+}
+
     ?>
 <form name="capthca" method="post" action="">
-<h3>reCaptcha in Forms </h3>
-            <table class="form-table">
+<h3>Captcha in Forms </h3>
+ <table class="form-table">
+
+        <tbody><tr valign="top">
+        <th class="titledesc" scope="row">Select reCaptcha/Simple Captcha</th>
+                    <td class="forminp"><select style="width:185px;" id="awp_captcha_type" name="awp_captcha_type" onchange="awp_captcha_change()">
+                                                    <option <?php if($option->awp_captcha_type=="recaptcha"){echo 'selected="selected"'; }?> value="recaptcha">reCaptcha</option>
+                                                    <option <?php if($option->awp_captcha_type=="simplecaptcha"){echo 'selected="selected"'; }?> value="simplecaptcha">Simple Captcha</option>
+                                        </select>
+                    </td></tr>
+         </tbody></table>
+         <table class="form-table" id="color_table" style="display:<?php echo $display_color;?>"><tbody>
+         	<tr valign="top">
+        	<th class="titledesc" scope="row">Captcha Foreground Color</th>
+        	<td ><input class="color {hash:true}" name="awp_fg_color" type="text" value=<?php if($option->awp_fg_color !="") { echo $option->awp_fg_color; } else { echo '#FFFFFF'; } ?>></td>
+        	</tr>
+        	<tr valign="top">
+        	<th class="titledesc" scope="row">Captcha Background Color</th>
+        	<td ><input class="color {hash:true}" name="awp_bg_color" type="text" value=<?php if($option->awp_bg_color !="") { echo $option->awp_bg_color; } else { echo '#000000'; }?>></td>
+        	</tr>
+		</tbody></table>
+		
+            <table class="form-table" id="recaptcha_table" style="display:<?php echo $display;?>">
 
 <tbody><tr valign="top">
 					<th class="titledesc" scope="row">Enable reCaptcha</th>
@@ -1010,4 +1047,10 @@ $option=json_decode($option);
 	     echo "</div>";
     }
 	
+}
+add_action('admin_enqueue_scripts', 'awp_load_scripts');
+
+function awp_load_scripts() {
+    wp_register_script('colorpicker-js',plugins_url('apptivo-business-site/assets/js/jscolor/jscolor.js'));
+	wp_enqueue_script('colorpicker-js');
 }

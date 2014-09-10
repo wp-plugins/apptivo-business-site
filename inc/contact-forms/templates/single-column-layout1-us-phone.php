@@ -12,6 +12,10 @@ if( $contactform[css] != '' )
 	echo $css='<style type="text/css">'.$contactform[css].'</style>';
 }
 echo '<style type="text/css">
+		.abswpcfm input, .abswpcfm textarea, .abswpcfm select {width:95%}
+        .abswpcfm input[type="checkbox"], .abswpcfm input[type="radio"]{width:auto; float:left; margin-top:5px;margin-right: 5px;}
+        .abswpcfm input[type="button"], .abswpcfm input[type="reset"], .abswpcfm input[type="submit"], .abswpcfm input[type="image"] {width:auto;margin-top: 15px}
+        .abswpcfm input[type="image"] {border:none}
     	@media screen and (max-width:900px){
 		.awp_contactform_maindiv_'.$contactform[name].' .form_left_part {width:100%  ;float:left  ;}
 		.awp_contactform_maindiv_'.$contactform[name].' .form_rgt_part{width:100%  ;float:left  ;margin-top:5px;}
@@ -62,7 +66,7 @@ if($captch_error!="" && $submitformname==$contactform[name]){
 
 do_action ('apptivo_business_contact_'.$contactform[name].'_before_form'); //Before submit form
 
-echo  '<form id="'.$contactform[name].'_contactforms" class="awp_contact_form" name="'.$contactform[name].'_contactforms" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
+echo  '<form id="'.$contactform[name].'_contactforms" class="abswpcfm awp_contact_form" name="'.$contactform[name].'_contactforms" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
 echo '<input type="hidden" value="'.$contactform[name].'" name="awp_contactformname" id="awp_contactformname">';
 echo '<div class="awp_contactform_maindiv_'.$contactform[name].'">';
 foreach($formfields as $field)
@@ -219,7 +223,7 @@ foreach($formfields as $field)
 			break;
 			
 		case "captcha":
-            awp_reCaptcha();
+            awp_captcha($fieldid,$postValue,$validateclass);
 		break;
 		
 	}

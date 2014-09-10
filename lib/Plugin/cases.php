@@ -5,6 +5,7 @@
  * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
  */
 require_once AWP_LIB_DIR . '/Plugin.php';
+require_once AWP_ASSETS_DIR.'/captcha/simple-captcha/simple-captcha.php';
 class AWP_Cases extends AWP_Base
 {
 function &instance()
@@ -101,65 +102,62 @@ function validate_load_script()
 
 function get_cases_form_fields($formname)
 {
-            $caseform=array();
-            $cases_forms=array();
-            $formexist="";
-            $casesformdetails=array();
-            $formname=trim($formname);
+	$caseform=array();
+	$cases_forms=array();
+	$formexist="";
+	$casesformdetails=array();
+	$formname=trim($formname);
 
-            $cases_forms=get_option("awp_casesforms");
-            $formexists=awp_recursive_array_search($cases_forms,$formname,'name');
+	$cases_forms=get_option("awp_casesforms");
+	$formexists=awp_recursive_array_search($cases_forms,$formname,'name');
 
-            //echo 'formname==='.$formname.'form exists==='.$formexists;
-            //echo 'cases forms====='.$cases_forms;
-            
-            if(trim($formexists)!="")
-            {
-                $caseform=$cases_forms[$formexists];
+	if(trim($formexists)!="")
+	{
+		$caseform=$cases_forms[$formexists];
 
-                $formFields = $caseform['fields'];
-		
-	foreach($formFields as $fields):
-	   $fieldid=$fields['fieldid'];
-	   $pos=strpos($fieldid, "customfield");
+		$formFields = $caseform['fields'];
+
+		foreach($formFields as $fields):
+		$fieldid=$fields['fieldid'];
+		$pos=strpos($fieldid, "customfield");
 		if($pos===false) :
 		else:
-		 $customfieldVal = $_POST[$fieldid];
+		$customfieldVal = $_POST[$fieldid];
 
-		 if( is_array($customfieldVal)) :
-		 $customfieldVal = implode(",", $customfieldVal);
-		 endif;
-		 	 if($customfieldVal != '') :
-			 $customfields .= "<br/><b>".$fields['showtext']."</b>:".stripslashes($customfieldVal);
-			 endif;
+		if( is_array($customfieldVal)) :
+		$customfieldVal = implode(",", $customfieldVal);
+		endif;
+		if($customfieldVal != '') :
+		$customfields .= "<br/><b>".$fields['showtext']."</b>:".stripslashes($customfieldVal);
+		endif;
 		endif;
 	 endforeach;
-	$customfields .= "<br/><b>Requested IP</b>:".stripslashes(get_RealIpAddr());
+	 $customfields .= "<br/><b>Requested IP</b>:".stripslashes(get_RealIpAddr());
 
 		if(!empty($customfields)){
-         $parent1details = nl2br($customfields);
-         $noteDetails = notes('Custom Fields',$parent1details,$parent1NoteId);
-        }
-            $case = array();
-            $case['firmid'] = null;
-            $case['caseid'] = null;
-            $case['firstName'] = stripslashes(trim($_POST['firstname']));
-            $case['lastName'] = stripslashes(trim($_POST['lastname']));
-            $case['emailId'] = stripslashes(trim($_POST['email']));
-            $case['phoneNumber']=stripslashes(trim($_POST['phone']));
-            $case['comments'] = null;
-            $case['description'] = stripslashes(trim($_POST['description']));
-            $case['type'] = stripslashes(trim($_POST['type']));
-            $case['status'] = stripslashes(trim($_POST['status']));
-            $case['priority'] = stripslashes(trim($_POST['priority']));
-            $case['account'] = NULL;
-            $case['productName'] = NULL;
-            $case['subject'] = stripslashes(trim($_POST['subject']));
-            $case['responseString']=null;
-            $case['noteDetails']=$noteDetails;
-            $case['userIdStr']=null;
-                return $caseform;
-            }
+			$parent1details = nl2br($customfields);
+			$noteDetails = notes('Custom Fields',$parent1details,$parent1NoteId);
+		}
+		$case = array();
+		$case['firmid'] = null;
+		$case['caseid'] = null;
+		$case['firstName'] = stripslashes(trim($_POST['firstname']));
+		$case['lastName'] = stripslashes(trim($_POST['lastname']));
+		$case['emailId'] = stripslashes(trim($_POST['email']));
+		$case['phoneNumber']=stripslashes(trim($_POST['phone']));
+		$case['comments'] = null;
+		$case['description'] = stripslashes(trim($_POST['description']));
+		$case['type'] = stripslashes(trim($_POST['type']));
+		$case['status'] = stripslashes(trim($_POST['status']));
+		$case['priority'] = stripslashes(trim($_POST['priority']));
+		$case['account'] = NULL;
+		$case['productName'] = NULL;
+		$case['subject'] = stripslashes(trim($_POST['subject']));
+		$case['responseString']=null;
+		$case['noteDetails']=$noteDetails;
+		$case['userIdStr']=null;
+		return $caseform;
+	}
 
 }
 
@@ -169,190 +167,219 @@ function apptivo_business_casesnew($atts)
 {
 	$cases_fields_properties  = get_option('awp_casesforms');
 
-	
-        extract(shortcode_atts(array('name'=>  ''), $atts));
+
+	extract(shortcode_atts(array('name'=>  ''), $atts));
 	ob_start();
 	$formname=trim($name);
-        
-        $case_form=$this->get_cases_form_fields($formname);
-        $submitformname=$_POST['awp_caseformname'];
-        
-        $success_message="";
-        if(isset ($_POST["awp_casesforms_submit"])  && $submitformname==$formname )
-        {
-                
-                $customfields = '';
-                $formFields = $case_form['fields'];
-		if(isset($_POST["recaptcha_challenge_field"]))
-                {
-                    $captcha_error="";
-                    $response_field =   $_POST["recaptcha_response_field"];
-                    $challenge_field=   $_POST["recaptcha_challenge_field"];
-                    $option=get_option('apptivo_business_recaptcha_settings');
-                    $option=json_decode($option);
-                    $private_key    =   $option->recaptcha_privatekey;
-                    $response=    captchaValidation($private_key, $challenge_field, $response_field);
-                    if($response!="1")
-					{
-                        $value_present = true;
-                        $captcha_error = awp_messagelist("recaptcha_error");
-                        $success_message = awp_messagelist("recaptcha_error");
-                    }
-                        else
-                        {
-                            $captcha_error="";
-                            $success_message="";
-                        }
-                }
-	foreach($formFields as $fields):
-	   $fieldid=$fields['fieldid'];
-	   $pos=strpos($fieldid, "customfield");
+
+	$case_form=$this->get_cases_form_fields($formname);
+	$submitformname=$_POST['awp_caseformname'];
+
+	$success_message="";
+	if(isset ($_POST["awp_casesforms_submit"])  && $submitformname==$formname )
+	{
+
+		$customfields = '';
+		$formFields = $case_form['fields'];
+
+		if(isset($_POST["simple_captcha"]) )
+		{
+			if(isset($_POST['awp_simple_captcha_challenge'])){
+				$captcha_instance = new AWPSimpleCaptcha();
+				$response = $captcha_instance->check($_POST['awp_simple_captcha_challenge'], $_POST["simple_captcha"]);
+				$captcha_instance->remove( $_POST['awp_simple_captcha_challenge'] );
+
+				if($response!="1")
+				{
+					$value_present = true;
+					$captcha_error = awp_messagelist("recaptcha_error");
+				}
+				else
+				{
+					 
+					$captcha_error="";
+					$success_message="";
+				}
+			}else{
+				$captcha_instance = new AWPSimpleCaptcha();
+				$captcha_instance->remove( $_POST['awp_simple_captcha_challenge'] );
+				$captch_error = awp_messagelist("recaptcha_error");
+			}
+		}
+		elseif (isset($_POST["recaptcha_challenge_field"]))
+		{
+			$captcha_error="";
+			$response_field =   $_POST["recaptcha_response_field"];
+			$challenge_field=   $_POST["recaptcha_challenge_field"];
+			$option=get_option('apptivo_business_recaptcha_settings');
+			$option=json_decode($option);
+			$private_key    =   $option->recaptcha_privatekey;
+			$response =    captchaValidation($private_key, $challenge_field, $response_field);
+			if($response!="1")
+			{
+				$value_present = true;
+				$captcha_error = awp_messagelist("recaptcha_error");
+				$success_message = awp_messagelist("recaptcha_error");
+			}
+			else
+			{
+				$captcha_error="";
+				$success_message="";
+			}
+		}
+		foreach($formFields as $fields):
+		$fieldid=$fields['fieldid'];
+		$pos=strpos($fieldid, "customfield");
 		if($pos===false) :
 		else:
-		 $customfieldVal = $_POST[$fieldid];
+		$customfieldVal = $_POST[$fieldid];
 
-		 if( is_array($customfieldVal)) :
-		 $customfieldVal = implode(",", $customfieldVal);
-		 endif;
-		 	 if($customfieldVal != '') :
-			 $customfields .= "<br/><b>".$fields['showtext']."</b>:".stripslashes($customfieldVal);
-			 endif;
+		if( is_array($customfieldVal)) :
+		$customfieldVal = implode(",", $customfieldVal);
+		endif;
+		if($customfieldVal != '') :
+		$customfields .= "<br/><b>".$fields['showtext']."</b>:".stripslashes($customfieldVal);
+		endif;
 		endif;
 	 endforeach;
-	$customfields .= "<br/><b>Requested IP</b>:".stripslashes(get_RealIpAddr());
+	 $customfields .= "<br/><b>Requested IP</b>:".stripslashes(get_RealIpAddr());
 
 		if(!empty($customfields)){
-         $parent1details = nl2br($customfields);
-         $noteDetails = notes('Custom Fields',$parent1details,$parent1NoteId);
-        }
-        if(empty ($captcha_error))
-        {
-    $case = array();
-    $case['firmid'] = null;
-    $case['caseid'] = null;
-    $case['firstName'] = stripslashes(trim($_POST['firstname']));
-    $case['lastName'] = stripslashes(trim($_POST['lastname']));
-    $case['emailId'] = stripslashes(trim($_POST['email']));
-    $case['phoneNumber']=stripslashes(trim($_POST['phone']));
-    $case['comments'] = null;
-    $case['description'] = stripslashes(trim($_POST['description']));
-    $case['type'] = stripslashes(trim($_POST['type']));
-    $case['type_name'] = stripslashes(trim($_POST['type_name']));
-    $case['status'] = stripslashes(trim($_POST['awp_cases_status']));
-    $case['priority'] = stripslashes(trim($_POST['priority']));
-    $case['priority_name']=stripslashes(trim($_POST['priority_name']));
-    $case['account'] = NULL;
-    $case['productName'] = NULL;
-    $case['subject'] = stripslashes(trim($_POST['subject']));
-    $case['responseString']=null;
-    $case['noteDetails']=$noteDetails;
-    $case['userIdStr']=null;
-    /* create an array for method inputs */
-$caseStatus= $case['status'];
-$caseStatusId= stripslashes(trim($_POST['awp_cases_values']));
-$caseType  = $case['type_name'];
-$caseTypeId  = $case['type'];
-$casePriority= $case['priority_name'];
-$casePriorityId= $case['priority'];
-$emailId=$case['emailId'];
-$caseSummary= $case['subject'];
-$caseDescription= $case['description'];
-$caseNumber	=	'Auto generated number';
-$caseData   ='{"caseNumber":"'.stripslashes(trim($caseNumber)).'","caseStatus":"'.$caseStatus.'","caseStatusId":"'.$caseStatusId.'","":"","caseType":"'.$caseType.'","caseTypeId":"'.$caseTypeId.'","casePriority":"'.$casePriority.'","casePriorityId":"'.$casePriorityId.'","assignedObjectRefName":"'.$emailId.'","caseSummary":"'.addslashes($caseSummary).'","description":"'.addslashes($caseDescription).'","followUpDate":null,"followUpDescription":null,"caseItem":"","caseItemId":null,"caseProject":"","caseProjectId":null,"dateResolved":"","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","caseCustomer":"","caseCustomerId":null,"caseContact":"","caseContactId":null,"caseEmail":"'.$emailId.'","addresses":[]}';
-$params = array (
+			$parent1details = nl2br($customfields);
+			$noteDetails = notes('Custom Fields',$parent1details,$parent1NoteId);
+		}
+
+		$case = array();
+		$case['firmid'] = null;
+		$case['caseid'] = null;
+		$case['firstName'] = stripslashes(trim($_POST['firstname']));
+		$case['lastName'] = stripslashes(trim($_POST['lastname']));
+		$case['emailId'] = stripslashes(trim($_POST['email']));
+		$case['phoneNumber']=stripslashes(trim($_POST['phone']));
+		$case['comments'] = null;
+		$case['description'] = stripslashes(trim($_POST['description']));
+		$case['type'] = stripslashes(trim($_POST['type']));
+		$case['type_name'] = stripslashes(trim($_POST['type_name']));
+		$case['status'] = stripslashes(trim($_POST['awp_cases_status']));
+		$case['priority'] = stripslashes(trim($_POST['priority']));
+		$case['priority_name']=stripslashes(trim($_POST['priority_name']));
+		$case['account'] = NULL;
+		$case['productName'] = NULL;
+		$case['subject'] = stripslashes(trim($_POST['subject']));
+		$case['responseString']=null;
+		$case['noteDetails']=$noteDetails;
+		$case['userIdStr']=null;
+		/* create an array for method inputs */
+		$caseStatus= $case['status'];
+		$caseStatusId= stripslashes(trim($_POST['awp_cases_values']));
+		$caseType  = $case['type_name'];
+		$caseTypeId  = $case['type'];
+		$casePriority= $case['priority_name'];
+		$casePriorityId= $case['priority'];
+		$emailId=$case['emailId'];
+		$caseSummary= $case['subject'];
+		$caseDescription= $case['description'];
+
+		if(strlen(trim($case['lastName']))==0 || strlen(trim($emailId))==0 || !filter_var($emailId, FILTER_VALIDATE_EMAIL) || $casePriorityId == '' ||  $caseTypeId == ''){
+			echo awp_messagelist('no_redirection');
+		}
+		elseif(empty ($captcha_error))
+		{
+
+			$caseNumber	=	'Auto generated number';
+			$caseData   ='{"caseNumber":"'.stripslashes(trim($caseNumber)).'","caseStatus":"'.$caseStatus.'","caseStatusId":"'.$caseStatusId.'","":"","caseType":"'.$caseType.'","caseTypeId":"'.$caseTypeId.'","casePriority":"'.$casePriority.'","casePriorityId":"'.$casePriorityId.'","assignedObjectRefName":"'.$emailId.'","caseSummary":"'.addslashes($caseSummary).'","description":"'.addslashes($caseDescription).'","followUpDate":null,"followUpDescription":null,"caseItem":"","caseItemId":null,"caseProject":"","caseProjectId":null,"dateResolved":"","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","caseCustomer":"","caseCustomerId":null,"caseContact":"","caseContactId":null,"caseEmail":"'.$emailId.'","addresses":[]}';
+			$params = array (
                 "a" => "createCase",
                 "caseData"  => $caseData,
                 "fromObjectId"=>	"null",
                 "fromObjectRefId" =>	"null",
                 "apiKey" => APPTIVO_BUSINESS_API_KEY,
                 "accessKey" => APPTIVO_BUSINESS_ACCESS_KEY
-                );
-$verification = check_blockip();
-		   if($verification){
-		   	  $success_message= awp_messagelist('IP_banned');
-		   	  
-		   }
-		   else{                  
-	if(!_isCurl()) 
-	{
-	$params = array (
-            "arg0" => APPTIVO_BUSINESS_API_KEY,  
-            "arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
-            "arg2" => $case,             
-    );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createCase',$params);
-    //Custom success Message.
-    $properties = $case_form['properties'];
-    $success_message = $properties['confmsg'];
-   }	
-	else{	   	
-    $response=getRestAPICall("POST", APPTIVO_CASES_API,$params);
-    $caseId	= $response->csCase->caseId;
-               if($noteDetails!="")
-   {
-      $noteText=$noteDetails->noteText;
-      $caseNotes='{"noteText":"'.$noteText.'"}';
-      $param = array (
+			);
+			$verification = check_blockip();
+			if($verification){
+				$success_message= awp_messagelist('IP_banned');
+			}
+			else{
+				if(!_isCurl())
+				{
+					$params = array (
+            			"arg0" => APPTIVO_BUSINESS_API_KEY,  
+            			"arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
+           				"arg2" => $case,             
+					);
+					$response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createCase',$params);
+					//Custom success Message.
+					$properties = $case_form['properties'];
+					$success_message = $properties['confmsg'];
+				}
+				else{
+					$response=getRestAPICall("POST", APPTIVO_CASES_API,$params);
+					$caseId	= $response->csCase->caseId;
+					if($noteDetails!="" && $caseId != '')
+					{
+						$noteText=$noteDetails->noteText;
+						$caseNotes='{"noteText":"'.$noteText.'"}';
+						$param = array (
                 "a"         => "save",
                 "objectId"  => APPTIVO_CASES_OBJECT_ID,
                 "objRefId"  => "$caseId",
                 "noteData"  =>  "$caseNotes",
                 "apiKey"=> APPTIVO_BUSINESS_API_KEY,
                 "accessKey"=> APPTIVO_BUSINESS_ACCESS_KEY
-                );
-     $notesResponse= getRestAPICall("POST", APPTIVO_NOTES_API,$param);
-     $noteid=$notesResponse->noteId;
-  }
-    $properties = $case_form['properties'];
-    $success_message = $properties['confmsg'];
+						);
+						$notesResponse= getRestAPICall("POST", APPTIVO_NOTES_API,$param);
+						$noteid=$notesResponse->noteId;
+					}
+					$properties = $case_form['properties'];
+					$success_message = $properties['confmsg'];
+				}
+				if($success_message=="")
+				{
+					$success_message="Case Submitted Successfully";
+				}
+				if($response->return->statusCode == 1000)
+				{
+					if(strlen(trim($success_message)) != 0):
+					$response->return->successMessage = $success_message;
+					else:
+					$response->return->successMessage = $response->return->responseString;
+					endif;
+				}
+			}
+		}
 	}
-    if($success_message=="")
-    {
-    	$success_message="Case Submitted Successfully";
-    }
-    if($response->return->statusCode == 1000)
-    {
-    	if(strlen(trim($success_message)) != 0):
-    	$response->return->successMessage = $success_message;
-    	else:
-    	$response->return->successMessage = $response->return->responseString;
-    	endif;
-    }
-        }
-        }
-        }
 
-        if(strlen(trim($success_message)) != 0 && $properties['confirm_msg_page'] == 'other' ) :
-                $location = get_permalink($properties['confirm_msg_pageid']);
-	            wp_safe_redirect($location);
-        else :
-           // echo '<center>'. trim($success_message).'</center>';
-            
+	if(strlen(trim($success_message)) != 0 && $properties['confirm_msg_page'] == 'other' ) :
+	$location = get_permalink($properties['confirm_msg_pageid']);
+	wp_safe_redirect($location);
+	else :
+	// echo '<center>'. trim($success_message).'</center>';
+
 	endif;
 
 
-            
-        if ($case_form):
-            
-        $cases_properties = $case_form['properties'];
-        
 
-        $this->validate_load_script();
+	if ($case_form):
+
+	$cases_properties = $case_form['properties'];
+
+	$this->validate_load_script();
 	$form_fields=$case_form['fields']; //Cases Fields
 	usort($form_fields, "awp_sort_by_order");
 
 	$cases_fields = array();
-    $form_properties=$case_form['properties'];//Case Properties
-    $form_fields[] = array("fieldid"=>"status");
-    if(!_isCurl()){
-    foreach( $form_fields as $FormFields) :
-	if($FormFields['fieldid'] == 'status')
-	{
-		$FormFields['options'] = 'NEW';
-	}else if($FormFields['fieldid'] == 'type')
-	{
-		//Don't change
-		$FormFields['options'] = 'Product Questions
+	$form_properties=$case_form['properties'];//Case Properties
+	$form_fields[] = array("fieldid"=>"status");
+	if(!_isCurl()){
+		foreach( $form_fields as $FormFields) :
+		if($FormFields['fieldid'] == 'status')
+		{
+			$FormFields['options'] = 'NEW';
+		}else if($FormFields['fieldid'] == 'type')
+		{
+			//Don't change
+			$FormFields['options'] = 'Product Questions
 		Technical Issues
 		Product Purchases
 		Partnership Opportunities
@@ -360,112 +387,110 @@ $verification = check_blockip();
 		Feedback
 		Report a problem
 		Other';                            
-	}else if($FormFields['fieldid'] == 'priority')
-	{
-		//Don't change
-		$FormFields['options'] = 'High
+		}else if($FormFields['fieldid'] == 'priority')
+		{
+			//Don't change
+			$FormFields['options'] = 'High
 		Low
 		Medium'; 
-	}
-    $push_fields = true;
-	if( $FormFields['type'] == 'select'  || $FormFields['type'] == 'radio' || $FormFields['type'] == 'checkbox' ) :
+		}
+		$push_fields = true;
+		if( $FormFields['type'] == 'select'  || $FormFields['type'] == 'radio' || $FormFields['type'] == 'checkbox' ) :
 	 if(trim($FormFields['options']) == '' ):
 	 $push_fields = FALSE;
 	 endif;
-	endif;
+	 endif;
 
-	if($push_fields):
-	array_push($cases_fields,$FormFields);
-        endif;
-        	endforeach;
-    }
-    else {
-    foreach( $form_fields as $FormFields) :
-	if($FormFields['fieldid'] == 'status')
-	{
-            $case_status  = get_option("awp_cases_status");
-            $case_status  = json_decode($case_status);
-            foreach ($case_status as $casestatus)
-            {
-                if($casestatus->meaning=="New")
-                {
-                    $status_type[]= $casestatus->meaning;
-                    $status_type_value[]=$casestatus->lookupId;
-                }
-            }
-            $formnames =implode("\n", $status_type);
-            $formvalues =implode("\n", $status_type_value);
-            $FormFields['options'] = $formnames;
-            $FormFields['value']=$formvalues;
-            
-	}else if($FormFields['fieldid'] == 'type')
-	{
-		//Don't change
-
-            $case_type  = get_option("awp_cases_type");
-            $case_type  = json_decode($case_type);
-            foreach ($case_type as $casetype)
-            {
-                if($casetype->disabled != 'Y')
-                {
-                    $type[]= $casetype->meaning;
-                    $type_value[]=$casetype->lookupId;
-                }
-            }
-            $formnames =implode("\n", $type);
-            $formvalues =implode("\n", $type_value);
-            $FormFields['options'] = $formnames;
-            $FormFields['value']=$formvalues;
-        
-	}else if($FormFields['fieldid'] == 'priority')
-	{
-
-//Don't change
-            $case_priority  = get_option("awp_cases_priority");
-            $case_priority  = json_decode($case_priority);
-            foreach ($case_priority as $casepriority)
-            {
-                if($casepriority->disabled != 'Y'){
-                    $type[]= $casepriority->meaning;
-                    $type_value[]=$casepriority->lookupId;
-                }
-            }
-            $formnames =implode("\n", $type);
-            $formvalues =implode("\n", $type_value);
-            $FormFields['options'] = $formnames;
-            $FormFields['value']=$formvalues;
-            unset($type);
-            unset($type_value);
+	 if($push_fields):
+	 array_push($cases_fields,$FormFields);
+	 endif;
+	 endforeach;
 	}
-	$push_fields = true;
-	if( $FormFields['type'] == 'select'  || $FormFields['type'] == 'radio' || $FormFields['type'] == 'checkbox' ) :
+	else {
+		foreach( $form_fields as $FormFields) :
+		if($FormFields['fieldid'] == 'status')
+		{
+			$case_status  = get_option("awp_cases_status");
+			$case_status  = json_decode($case_status);
+			foreach ($case_status as $casestatus)
+			{
+				if($casestatus->meaning=="New")
+				{
+					$status_type[]= $casestatus->meaning;
+					$status_type_value[]=$casestatus->lookupId;
+				}
+			}
+			$formnames =implode("\n", $status_type);
+			$formvalues =implode("\n", $status_type_value);
+			$FormFields['options'] = $formnames;
+			$FormFields['value']=$formvalues;
+		}else if($FormFields['fieldid'] == 'type')
+		{
+			//Don't change
+			$case_type  = get_option("awp_cases_type");
+			$case_type  = json_decode($case_type);
+			foreach ($case_type as $casetype)
+			{
+				if($casetype->disabled != 'Y')
+				{
+					$type[]= $casetype->meaning;
+					$type_value[]=$casetype->lookupId;
+				}
+			}
+			$formnames =implode("\n", $type);
+			$formvalues =implode("\n", $type_value);
+			$FormFields['options'] = $formnames;
+			$FormFields['value']=$formvalues;
+
+		}else if($FormFields['fieldid'] == 'priority')
+		{
+
+			//Don't change
+			$case_priority  = get_option("awp_cases_priority");
+			$case_priority  = json_decode($case_priority);
+			foreach ($case_priority as $casepriority)
+			{
+				if($casepriority->disabled != 'Y'){
+					$type[]= $casepriority->meaning;
+					$type_value[]=$casepriority->lookupId;
+				}
+			}
+			$formnames =implode("\n", $type);
+			$formvalues =implode("\n", $type_value);
+			$FormFields['options'] = $formnames;
+			$FormFields['value']=$formvalues;
+			unset($type);
+			unset($type_value);
+		}
+		$push_fields = true;
+		if( $FormFields['type'] == 'select'  || $FormFields['type'] == 'radio' || $FormFields['type'] == 'checkbox' ) :
 	 if(trim($FormFields['options']) == '' ):
 	 $push_fields = FALSE;
 	 endif;
-	endif;
+	 endif;
 
-	if($push_fields):
-	array_push($cases_fields,$FormFields);
-        endif;
-        
-	endforeach;
-    }
-        $template_type = $form_properties['tmpltype'];
+	 if($push_fields):
+	 array_push($cases_fields,$FormFields);
+	 endif;
+
+	 endforeach;
+	}
+	$template_type = $form_properties['tmpltype'];
 	$template_layout = $form_properties['layout'];
 	if($template_type=="awp_plugin_template") :
-		$templatefile = AWP_CASES_TEMPLATEPATH."/".$template_layout; // Plugin templates
+	$templatefile = AWP_CASES_TEMPLATEPATH."/".$template_layout; // Plugin templates
 	else :
-		$templatefile=TEMPLATEPATH."/cases/".$template_layout; // theme templates
+	$templatefile=TEMPLATEPATH."/cases/".$template_layout; // theme templates
 	endif;
 
 	ob_start();
 	//Cusom Css
-       
+	 
 	if( trim($form_properties['css']) != '') :
-	 echo '<style type="text/css">'.trim($form_properties['css']).'</style>';
+	echo '<style type="text/css">'.trim($form_properties['css']).'</style>';
 	endif;
-		//Include Template
-		include $templatefile;
+	//Include Template
+	include $templatefile;
 	$content = ob_get_clean();
 	return $content;
 	else:
@@ -711,7 +736,7 @@ if(isset($_POST['newcasesformname']))
                 }
 
 
-                if(isset($_POST['awp_caseform_select_form']))
+        if(isset($_POST['awp_caseform_select_form']))
 		{
 			$selectedcasesform =  trim( $_POST['awp_caseform_select_form']);
 			if($selectedcasesform!='')

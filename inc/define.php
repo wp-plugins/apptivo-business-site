@@ -1058,7 +1058,7 @@ echo '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$pl
 				}
                         break;
             case "captcha":
-                awp_reCaptcha();
+                awp_captcha($fieldid,$postValue,$validateclass);
             break;
 
             case "file":
@@ -1395,4 +1395,46 @@ else
    $browser = 'other';
 }
 return $browser;
+}
+
+/* Simple Captcha Integration */
+
+function awp_simple_captcha($fieldid,$postValue,$validateclass,$fg_color,$bg_color)
+{
+         
+         $captcha_instance = new AWPSimpleCaptcha();
+         list($r, $g, $b) = sscanf($fg_color, "#%02x%02x%02x");
+         $captcha_instance->fg = array($r,$g,$b);
+         list($bg_r, $bg_g, $bg_b) = sscanf($bg_color, "#%02x%02x%02x");
+		 $captcha_instance->bg = array( $bg_r,$bg_g,$bg_b );
+         $word = $captcha_instance->generate_random_word();
+         $prefix = mt_rand();
+         $image=$captcha_instance->generate_image($prefix, $word );
+         $awp_upload_url=wp_upload_dir();
+         $awp_url=path_join( $awp_upload_url['baseurl'], 'awp_captcha' );
+		 echo '<input type="hidden" value="'.$prefix.'" name="awp_simple_captcha_challenge"><img id="captcha_image" src="'.$awp_url ."/". $image. '" alt=""/>&nbsp;&nbsp;&nbsp;<input type="text" name="simple_'.$fieldid.'" id="'.$fieldid.'_id" value="" class="absp_contact_input_text'.$validateclass.'" size="5">';
+        
+}
+
+/* CleanUp All unwanted Captcha Images */
+
+add_action( 'template_redirect', 'awp_captcha_cleanup' );
+
+function awp_captcha_cleanup(){
+         $captcha_instance = new AWPSimpleCaptcha();
+         $captcha_instance->cleanup(60);
+
+}
+function awp_captcha($fieldid,$postValue,$validateclass){
+
+			$option=get_option('apptivo_business_recaptcha_settings') ;
+			$option=json_decode($option);
+			$fg_color=$option->awp_fg_color;
+			$bg_color=$option->awp_bg_color;
+			if($option->awp_captcha_type=='recaptcha')
+			{
+            awp_reCaptcha();
+			}elseif ($option->awp_captcha_type=='simplecaptcha'){
+            awp_simple_captcha($fieldid, $postValue, $validateclass,$fg_color,$bg_color);
+		}
 }

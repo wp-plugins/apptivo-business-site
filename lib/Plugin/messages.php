@@ -34,7 +34,8 @@ function awp_messagelist($key='')
 		"jobsearch-noresult"                    => '<span class="error_message">No jobs are found. Please modify your search and try again</span>',
 	    "IP_banned"                             => '<span class="error_message">Your IP Banned.</span>',
         "recaptcha_error"                       => '<span class="error_message">Please enter correct Verification code.</span>',
-        "soap_error"                       => '<div class="updated" id="errormessage"><p style="color:#f00;font-weight:bold;text-align:center;"> SOAP extension required to run Apptivo Business Site CRM  plugin. </p></div>'
+        "soap_error"                            => '<div class="updated" id="errormessage"><p style="color:#f00;font-weight:bold;text-align:center;"> SOAP extension required to run Apptivo Business Site CRM  plugin. </p></div>',
+	    "no_redirection"                        => '<span class="absp_error">Please enter the valid details.</span>'
     );
 	
 	return $awp_errormessage_list[$key];	

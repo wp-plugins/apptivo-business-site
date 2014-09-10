@@ -345,7 +345,8 @@ function get_RealIpAddr()
 
 function absp_table_exists($tableName)
 {
-	if( mysql_num_rows( mysql_query("SHOW TABLES LIKE '" . $tableName . "'")))
+	 global $wpdb;
+	 if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name)
 	 {
 	   return TRUE;
 	 }

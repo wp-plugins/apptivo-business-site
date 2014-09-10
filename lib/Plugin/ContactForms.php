@@ -8,6 +8,7 @@ require_once AWP_LIB_DIR . '/Plugin.php';
 require_once AWP_INC_DIR . '/apptivo_services/labelDetails.php';
 require_once AWP_INC_DIR . '/apptivo_services/noteDetails.php';
 require_once AWP_INC_DIR . '/apptivo_services/LeadDetails.php';
+require_once AWP_ASSETS_DIR.'/captcha/simple-captcha/simple-captcha.php'; 
 /**
  * Class AWP_ContactForms
  */
@@ -103,8 +104,30 @@ class AWP_ContactForms extends AWP_Base
 	$value_present = false;
         if(isset($_POST['awp_contactform_submit']) && $submitformname==$formname )
          {
-
-            if(isset($_POST["recaptcha_challenge_field"]))
+           if(isset($_POST["simple_captcha"]) )
+                {
+                	if(isset($_POST['awp_simple_captcha_challenge'])){
+                	$captcha_instance = new AWPSimpleCaptcha();
+                    $response = $captcha_instance->check($_POST['awp_simple_captcha_challenge'], $_POST["simple_captcha"]);
+                    $captcha_instance->remove( $_POST['awp_simple_captcha_challenge'] );
+                    
+                    if($response!="1")
+			        {
+                        $value_present = true;
+	                	$captch_error = awp_messagelist("recaptcha_error");
+                        }
+                        else
+                        {
+                        	
+                            $successmsg=$this->save_contact($submitformname);
+                        }
+                	}else{
+                		$captcha_instance = new ReallySimpleCaptcha();
+                		$captcha_instance->remove( $_POST['awp_simple_captcha_challenge'] );
+                		$captch_error = awp_messagelist("recaptcha_error");
+                	}
+                }
+            else if(isset($_POST["recaptcha_challenge_field"]))
                 {
                     $response_field =   $_POST["recaptcha_response_field"];
                     $challenge_field=   $_POST["recaptcha_challenge_field"];
@@ -114,9 +137,9 @@ class AWP_ContactForms extends AWP_Base
                     $response=    captchaValidation($private_key, $challenge_field, $response_field);
 
                     if($response!="1")
-			{
+			        {
                         $value_present = true;
-	                $captch_error = awp_messagelist("recaptcha_error");
+	                	$captch_error = awp_messagelist("recaptcha_error");
                         }
                         else
                         {
@@ -262,6 +285,7 @@ class AWP_ContactForms extends AWP_Base
                         $city = $submittedformvalues['city'];
                         $state = $submittedformvalues['state'];
                         $zipCode = $submittedformvalues['zipcode'];
+                        $simple_captcha=$submittedformvalues['simple_captcha'];
                         $bestWayToContact = $submittedformvalues['bestway'];
                         $country = $submittedformvalues['country'];
                         $leadSource = $submittedformvalues['name'];
@@ -294,6 +318,9 @@ class AWP_ContactForms extends AWP_Base
                         if(strlen(trim($firstName)) == 0 ) :
                         $firstName = null;
                         endif;
+                    if(strlen(trim($lastName))==0 || strlen(trim($emailId))==0 || !filter_var($emailId, FILTER_VALIDATE_EMAIL)){
+                    	echo awp_messagelist('no_redirection');
+                    }else{
                         $response = saveLeadDetails($firstName , $lastName, $emailId, $jobTitle, $company, $address1, $address2, $city, $state, $zipCode, $bestWayToContact, $country, $leadSource, $phoneNumber, $comments, $noteDetails,$targetname);
                         $response_msg = $response;
                         if($response_msg=='Success' && $response != 'E_100'){
@@ -305,7 +332,7 @@ class AWP_ContactForms extends AWP_Base
                             }
                         }else if($response == 'E_IP') { echo awp_messagelist('IP_banned');}
                         else { echo awp_messagelist('contactlead-display-page'); }
-
+                    }
 		}
 		return $confmsg;
 	}

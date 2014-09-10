@@ -75,11 +75,11 @@ label.error{padding-left: 10px;color: red;float:left;width:150px;}
 .absp_business_main input.required{color:#000;}
 .absp_success_msg{color:green;font-weight:bold;padding-bottom:5px;}
 .absp_error{color:red;font-weight:bold;padding-bottom:5px;}
-.case_main .case_input select{padding:6px;width:100%;}
+.case_main .case_input select{padding:6px;width:95%;}
 .case_main .case_input input{width:95%;}
 .case_main .case_input textarea{width:95%;}
 .case_main input[type="submit"]{margin-left:0px !important;float:left;}
-.case_input input[type="radio"],.case_input input[type="checkbox"]{width:auto;margin:0;}
+.case_input input[type="radio"],.case_input input[type="checkbox"]{width:auto;margin:0;float:left}
 @media screen and (max-width:900px){
 .case_main .case_label{width:100%;float:left;}
 .case_main .case_input {width:100%;float:left;margin-top:5px;}

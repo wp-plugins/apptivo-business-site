@@ -1451,3 +1451,13 @@ function uploadImage(imageUrl)
 		 tb_remove();
 		}
 }
+
+function awp_captcha_change(){
+    if(document.getElementById("awp_captcha_type").value=="recaptcha"){
+ 	   document.getElementById("recaptcha_table").style.display="block";
+ 	   document.getElementById("color_table").style.display="none";
+    }else if(document.getElementById("awp_captcha_type").value=="simplecaptcha"){
+ 	   document.getElementById("recaptcha_table").style.display="none";
+ 	  document.getElementById("color_table").style.display="block";
+    }
+}

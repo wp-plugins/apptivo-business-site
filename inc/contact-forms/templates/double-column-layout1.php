@@ -28,6 +28,8 @@ form{margin:0;padding:0;}
 .awp_contactform_maindiv_'.$contactform[name].' .form_rgt_part label{float:left;line-height:13px;}
 .awp_contactform_maindiv_'.$contactform[name].' input[type="submit"]{margin-left:0px !important;float:right;clear:both;}
 .awp_recaptcha_error .error{line-height:2px !important;}
+.abswpcfm input[type="button"], .abswpcfm input[type="reset"], .abswpcfm input[type="submit"], .abswpcfm input[type="image"] {width:auto;margin-top: 15px}
+.abswpcfm input[type="image"] {border:none}
 @media screen and (max-width:900px){
 .awp_contactform_maindiv_'.$contactform[name].' .form_left_part {width:100%;float:left;}
 .awp_contactform_maindiv_'.$contactform[name].' .form_rgt_part{width:100%;float:left;margin-top:5px;}
@@ -225,7 +227,7 @@ foreach($formfields as $field)
 			}
 			break;
 		case "captcha":
-                        awp_reCaptcha();
+                       awp_captcha($fieldid,$postValue,$validateclass);
 			break;
 	}
 	echo '</div>'.'</div>';
