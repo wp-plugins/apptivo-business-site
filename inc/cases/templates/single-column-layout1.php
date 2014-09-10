@@ -57,7 +57,7 @@ else
 ?>
 <style type="text/css">
 div.message {background-color: #DFF2BF;color: #4F8A10;padding: 10px 10px 10px 32px;margin:15px;}
-div.error {background-color: #FFD4D4;color: #D8000C;padding: 10px 10px 10px 32px;margin:15px;}
+div.error {color: #D8000C;padding: 5px 0 0 5px;margin:15px;}
 .cases_outfrm{width:440px;display:block;}
 .case_main {font-family: arial, helvetica, sans-serif;font-size: 12px;margin-left: 20px;color: #000;width: 100%;display:inline-block;}
 .case_main .case_label {float: left;width: 48%;}
@@ -95,9 +95,9 @@ label.error{padding-left: 10px;color: red;float:left;width:150px;}
            	$postValue="";
           }
 do_action('apptivo_business_cases_before_form'); //Before Form
-if($captch_error!="")
+if($captcha_error!="")
 {
-    echo '<div class="absp_error error">The reCAPTCHA was not entered correctly. Please try again.</div>';
+    echo '<div class="absp_error error">'.$captcha_error.'</div>';
 }
 echo  '<div id="success_'.$case_form[name].'" class="absp_success_msg success_'.$case_form[name].'">'.$success_message."</div>";
 echo  '<form id="'.$case_form[name].'_casesforms" name="'.$case_form[name].'_caseforms" action="'.$_SERVER['REQUEST_URI'].'" method="post">';

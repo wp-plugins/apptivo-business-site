@@ -219,7 +219,6 @@ function apptivo_business_casesnew($atts)
 			{
 				$value_present = true;
 				$captcha_error = awp_messagelist("recaptcha_error");
-				$success_message = awp_messagelist("recaptcha_error");
 			}
 			else
 			{
@@ -280,8 +279,9 @@ function apptivo_business_casesnew($atts)
 		$caseSummary= $case['subject'];
 		$caseDescription= $case['description'];
 
-		if(strlen(trim($case['lastName']))==0 || strlen(trim($emailId))==0 || !filter_var($emailId, FILTER_VALIDATE_EMAIL) || $casePriorityId == '' ||  $caseTypeId == ''){
-			echo awp_messagelist('no_redirection');
+		if(strlen(trim($case['lastName']))==0 || strlen(trim($emailId))==0 || !filter_var($emailId, FILTER_VALIDATE_EMAIL) || $casePriorityId == '' ||  $caseTypeId == '' ){
+			if(empty($captcha_error))
+				echo awp_messagelist('no_redirection');
 		}
 		elseif(empty ($captcha_error))
 		{

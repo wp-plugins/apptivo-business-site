@@ -1041,11 +1041,13 @@ echo '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$pl
 				{
                                      $selected ="";
 				if(isset($postValue)!="" && count($postValue) >1)  {
-                   foreach($postValue[$fieldid] as $value){
-                        if(trim($value) == trim($optionvalue)){
-                        $selected='checked="checked"';
+					 if(isset($postValue[$fieldid])){
+                   		foreach($postValue[$fieldid] as $value){
+                        	if(trim($value) == trim($optionvalue)){
+                        		$selected='checked="checked"';
                          }
-                    }
+                      }
+					}
                    }
 					if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 					{
