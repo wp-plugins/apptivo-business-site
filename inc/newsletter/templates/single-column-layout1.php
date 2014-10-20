@@ -8,7 +8,11 @@ $formfields=array();
 $formfields = $newsletterform[fields];
 if( $newsletterform[css] != '' )
 {
-	echo $css='<style type="text/css">'.$newsletterform[css].'</style>';
+	echo $css='<style type="text/css">'.$newsletterform[css].' .required{color:#000;font-weight:normal;}</style>';
+}
+else
+{
+echo '<style type="text/css"> .required{color:#000;font-weight:normal;} </style>';
 }
 
 echo $jscript='<script type="text/javascript">

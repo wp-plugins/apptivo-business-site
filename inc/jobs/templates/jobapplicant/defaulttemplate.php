@@ -57,7 +57,7 @@ elseif($hrjobsform['confmsg_pagemode']=="other")
     $page_redirect  =    $hrjobsform['confmsg_pageid'];
     $post = get_post( $page_redirect);
     $page_action    =   $post->post_name;
-    echo  '<form id="'.$hrjobsform[name].'_hrjobsforms" class="awp_hrjobs_form" name="'.$hrjobsform[name].'_hrjobsforms" action="'.SITE_URL.'/'.$page_action.'" method="post">';
+    echo  '<form id="'.$hrjobsform[name].'_hrjobsforms" class="awp_hrjobs_form" name="'.$hrjobsform[name].'_hrjobsforms" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
 }
 echo  '<input type="hidden" value="'.$jobId.'" name="jobId" id="jobId"><input type="hidden" value="'.$jobNo.'" name="jobNo" id="jobNo">';
 echo '<input type="hidden" value="'.$hrjobsform[name].'" name="awp_jobsformname" id="awp_jobsformname">';

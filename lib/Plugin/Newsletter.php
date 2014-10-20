@@ -61,10 +61,12 @@ function shownewsletterform($atts){
 	$content="";
 	$successmsg="";
 	$newsletterform=$this->get_newsletterform_fields($formname);
-         $submitformname=$_POST['awp_newsletterformname'];
-         if(isset($_POST['awp_newsletterform_submit']) && $submitformname==$formname){
+        
+        $submitformname=$_POST['awp_newsletterformname'];
+        if(isset($_POST['awp_newsletterform_submit']) && $submitformname==$formname){
 	          $successmsg= $this->save_newsletter($submitformname); 
-          }
+        }
+        
 	ob_start();
 	if(!empty($newsletterform) && !empty($newsletterform[fields]) ){		
 		include $newsletterform['templatefile'];
@@ -75,38 +77,46 @@ function shownewsletterform($atts){
 	return $content;
 }
 function save_newsletter($formname){
+    
               $newsletterform=$this->get_newsletterform_fields($formname);
+              
              if(!empty($newsletterform)){
                 $newsletterformfields=$newsletterform['fields'];
                 //Process the $_POST here..
 		$submittedformvalues=array();
-        $submittedformvalues['category'] = $_POST['newsletter_category'];
+                $submittedformvalues['category'] = $_POST['newsletter_category'];
 		foreach($newsletterformfields as $field)
 		{
+			$notesLabel=$field['showtext'];
 		  $fieldid=$field['fieldid'];
 		  if($fieldid=='newsletter_phone'){
-             if(isset($_POST[$formname.'_newsletter_phone1']))
-             {
-                   $submittedformvalues[$fieldid]= $_POST[$formname.'_newsletter_phone1'].$_POST[$formname.'_newsletter_phone2'].$_POST[$formname.'_newsletter_phone3'];
-             } else
-             {
-                     $submittedformvalues[$fieldid]= $_POST[$fieldid];
-              }
-           } else {
+                    if(isset($_POST[$formname.'_newsletter_phone1']))
+                    {
+                        $submittedformvalues[$fieldid]= $_POST[$formname.'_newsletter_phone1'].$_POST[$formname.'_newsletter_phone2'].$_POST[$formname.'_newsletter_phone3'];
+                    } 
+                    else{
+                        $submittedformvalues[$fieldid]= $_POST[$fieldid];
+                    }
+                  } 
+                  else {
 			$submittedformvalues[$fieldid]= stripslashes($_POST[$fieldid]);
-           }
+                  }
 		}
-			    //Submit the $submittedformvalues to Apptivo Lead Webservice
-				//Dont forgot to save the contact form name as Lead Source value
-                $category = $submittedformvalues[category];
+		//Submit the $submittedformvalues to Apptivo Lead Webservice
+		//Dont forgot to save the contact form name as Lead Source value
+                $category = $submittedformvalues[category]; 
+                
                 $firstname = $submittedformvalues[newsletter_firstname];
                 $lastname = $submittedformvalues[newsletter_lastname];
                 $email = $submittedformvalues[newsletter_email];
                 $phoneNumber = $submittedformvalues[newsletter_phone];
                 $comments = $submittedformvalues[newsletter_comments];
+
                 if(!empty($email)){
-                	$response = createTargetList($category, $firstname, $lastname,$email,$phoneNumber,$comments);
-                   $confmsg = $response->return->statusMessage;
+                	$response = createTargetList($category, $firstname, $lastname,$email,$phoneNumber,$comments,$notesLabel);
+                        if(isset($response->targetId) && $response->targetId != ''){
+                            $confmsg = "Newsletter subscribed successfully";
+                        }
                 }
                 if($response == 'E_100')
                 { 
@@ -120,9 +130,7 @@ function save_newsletter($formname){
                     if(!empty($newsletterform[confmsg])){
                         $confmsg = $newsletterform[confmsg];
                      }
-                }
-                             
-    		
+                }    		
 	}
 	return $confmsg;
 }
@@ -401,7 +409,7 @@ if($_POST['awp_newsletterform_settings']){
 	}
 	
 	
-	echo "<h2>" . __( 'Apptivo Newsletter Forms', 'awp_newsletterform' ) . "</h2>";
+	echo "<div class='wrap'><h2>" . __( 'Apptivo Newsletter Forms', 'awp_newsletterform' ) . "</h2></div>";
         checkSoapextension("Newsletter");
     echo '<div class="newsletterform_err"></div>';
 if(trim($updatemessage)!=""){
@@ -434,20 +442,26 @@ if(trim($updatemessage)!=""){
 		
 		</p> 
 		<p>
-		<input <?php echo $disabledForm; ?> type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e('Add New') ?>" />
+		<input <?php echo $disabledForm; ?> type="submit" name="Submit" class="button-primary newletter-add" value="<?php esc_attr_e('Add New') ?>" />
 	</p>
 </form>
 <br />
 
 
-<?php  if( !empty($newsletter_forms))
-{  $newsletter_categories = $this->getNewsletterCategory();
+<?php 
+$newsletter_categories = $this->getNewsletterCategory();
+
    if(empty($newsletter_categories[0])){
-    echo "<span style='color:red; font-size:14px;'>Please add target list in apptivo before configuring newsletter</span>";
+    echo "<span style='color:red; font-size:14px;'>Please add target list in apptivo before configuring newsletter</span><input type='hidden' class='awp_targetlist' value='0'/>";
+    exit;
    }
    else{
-   ?>
-<hr />
+   	echo "<input type='hidden' class='awp_targetlist' value='1'/>";
+   }
+if( !empty($newsletter_forms))
+{  
+   	?>
+<br/>
 		<?php
 		if(trim($selectednewsletterform)==""){
 			$selectednewsletterform=$newsletter_forms[0][name];
@@ -618,7 +632,7 @@ arsort($plugintemplates_newsletter);
 				<td valign="top">
                                  <select id="awp_newsletterform_category" name="awp_newsletterform_category">
                                 <?php foreach($newsletter_categories as $category){?>
-                                     <option value="<?php echo  $category->targetListName; ?>" <?php selected($category->targetListName, $newsletter_formproperties[category]) ?>><?php echo  $category->targetListName; ?></option>
+                                     <option value="<?php echo  $category->targetListId; ?>" <?php selected($category->targetListName, $newsletter_formproperties[category]) ?>><?php echo  $category->targetListName; ?></option>
                                  <?php } ?>
                                  </select>
 				</td>
@@ -740,7 +754,6 @@ arsort($plugintemplates_newsletter);
 
     <?php
     }
-    }
 	
     }
 
@@ -756,7 +769,7 @@ arsort($plugintemplates_newsletter);
      */
     function getNewsletterCategory(){
      $category = getAllTargetListcategory();
-     return awp_convertObjToArray($category->return->targetList);
+     return $category;
     }
     function createformfield_array($fieldid,$showtext,$required,$type,$validation,$options,$displayorder){
 		if(trim($displayorder)=="")
@@ -800,20 +813,21 @@ arsort($plugintemplates_newsletter);
  */
 function getAllTargetListcategory()
 {
-	$params = array (
-                "arg0" => APPTIVO_BUSINESS_API_KEY,
-                "arg1" => APPTIVO_BUSINESS_ACCESS_KEY
-                );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getAllTargetLists',$params);
-    return $response;
+    if(_isCurl()){
+        
+        $awp_services_obj=new AWPAPIServices();
+        $response = $awp_services_obj->getTargetListcategory();
+        return $response;
+    }
+   
 }
 
 function target_lists_category($category)
 {
    $target = new AWP_Newsletter();	
-   $targetcategory = $target->getNewsletterCategory();
+   $targetcategory = $target->getNewsletterCategory();   
    foreach($targetcategory as $targetLists):
-	   if($targetLists->targetListName == $category)
+    if($targetLists->targetListId == $category)
 	   {
 	   	return $category;
 	   }

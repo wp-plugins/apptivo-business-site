@@ -49,6 +49,7 @@ if ($status_msg == "Success") {
 $divId = '"awp-mask"';
 echo '<style type="text/css">
 body{ font:bold 12px Arial, Helvetica, sans-serif;margin:0;padding:0;min-width:960px;color:#bbbbbb;}
+.awp_testimonial_form input.required,.awp_testimonial_form select{color:#000;font-weight:normal;}
 #awp-testimonial-box{width:100%;position:absolute;}
 .absp_main_box{width:650px;background-color:#FFF;margin:0 auto;}
 #awp-mask {display: none;background: #808285;position: fixed; left: 0; top: 0;z-index: 10;width: 100%; height: 100%;opacity: 0.8;z-index: 999;}
@@ -291,7 +292,7 @@ foreach ($formfields as $field) {
 }
 
 /* redirection URL */
-$actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$actual_link = SITE_URL.$_SERVER[REQUEST_URI];
 
 $_SESSION['request_link'] = $actual_link;
 

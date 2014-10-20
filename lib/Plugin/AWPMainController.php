@@ -467,7 +467,7 @@ class AWP_MainController extends AWP_Base
 						<br><span class="description">API key generated in Apptivo</span>
 					</th>
 					<td valign="top">
-                     <input style="width:520px;" type="text" <?php if($keys_readonly) { echo 'readonly="true"';} ?>  name="api_key" id="api_key" class="enabled" value="<?php echo $apptivo_api_key; ?>"/>
+                     <input style="width:100%;" type="text" <?php if($keys_readonly) { echo 'readonly="true"';} ?>  name="api_key" id="api_key" class="enabled" value="<?php echo $apptivo_api_key; ?>"/>
                      <input type="hidden" name="prev_api_key" id="prev_api_key" value="<?php echo $apptivo_api_key; ?>"/>
                      <input type="hidden" name="update_site_inf" id="update_site_inf" value="yes"/>
 					</td>
@@ -478,7 +478,7 @@ class AWP_MainController extends AWP_Base
 						<br><span class="description">Access key generated in Apptivo</span>
 					</th>
 					<td valign="top">
-                     <input style="width:520px;" type="text" <?php if($keys_readonly) { echo 'readonly="true"';} ?>  name="access_key" id="access_key" class="enabled" value="<?php echo $apptivo_access_key; ?>"/>
+                     <input style="width:100%;" type="text" <?php if($keys_readonly) { echo 'readonly="true"';} ?>  name="access_key" id="access_key" class="enabled" value="<?php echo $apptivo_access_key; ?>"/>
                     </td>
 				</tr>
 				
@@ -564,6 +564,22 @@ class AWP_MainController extends AWP_Base
                     <span class="description">Contact Forms to collect lead from your website.</span></td>
                 </tr>
                <?php } ?> 
+               
+                         <?php if(!defined('AWP_CASES_DISABLE') || !AWP_CASES_DISABLE) {  ?>
+			<tr valign="top">
+					<th class="titledesc" scope="row"><label for="cases_enable"><?php _e("Cases", 'apptivo-businesssite' ); ?></label></th>
+                    <td class="forminp">
+                  <input type="checkbox" name="cases_enable" id="cases_enable" class="enabled" 
+						<?php if($disable_plugin){?>
+						disabled="disabled"
+						<?php } if($generalsettings["cases"]){?>
+						checked="checked"
+						<?php }?>
+						>
+                   <span class="description">Customers to log a case from your website and you can manage it using Apptivo Cases App</span></td>
+                </tr>
+               <?php } ?> 
+               
                <!-- Newsletter Form -->
                 <?php if(!defined('AWP_NEWSLETTER_DISABLE') || !AWP_NEWSLETTER_DISABLE) {  ?>
 			<tr valign="top">
@@ -641,24 +657,7 @@ class AWP_MainController extends AWP_Base
                     <span class="description">Customers to upload a resume from your website and you can manage it using Apptivo Jobs App</span></td>
                 </tr>
                <?php } ?> 
-               
-                 <?php if(!defined('AWP_CASES_DISABLE') || !AWP_CASES_DISABLE) {  ?>
-			<tr valign="top">
-					<th class="titledesc" scope="row"><label for="cases_enable"><?php _e("Cases", 'apptivo-businesssite' ); ?></label></th>
-                    <td class="forminp">
-                  <input type="checkbox" name="cases_enable" id="cases_enable" class="enabled" 
-						<?php if($disable_plugin){?>
-						disabled="disabled"
-						<?php } if($generalsettings["cases"]){?>
-						checked="checked"
-						<?php }?>
-						>
-                   <span class="description">Customers to log a case from your website and you can manage it using Apptivo Cases App</span></td>
-                </tr>
-               <?php } ?> 
-               
-			 
-				<tr>
+               	<tr>
 					<td colspan="2">
 						<p class="submit">
 							<input <?php if($disable_plugin) { echo 'disabled="disabled"'; } ?>type="submit" name="awp_generalform_commonplugin_settings"

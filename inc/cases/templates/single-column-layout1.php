@@ -4,64 +4,79 @@
  Template Type: Shortcode
  */
 $formfields=array();
-$formfields=$case_form[fields];
+$formfields=$case_form['fields'];
+if(isset($countrylist)){
 $countries = $countrylist;
+}
 $css="";
 $count=1;
-if( $case_form[css] != '' )
+$checkType="0";
+$checkPriority = "0";
+$checkStatus = "0";
+$form_outer_width=$cases_width_size;
+for($i=0;$i<count($formfields);$i++)
 {
-	echo $css='<style type="text/css">'.$case_form[css].'</style>';
+	if($formfields[$i]["fieldid"]=="type")
+	 {
+	 	$checkType= "1";
+	 }
+	else if($formfields[$i]["fieldid"]=="priority")
+	 {
+	 	$checkPriority= "1";
+	 }
+	else if($formfields[$i]["fieldid"]=="status")
+	 {
+	 	$checkStatus= "1";
+	 }
+}
+if( isset($case_form['css']) != '' )
+{
+	echo $css='<style type="text/css">'.$case_form['css'].'</style>';
 }
 
 echo $jss ='<script type="text/javascript">
-function sendText(option){ }
 jQuery(document).ready(function()
 {
+ var priorityName= jQuery("#priority option:selected", this).text();
+      jQuery("#priority_name").val(priorityName);
+ var typeName= jQuery("#type option:selected", this).text();
+      jQuery("#type_name").val(typeName);
 jQuery("#priority").change(function(){
-      var fieldName= jQuery("option:selected", this).attr("rel");
+      var fieldName= jQuery("option:selected", this).text();
       jQuery("#priority_name").val(fieldName);
         });
 jQuery("#type").change(function(){
-      var fieldName= jQuery("option:selected", this).attr("rel");
+      var fieldName= jQuery("option:selected", this).text();
       jQuery("#type_name").val(fieldName);
         });
-jQuery.validator.addMethod("phoneUS", function(phone_number, element) {
-    return this.optional(element) || phone_number.match(/^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/);
-}, "Please enter a valid phone number");
-if (jQuery("#phone_id").is(".required")){
-jQuery("#'.$case_form[name].'_casesforms").validate(
-{ rules: {
-        phone: "phoneUS",
-       }
-});
-}else{
-jQuery("#'.$case_form[name].'_casesforms").validate(
+jQuery("#status").change(function(){
+      var fieldName= jQuery("option:selected", this).text();
+      jQuery("#status_name").val(fieldName);
+        });
+jQuery("#'.$case_form['name'].'_casesforms").validate(
 {
 submitHandler: function(form) {
       form.submit();
     }
-});
-}
-';
+});';
+
 if($success_message!="" && $case_form[properties][confmsg]!="")
 {
-    echo ' document.getElementById("success_'.$case_form[name].'").scrollIntoView();
-});
-</script>';
+    echo ' document.getElementById("success_'.$case_form[name].'").scrollIntoView();';
 }
-else
-{
-    echo ' }); </script>';
-}
+
+echo ' }); </script>';
+
 
 ?>
 <style type="text/css">
+.cases_outfrm_<?php echo $case_form[name];?>{width:<?php echo $form_outer_width;?>;}
 div.message {background-color: #DFF2BF;color: #4F8A10;padding: 10px 10px 10px 32px;margin:15px;}
 div.error {color: #D8000C;padding: 5px 0 0 5px;margin:15px;}
 .cases_outfrm{width:440px;display:block;}
 .case_main {font-family: arial, helvetica, sans-serif;font-size: 12px;margin-left: 20px;color: #000;width: 100%;display:inline-block;}
-.case_main .case_label {float: left;width: 48%;}
-.case_main .case_input {float: left;width: 48%;padding-bottom: 10px;}
+.case_main .case_label {float: left;width: 30%;}
+.case_main .case_input {float: left;width: 65%;padding-bottom: 10px;}
 #intro_msg{margin-left: 20px;font-size: 12px;font-weight:normal;font-family:arial,helvetica,sans-serif;}
 .case_main .case_label span span {color: red;}
 .submit_btn {float: left;text-align: left;width: 42%;position:relative;}
@@ -88,21 +103,21 @@ label.error{padding-left: 10px;color: red;float:left;width:150px;}
 </style>
 <?php
 
-		  if ($value_present){
+		  if (isset($value_present)){
 		    $postValue = $_REQUEST;
 		  }
           else {
            	$postValue="";
           }
 do_action('apptivo_business_cases_before_form'); //Before Form
-if($captcha_error!="")
+if(isset($captcha_error)!="")
 {
     echo '<div class="absp_error error">'.$captcha_error.'</div>';
 }
-echo  '<div id="success_'.$case_form[name].'" class="absp_success_msg success_'.$case_form[name].'">'.$success_message."</div>";
-echo  '<form id="'.$case_form[name].'_casesforms" name="'.$case_form[name].'_caseforms" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
-echo '<input type="hidden" value="'.$case_form[name].'" name="awp_caseformname" id="awp_caseformname">';
-echo '<div class="absp_business_main cases_outfrm_'.$case_form[name].'">';
+echo  '<div id="success_'.$case_form['name'].'" class="absp_success_msg success_'.$case_form['name'].'">'.$success_message."</div>";
+echo  '<form id="'.$case_form['name'].'_casesforms" name="'.$case_form['name'].'_caseforms" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
+echo '<input type="hidden" value="'.$case_form['name'].'" name="awp_caseformname" id="awp_caseformname">';
+echo '<div class="absp_business_main cases_outfrm_'.$case_form['name'].'">';
 if(get_option ('apptivo_business_recaptcha_mode')=="yes")
 {
     $option=get_option('apptivo_business_recaptcha_settings');
@@ -117,20 +132,16 @@ foreach($cases_fields as $field)
   $i=$i+1;
   echo '<div class="case_main">';
   $mandatory_symbol =    ' '.awp_mandatoryfield($field,$before='<span>',$after='</span>',$mandatory_symbol = '*');
-  echo awp_create_labelfield($field['showtext'],'','','<div class="case_label" ><span style="float: left; padding-top: 3px;">',$mandatory_symbol.'</span></div>'); //Label Field
-  cases_textfield($form_properties,$field,$countries,$valuepresent,'<div class="case_input">','</div>',false, $i,true,'cases',$postValue);//Text Field
+  if(isset($field['showtext'])){
+  echo awp_create_labelfield($field['showtext'],'','','<div class="case_label" ><span style="float: left; padding-top: 3px;">',$mandatory_symbol.'</span></div>'); /* Label Field */
+  }
+  cases_textfield($form_properties,$field,isset($countries),isset($valuepresent),'<div class="case_input">','</div>',false, $i,true,'cases',$postValue,$case_form['name']); /* Text Field */
+  
   echo '</div>';
   $count=$count+1;
-  if($field['fieldid']=="status")
-      {
-          echo '<input type="hidden" name="awp_cases_status" value="'.$field[options].'"/>';
-          echo '<input type="hidden" name="awp_cases_values" value="'.$field[value].'"/>';
-      }
   }
-
-  
-do_action('apptivo_business_cases_before_submit_query'); //Before submit Query  
-
+getFirstConfigData($checkType,$checkPriority,$checkStatus,$case_form['name']);
+do_action('apptivo_business_cases_before_submit_query'); //Before submit Query
 echo '<input type="hidden" name="awp_casesforms_submit" />';
 
 $submit = cases_submit_type($form_properties,"apptivo_casesform",'','','', $i+1); //SubMit Button Type

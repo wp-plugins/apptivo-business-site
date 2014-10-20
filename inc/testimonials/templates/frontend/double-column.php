@@ -48,8 +48,11 @@ if ($status_msg == "Success") {
 
 echo '<style type="text/css">
 form{margin:0;padding:0;}
-/*contact*/
+label.error{font-size:13px;}
+#login-box select{color:#000000;}
+.awp_testimonial_form input.required{color:#000;font-weight:normal;}
 .recaptcha_source{margin:0 !important;}
+.awp_recaptcha_error .error{margin-left:10px;}
 #login-box .form_section{float:left;width:100%;margin-bottom:15px;}
 #login-box{float:left;width:100%;}
 #login-box .form_left_part {width:48% !important;float:left;}
@@ -61,9 +64,8 @@ form{margin:0;padding:0;}
 #login-box .form_rgt_part select{padding:6px;width:100%;}
 #login-box .form_rgt_part label{float:left;line-height:18px;}
 #login-box input[type="submit"], #login-box input[type="image"]{margin-left:0px !important;float:right !important;}
-.awp_recaptcha_error .error{line-height:2px !important;}
 .absp_success_msg{color:green;font-weight:bold;padding-bottom:5px;}
-#recaptcha_widget_div{zoom:0.59;-moz-transform: scale(0.56);}
+#recaptcha_widget_div{zoom:0.63;-moz-transform: scale(0.59);}
 
 
 
@@ -107,7 +109,7 @@ echo "<div class='container'>
 <div id='login-box' class='login-popup'>";
 foreach ($formfields as $field) {
     if($count%2==0) $style='style="width: 48%;float:right;"';
-	else $style='style="width: 48%;float:left;"';
+	else $style='style="width: 48%;float:left;clear:both;"';
 	$fieldid = $field['fieldid'];
     $showtext = $field['showtext'];
     $validation = $field['validation'];
@@ -243,7 +245,7 @@ echo '<div class="form_rgt_part">';
 }
 
 /* redirection URL */
-$actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$actual_link = SITE_URL.$_SERVER[REQUEST_URI];
 
 $_SESSION['request_link'] = $actual_link;
 

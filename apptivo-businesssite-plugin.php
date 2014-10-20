@@ -3,7 +3,7 @@
  Plugin Name: Apptivo Business site Plugin
  Plugin URI: http://www.apptivo.com/apptivo-business-site-wordpress-plug-in/
  Description: Apptivo Business Site plugin provides News , Events , Testimonials, Jobs, Contact Forms and Newsletter sub plugins with <a href="http://www.apptivo.com" target="_blank">Apptivo ERP</a>.
- Version: 1.2.2
+ Version: 1.2.3
  Author: Rajkumar Mohanasundaram
  Author URI: http://www.apptivo.com/
  */
@@ -13,6 +13,7 @@ if (!session_id()) session_start();
  	if( is_admin() )
  	{
  		register_activation_hook( __FILE__, 'activate_apptivo_business' );
+        register_activation_hook( __FILE__, 'awp_ip_jal_install' );
  	}
  	define('AWP_PLUGIN_BASEPATH',plugin_dir_path(__FILE__));
  	define('AWP_PLUGIN_BASEURL',plugins_url(basename( dirname(__FILE__))));
@@ -113,10 +114,43 @@ echo '<script type="text/javascript" language="javascript" >jQuery(document).rea
 function activate_apptivo_business()
 {   
      //Update plugin version.
-	 update_option( "apptivo_business_plugin_version", '1.2.1' );
-     update_option( "apptivo_business_plugin_installed", 1 );
-     awp_bsp_createcaptcha();
+	update_option( "apptivo_business_plugin_version", '1.2.3' );
+    update_option( "apptivo_business_plugin_installed", 1 );
+    awp_bsp_createcaptcha();
 }
+
+global $awp_ip_jal_db_version;
+$awp_ip_jal_db_version = '1.0';
+
+function awp_ip_jal_install() {
+	global $wpdb;
+	global $jal_db_version;
+
+	$table_name = $wpdb->prefix . 'absp_ipdeny';
+	
+	$charset_collate = '';
+
+	if ( ! empty( $wpdb->charset ) ) {
+	  $charset_collate = "DEFAULT CHARACTER SET {$wpdb->charset}";
+	}
+
+	if ( ! empty( $wpdb->collate ) ) {
+	  $charset_collate .= " COLLATE {$wpdb->collate}";
+	}
+
+	$sql = "CREATE TABLE $table_name (
+		ID INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		ip_address VARCHAR(200),
+		ip_type VARCHAR(200),
+		cur_timestamp TIMESTAMP
+            ) $charset_collate;";
+
+	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+	dbDelta( $sql );
+
+	add_option( 'jal_db_version', $awp_ip_jal_db_version );
+}
+
 
 function awp_bsp_createcaptcha(){
    
@@ -319,25 +353,7 @@ function apptivo_business_contactus_lead(){
     echo $contact_formlead;exit;		
 }
 
-add_action('wp_ajax_apptivo_business_captcha_refresh', 'apptivo_business_captcha_refresh');
-add_action('wp_ajax_nopriv_apptivo_business_captcha_refresh', 'apptivo_business_captcha_refresh');
 
-function apptivo_business_captcha_refresh()
-{
-	if (!session_id()) session_start();
-	$possible_letters = '23456789bcdfghjkmnpqrstvwxyz';
-	$characters_on_image = 6;
-	$code = '';
-	$i = 0;
-	while ($i < $characters_on_image) { 
-	$code .= substr($possible_letters, mt_rand(0, strlen($possible_letters)-1), 1);
-	$i++;
-	}
-	$_SESSION['apptivo_business_captcha_code'] = $code;
-    $image_src = AWP_PLUGIN_BASEURL.'/assets/captcha/captcha_code_file.php?captcha_code='.$code;
-	echo '<img style="border: 1px solid rgb(0, 0, 0);" id="captchaimg" src="'.$image_src.'">';
-	exit;
-}
 //Newsletter Form Submit.
 add_action('wp_ajax_apptivo_business_newsletter', 'apptivo_business_newsletter_target');
 add_action('wp_ajax_nopriv_apptivo_business_newsletter', 'apptivo_business_newsletter_target');

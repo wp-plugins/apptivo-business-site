@@ -56,7 +56,22 @@ jQuery(document).ready(function($) {
 			 return true;
 		 }
 	});
-	
+	$('form#awp_cases_new_form').submit(function(){
+		 var contact_form = jQuery('#newcasesformname').val();
+		 var contactform = jQuery.trim( contact_form );	
+		 if(contactform == '')
+		 {
+			 $('#newcasesformname').css('border-color', '#f00');
+			 $('#message').remove(); 
+			 $('#errormessage').remove();	
+			 $('.casesform_err').before('<div id="errormessage" class="updated"><p style="color:#f00;font-weight:bold;" >Cases Form Name cannot be empty.<p></div>');
+			 return false;
+		 }else {
+			 $('#errormessage').remove();		 
+			 $('#newcasesformname').css('border-color', '#CCCCCC');
+			 return true;
+		 }		
+	});
 
 	   jQuery('input:radio[name=awp_contactform_confirm_msg_page]').change(function() {
 	      if(jQuery('input:radio[name=awp_contactform_confirm_msg_page]:checked').val() == 'same')
@@ -302,6 +317,15 @@ jQuery(document).ready(function($) {
 		jQuery("#captcha_show").click(function(){
 			jQuery("#captcha_require").attr("checked","checked").attr("disabled","disabled");
 		});
+		if((jQuery("#awp_captcha_enable").val())=="")
+			{
+			jQuery("#captcha_show").attr("disabled", true).prop("checked", false).attr("title","Please Enable Recaptcha in Plugin settings.");
+			}
+		if((jQuery(".awp_targetlist").val())=="0")
+			{
+			jQuery('.newletter-add').remove(); jQuery('#newnewsletterformname').attr('disabled','true').attr("title","Please add target list in apptivo before configuring newsletter");
+			}
+			jQuery("#type_require,#priority_require").attr("disabled", true).prop("checked", true);
 });
 
 function isNumberKey(evt)
@@ -985,7 +1009,6 @@ jQuery(document).ready(function($) {
 		jcounter++;
 	});
  }
-	
 });
 
 function validatecreatejobs()
@@ -1191,7 +1214,10 @@ function delete_ipbanned(ipid)
 		     msg = msg.split('::');
 			 if(msg[0] == 'Success') {
 	 			jQuery("#tr_"+msg[1]).remove();	
-	 			alert("Successfully deleted");
+	 			var style='border: medium none; background: none repeat scroll 0% 0% transparent; color: red; font-weight: bold; font-size: 16px; display: block;';
+	 			jQuery(".error,.del_error").hide();
+	 			jQuery(".wrap").first().append('<div class="del_error" style="'+style+'"> Successfully Deleted </div>');
+	 			jQuery(".del_error").fadeOut(8000);
 	 					 				
 		     }
 		     else {
@@ -1296,6 +1322,28 @@ jQuery(document).ready(function($) {
 	        }
 	    });
 	   
+	   if(jQuery('input:radio[name=awp_testimonialform_submit_type]:checked').val()=='submit')
+	    {
+	           jQuery('#awp_testimonialform_submit_value').text('Button Text');
+	           jQuery("#testimonialform_upload_img_button").hide();
+	    }else {	   
+	          jQuery('#awp_testimonialform_submit_value').text('Button Image URL');
+	          jQuery("#testimonialform_upload_img_button").show();
+	   }	     
+	 	                 
+	   jQuery('input:radio[name=awp_testimonialform_submit_type]').change(function() {
+	   jQuery('#awp_testimonialform_submit_val').val('');
+	        if(jQuery('input:radio[name=awp_testimonialform_submit_type]:checked').val()=='submit')
+	        {
+	            jQuery('#awp_testimonialform_submit_value').text('Button Text');
+	            jQuery("#testimonialform_upload_img_button").hide();
+	        }
+	        else {
+	          jQuery('#awp_testimonialform_submit_value').text('Button Image URL');
+	          jQuery("#testimonialform_upload_img_button").show();
+	        }
+	    });
+	   
 });
 function cases_change_template()
 {
@@ -1335,6 +1383,10 @@ function casesform_enablefield(fieldid){
 			document.getElementById(fieldid+'_options').disabled="disabled";	
 		}
 	}
+	if(fieldid=="type" || fieldid=="priority")
+		{
+		jQuery("#type_require,#priority_require").attr("disabled", true).prop("checked", true);
+		}
 }
 
 function casesform_showoptionstextarea(fieldid){

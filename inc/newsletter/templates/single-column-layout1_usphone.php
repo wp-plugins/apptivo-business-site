@@ -8,9 +8,12 @@ $formfields=array();
 $formfields = $newsletterform[fields];
 if( $newsletterform[css] != '' )
 {
-	echo $css='<style type="text/css">'.$newsletterform[css].'</style>';
+	echo $css='<style type="text/css">'.$newsletterform[css].' .required{color:#000;font-weight:normal;}</style>';
 }
-
+else
+{
+echo '<style type="text/css"> .required{color:#000;font-weight:normal;} </style>';
+}
 echo $jscript='<script type="text/javascript">
 jQuery(document).ready(function(){
 jQuery("#'.$newsletterform[name].'_newsletter").validate({
@@ -46,11 +49,15 @@ messages: {
       form.submit();
     }
 });
-document.getElementById("success_'.$newsletterform[name].'").scrollIntoView();
 });
 </script>';
 
 if($submitformname==$newsletterform[name] && $successmsg!=""){
+	echo '<script type="text/javascript">
+	jQuery(document).ready(function(){
+	document.getElementById("success_'.$newsletterform[name].'").scrollIntoView();
+	});
+	</script>';
 	echo  '<div id="success_'.$newsletterform[name].'" class="absp_success_msg success_'.$newsletterform[name].'">'.$successmsg."</div>";
 }
 

@@ -44,6 +44,7 @@ define("RECAPTCHA_VERIFY_SERVER", "www.google.com");
  * @param $data - array of string elements to be encoded
  * @return string - encoded request
  */
+if(!function_exists('_recaptcha_qsencode')){
 function _recaptcha_qsencode ($data) {
         $req = "";
         foreach ( $data as $key => $value )
@@ -53,7 +54,7 @@ function _recaptcha_qsencode ($data) {
         $req=substr($req,0,strlen($req)-1);
         return $req;
 }
-
+}
 
 
 /**
@@ -64,6 +65,7 @@ function _recaptcha_qsencode ($data) {
  * @param int port
  * @return array response
  */
+if(!function_exists('_recaptcha_http_post')){
 function _recaptcha_http_post($host, $path, $data, $port = 80) {
 
         $req = _recaptcha_qsencode ($data);
@@ -90,7 +92,7 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
 
         return $response;
 }
-
+}
 
 
 /**
@@ -103,6 +105,7 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
 
  * @return string - The HTML to be embedded in the user's form.
  */
+if(!function_exists('recaptcha_get_html')){
 function recaptcha_get_html ($pubkey, $error = null, $use_ssl = false)
 {
 	if ($pubkey == null || $pubkey == '') {
@@ -131,17 +134,18 @@ setTimeout(function() {
   		<input type="hidden" name="recaptcha_response_field" value="manual_challenge"/>
 	</noscript>';
 }
-
-
-
+}
 
 /**
  * A ReCaptchaResponse is returned from recaptcha_check_answer()
  */
-class ReCaptchaResponse {
+if(!class_exists('ReCaptchaResponse')){
+    class ReCaptchaResponse {
         var $is_valid;
         var $error;
+    }
 }
+
 
 
 /**
@@ -153,6 +157,7 @@ class ReCaptchaResponse {
   * @param array $extra_params an array of extra variables to post to the server
   * @return ReCaptchaResponse
   */
+if(!function_exists('recaptcha_check_answer')){
 function recaptcha_check_answer ($privkey, $remoteip, $challenge, $response, $extra_params = array())
 {
 	if ($privkey == null || $privkey == '') {
@@ -195,7 +200,7 @@ function recaptcha_check_answer ($privkey, $remoteip, $challenge, $response, $ex
         return $recaptcha_response;
 
 }
-
+}
 /**
  * gets a URL where the user can sign up for reCAPTCHA. If your application
  * has a configuration page where you enter a key, you should provide a link
@@ -203,18 +208,21 @@ function recaptcha_check_answer ($privkey, $remoteip, $challenge, $response, $ex
  * @param string $domain The domain where the page is hosted
  * @param string $appname The name of your application
  */
+if(!function_exists('recaptcha_get_signup_url')){
 function recaptcha_get_signup_url ($domain = null, $appname = null) {
 	return "https://www.google.com/recaptcha/admin/create?" .  _recaptcha_qsencode (array ('domains' => $domain, 'app' => $appname));
 }
-
+}
+if(!function_exists('_recaptcha_aes_pad')){
 function _recaptcha_aes_pad($val) {
 	$block_size = 16;
 	$numpad = $block_size - (strlen ($val) % $block_size);
 	return str_pad($val, strlen ($val) + $numpad, chr($numpad));
 }
+}
 
 /* Mailhide related code */
-
+if(!function_exists('_recaptcha_aes_encrypt')){
 function _recaptcha_aes_encrypt($val,$ky) {
 	if (! function_exists ("mcrypt_encrypt")) {
 		die ("To use reCAPTCHA Mailhide, you need to have the mcrypt php module installed.");
@@ -224,12 +232,13 @@ function _recaptcha_aes_encrypt($val,$ky) {
 	$val=_recaptcha_aes_pad($val);
 	return mcrypt_encrypt($enc, $ky, $val, $mode, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
 }
+}
 
-
+if(!function_exists('_recaptcha_mailhide_urlbase64')){
 function _recaptcha_mailhide_urlbase64 ($x) {
 	return strtr(base64_encode ($x), '+/', '-_');
 }
-
+}
 /* gets the reCAPTCHA Mailhide url for a given email, public key and private key */
 function recaptcha_mailhide_url($pubkey, $privkey, $email) {
 	if ($pubkey == '' || $pubkey == null || $privkey == "" || $privkey == null) {

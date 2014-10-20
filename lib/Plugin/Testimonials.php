@@ -1141,6 +1141,7 @@ else {
 	                                    </tr></tfoot>
 	                                   <tbody id="the-list">
 	                                     <?php
+	                                     usort($all_awp_testimonials, 'sortTestimonials');
 	                                    foreach ($all_awp_testimonials as $awp_testimonial) {
                                         if($_GET['tstid'] !='' && $_GET['tstid']== $awp_testimonial->siteTestimonialId && $_GET['tstmode'] =='edit')
                                     	{
@@ -1785,8 +1786,8 @@ else {
 	                                    </tr>
 
 
-	                                <tr valign="top">
-									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
+	                                <tr>
+									<td style="padding-bottom:10px;"><?php _e('Image URL','apptivo-businesssite'); ?></td>
 									<td><label for="upload_image">
 									<input id="awp_testimonials_imageurl" type="text" size="43" name="awp_testimonials_imageurl" value="" />
 									<input id="testimonials_upload_images" type="button" value="Upload Image"  class="button-primary"/>
@@ -1851,7 +1852,7 @@ else {
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_testimonials_imageurl" type="text" size="43" name="awp_testimonials_imageurl" value="<?php echo $all_awp_testimonials->testimonialImageUrl; ?>" />
-									<input id="testimonials_upload_images" type="button" value="Upload Image" />
+									<input id="testimonials_upload_images" type="button" value="Upload Image" class="button-primary" />
 									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 									</label></td>
 									</tr>
@@ -2047,4 +2048,13 @@ if($_REQUEST['page']=="awp_testimonials" && $_REQUEST['email'] !="")
                                                                   $success = $response->return->statusMessage;
                                                                   successMessage($success);
                                                               }
+}
+
+
+/*
+ * To Sort testimonials by siteTestimonialId
+ */
+function sortTestimonials($a, $b)
+{
+    return strcmp($a->siteTestimonialId, $b->siteTestimonialId);
 }

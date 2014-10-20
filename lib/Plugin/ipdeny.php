@@ -8,7 +8,6 @@ require_once AWP_LIB_DIR . '/Plugin.php';
 /**
  * Class AWP_IPDeny
  */
-
 add_action('wp_ajax_nopriv_delete_ipbannedaccount', 'delete_ipbannedaccount');
 add_action('wp_ajax_delete_ipbannedaccount', 'delete_ipbannedaccount');
 
@@ -52,37 +51,7 @@ class AWP_IPDeny extends AWP_Base
         }        
         return $instances[0];
     }
-    
-    function create_table()
-    {
-	    global $wpdb;
-	    $table_name = $wpdb->prefix . "absp_ipdeny";  //table Name        
-	    $result = mysql_list_tables(DB_NAME);
-	    $tables = array();
-		while ($row = mysql_fetch_row($result)) {
-				$tables[] = $row[0];
-		}
-		//	Only install if the table doesn't exist
-		if ( !in_array($table_name, $tables) ) {
-		 
-		$query="CREATE TABLE ".$table_name ." ( `ID` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-	                                            `ip_address` VARCHAR(200),
-	                                            `ip_type` VARCHAR(200),
-	                                            `cur_timestamp` TIMESTAMP)";		 
-	    $result=mysql_query($query) or die('Unable to create table, Error is'.mysql_error());
-		
-	    if($result) 
-		{
-		    	update_option('apptivo_ipdeny_table','yes');
-		}
-	    
-		}   
-		if (!$result) {
-	            return false;
-		}
-		return true; 
-    }
-    
+        
     function settings()
     {
     	global $wpdb;
@@ -144,10 +113,11 @@ class AWP_IPDeny extends AWP_Base
 	    }
             if(empty($error)) :
                  /* Insert into table */
-	            $query = "INSERT INTO " . $table_name . " (ip_address, ip_type) VALUES ('". $ip_address . "','". $ip_type. "' )";
-	   			$result=mysql_query($query) or die('Unable to insert table, Error is'.mysql_error());
-	   			if($result):
-	              echo '<div class="error" style="border:none;background:none;color:green;font-weight:bold;">Sucessfully Added</div>';
+                    $data = '';
+                    $result = $wpdb->insert( $table_name, array( 'ip_address' => $ip_address, 'ip_type' => $ip_type ), array( '%s', '%s' ) ); 
+                    
+                    if($result):
+	              echo '<div class="error" style="border:none;background:none;color:green;font-weight:bold;font-size:16px;">Sucessfully Added</div>';
 	              $ip_address = '';
 	              $ip_type = 'Single';
 	            endif; 
@@ -165,9 +135,6 @@ class AWP_IPDeny extends AWP_Base
     	 	$single_select = ' selected="selected"';
     	 endif; 
     	 
-    	 
-    	/* Create Table */
-    	$this->create_table();
     	echo '<div class="wrap"><h2>Block IP Addresses</h2></div>';
         echo '<form action="" method="post" name="absp_ip_address">
                <table class="form-table"><tbody>                			
@@ -277,15 +244,16 @@ function validateIpAddress($ip_addr)
 
 function check_blockip()
 {  
-	
 	global $wpdb;
 	$table_name = $wpdb->prefix . "absp_ipdeny";  //table Name	
 	$ipdeny_table = absp_table_exists($table_name);
+        
 	if(!$ipdeny_table)
 	{
 		return false;
 	}	
 	$visitorIp = get_RealIpAddr();
+      
 	$single_results = $wpdb->get_results("SELECT * FROM " . $table_name . " where ip_type='Single'");
 	$singles = array();	
 	foreach($single_results as $singleresults)
@@ -301,7 +269,7 @@ function check_blockip()
 	}
     //Chk with Single IP
 	$status = array_search($visitorIp, $singles);
-	
+
 	// Let's check if $status has a true OR false value.
 	if($status !== false)
 	    {
@@ -344,9 +312,10 @@ function get_RealIpAddr()
 }
 
 function absp_table_exists($tableName)
-{
+{ 
 	 global $wpdb;
-	 if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name)
+	 $db= $wpdb->get_var("SHOW TABLES LIKE '$tableName'");
+	 if($db == $tableName)
 	 {
 	   return TRUE;
 	 }

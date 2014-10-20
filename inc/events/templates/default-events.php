@@ -12,7 +12,7 @@ if( $awp_events[custom_css] != '' )
 echo '<style type="text/css">
 s{ text-decoration:none;	}
 .eventss {display: inline-block;margin-top: 15px;margin-left:8px;}
-.middle {  display: inline-block; }
+.middle {  display: inline-block;padding:8px; }
 .absp_events_image {float: left;height: 80px;margin: 3px 10px 4px 12px;width: 78px; border: 1px solid #f00;}    
 p {color: #211B15;font-family: Trebuchet MS,Arial,Helvetica,sans-serif;font-size: 13px;font-style: italic;font-weight: normal;margin-right: 12px;text-align: justify;}
 #events0 { border:1px solid #ccc;margin: 10px 0px 10px 0px;}

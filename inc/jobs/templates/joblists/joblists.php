@@ -14,9 +14,7 @@ if($allJobs['0'] != '')
                 ?> 
                  <li><a title="<?php echo $allJobs[$i]->jobTitle; ?>" href="<?php echo add_query_arg('vacancyno', $allJobs[$i]->jobNumber, get_permalink($target_pageid)); ?>" ><?php echo $allJobs[$i]->jobTitle; ?></a></li>
                  <?php } ?></ul>
- 
-
-  <?php }else {     
+ <?php }else {     
   					
                     echo 'No jobs are found';
                    

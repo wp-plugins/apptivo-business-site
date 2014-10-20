@@ -5,7 +5,7 @@ jQuery(document).ready(function() {
 		jQuery('.uploadifyQueueItem').remove();
 		jQuery('#uploadfile_docid').val('');
 		jQuery('#uploadfile_docid').next("label.error").show();
-		
+		jQuery(".awp_hrjobsform_submit_jaform").removeAttr("disabled");
 	});
 	    jQuery("#file_upload").uploadify({			
 			'uploader'		: awp_upload.swfUrl, 

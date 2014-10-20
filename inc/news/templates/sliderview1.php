@@ -42,7 +42,7 @@ margin: 0 !important;padding: 5px!important;text-align:justify;
 }
 #awp_news blockquote p a { text-decoration:none;}
 #awp_news blockquote p img {
-float:left;padding-right:10px;padding-top:0px;margin:0px;
+float:left;padding-right:10px;padding-top:0px;margin:0px;box-shadow:none;
 }
 #awp_news blockquote cite a{ text-decoration:none; }
 #awp_news blockquote cite {

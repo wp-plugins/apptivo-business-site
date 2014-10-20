@@ -48,8 +48,10 @@ echo '<style type="text/css">
 form{margin:0;padding:0;}
 /*contact*/
 .recaptcha_source{margin:0 !important;}
+.awp_testimonial_form input.required{color:#000;font-weight:normal;}
 #login-box .form_section{float:left;width:100%;margin-bottom:15px;}
 #login-box{float:left;width:100%;}
+#login-box select{color:#000000;}
 #login-box .form_left_part {width:100% !important;float:left;}
 #login-box .form_rgt_part{width:100% !important;float:left;margin-top:5px;}
 #login-box .form_rgt_part input{width:50%;}
@@ -234,7 +236,7 @@ echo '<div class="form_rgt_part">';
 }
 
 /* redirection URL */
-$actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$actual_link = SITE_URL.$_SERVER[REQUEST_URI];
 
 $_SESSION['request_link'] = $actual_link;
 

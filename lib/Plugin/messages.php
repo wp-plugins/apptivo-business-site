@@ -33,9 +33,10 @@ function awp_messagelist($key='')
 		"validate-getJobsByNo"                  => '<span class="error_message">Selected jobs are not found.Please try again after 10 mins.</span>',
 		"jobsearch-noresult"                    => '<span class="error_message">No jobs are found. Please modify your search and try again</span>',
 	    "IP_banned"                             => '<span class="error_message">Your IP Banned.</span>',
-        "recaptcha_error"                       => '<span class="error_message">Please enter correct Verification code.</span>',
-        "soap_error"                            => '<div class="updated" id="errormessage"><p style="color:#f00;font-weight:bold;text-align:center;"> SOAP extension required to run Apptivo Business Site CRM  plugin. </p></div>',
-	    "no_redirection"                        => '<span class="absp_error">Please enter the valid details.</span>'
+		"recaptcha_error"                       => '<span class="error_message" style="color:red;">Please enter correct Verification code.</span>',
+		"soap_error" 	                        => '<div class="updated" id="errormessage"><p style="color:#f00;font-weight:bold;text-align:center;"> SOAP extension required to run Apptivo Business Site CRM  plugin. </p></div>',
+	    "no_redirection"                        => '<span class="absp_error">Please enter the valid details.</span>',
+		"fatal_error"							=> '<div class="awp_updated" id="errormessage"><p style="color:#f00;font-weight:bold;text-align:center;"> Apptivo Business Site CRM  plugin- Requires php version 5.3.5 - 5.5 to run.</p></div>'
     );
 	
 	return $awp_errormessage_list[$key];	
@@ -131,11 +132,11 @@ function awp_image($key='',$imgtag=false)
 	 "edit_icon"           => AWP_PLUGIN_BASEURL."/assets/images/edit.jpeg",
 	 "delete_icon"         => AWP_PLUGIN_BASEURL."/assets/images/del.jpeg",
      "approve_icon"        => AWP_PLUGIN_BASEURL."/assets/images/approve.png",
-     "reject_icon"         => AWP_PLUGIN_BASEURL."/assets/images/reject.gif",
+	 "reject_icon"         => AWP_PLUGIN_BASEURL."/assets/images/reject.gif",
 	 "apptivo_icon"        => AWP_PLUGIN_BASEURL."/assets/images/apptivo.png",
 	 "success"             => AWP_PLUGIN_BASEURL."/assets/images/success.gif",
 	 "success-off"         => AWP_PLUGIN_BASEURL."/assets/images/success-off.gif",
-     "close-popup"        => AWP_PLUGIN_BASEURL."/assets/images/close_pop.png"
+	 "close-popup"         => AWP_PLUGIN_BASEURL."/assets/images/close_pop.png"
 	 );
 	 if($imgtag):
 	 	return '<img src="'.$images[$key].'" alt="" />'; 

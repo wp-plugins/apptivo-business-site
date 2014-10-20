@@ -3,7 +3,7 @@ Contributors: apptivo, rmohanasundaram, prabhuganapathy
 Tags: apptivo, contact forms, crm, newsletters, testimonials
 Requires at least: 3.0
 Tested up to: 4.0
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 
 Create contact forms, newsletter signups, and customer testimonials, integrated with Apptivo.
 
@@ -49,6 +49,15 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 2. screenshot-2.jpg
 
 == Changelog ==
+
+= 1.2.3 =
+* Disabled SSLv3 Protocol support due to POODLE vulnerability
+* Added Lead assignee (employee or team), lead source, rank, status, type for contact forms.
+* Added customer and contact association for cases by creating new or existing customer/contact.
+* Added Case assignee (employee or team), priority, status, type for Cases. 
+* Added double column layout and multiple custom fields for cases
+* Added customer association to lead for Contact forms by creating new or existing customer. 
+* Bug Fixes on Jobs and Newsletter plugin.
 
 = 1.2.2 =
 * added simple captcha

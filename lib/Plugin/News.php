@@ -311,7 +311,6 @@ checkCaptchaOption();
     {
         
 	$all_awp_news = $this->getAllNews();
-	
 	$numberofitems = count($all_awp_news);
    	$itemsperpage =5;
    	$tpages = ceil($numberofitems/$itemsperpage); 
@@ -893,7 +892,7 @@ checkCaptchaOption();
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_news_imageurl" type="text" size="50" name="awp_news_imageurl" value="<?php if(!is_array($news->newsImages)){ echo $news->newsImages; } else{echo $news->newsImages[0]; } ?>" />
-									<input id="news_upload_image" type="button" value="Upload Image" />
+									<input id="news_upload_image" type="button" value="Upload Image"  class="button-primary" />
 									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 									</label></td>
 									</tr>

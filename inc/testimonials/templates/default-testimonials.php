@@ -10,7 +10,7 @@ if( $awp_testimonials[custom_css] != '' )
 }
 echo '<style type="text/css">
 .testimonials { display: inline-block; margin-top: 15px; }
-.middle {  display: inline-block; }
+.middle {  display: inline-block;padding:8px; }
 .middle p { margin-left:8px;}
 .absp_testimonials_image { float: left;height: 80px;margin: 3px 10px 4px 12px;width: 78px;border: medium none;}    
 p { color: #211B15;font-family: Trebuchet MS,Arial,Helvetica,sans-serif;font-size: 13px;font-style: italic;font-weight: normal;margin-right: 12px;text-align: justify;}

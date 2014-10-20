@@ -569,7 +569,7 @@ class AWP_Events extends AWP_Base
 									<th scope="row"><?php _e('Image URL','apptivo-businesssite'); ?></th>
 									<td><label for="upload_image">
 									<input id="awp_events_imageurl" type="text" size="50" name="awp_events_imageurl" value="<?php if(!is_array($events->eventImages)){ echo $events->eventImages; } else{ echo $events->eventImages[0]; } ?>" />
-									<input id="events_upload_image" type="button" value="Upload Image" />
+									<input id="events_upload_image" type="button" value="Upload Image" class="button-primary" />
 									<br /><?php _e('Enter an URL or upload an image.','apptivo-businesssite'); ?>
 									</label></td>
 									</tr>

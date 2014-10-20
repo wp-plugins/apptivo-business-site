@@ -48,8 +48,9 @@ if ($status_msg == "Success") {
 
 echo '<style type="text/css">
 form{margin:0;padding:0;}
-/*contact*/
+.awp_testimonial_form input.required{color:#000;font-weight:normal;}
 .recaptcha_source{margin:0 !important;}
+#login-box select{color:#000000;}
 #login-box .form_section{float:left;width:100%;margin-bottom:15px;}
 #login-box{float:left;width:100%;}
 #login-box .form_left_part {width:40% !important;float:left;}
@@ -62,7 +63,7 @@ form{margin:0;padding:0;}
 #login-box .form_rgt_part label{float:left;line-height:18px;}
 #login-box input[type="submit"], #login-box input[type="image"]{margin-left:0px !important;float:right !important;}
 .absp_success_msg{color:green;font-weight:bold;padding-bottom:5px;}
-
+.awp_fullview{clear:both;padding:5px;}
 
 @media screen and (max-width:900px){
 #login-box .form_left_part {width:100% !important;float:left !important;}
@@ -259,7 +260,7 @@ echo '<div class="form_rgt_part">';
 }
 
 /* redirection URL */
-$actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$actual_link = SITE_URL.$_SERVER[REQUEST_URI];
 
 $_SESSION['request_link'] = $actual_link;
 

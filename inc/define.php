@@ -4,69 +4,7 @@
  * @package apptivo-business-site
  * @author  RajKumar <rmohanasundaram[at]apptivo[dot]com>
  */
-//Default values
-define('AWP_DEFAULT_ITEM_SHOW',5);
-define('AWP_DEFAULT_MORE_TEXT','More..');
-
-//Disable Plugins
-//define('AWP_CONTACTFORM_DISABLE',1);
-//define('AWP_NEWSLETTER_DISABLE',1);
-//define('AWP_NEWS_DISABLE',1);
-//define('AWP_EVENTS_DISABLE',1);
-//define('AWP_TESTIMONIALS_DISABLE',1);
-//define('AWP_JOBS_DISABLE',1);
-//define('AWP_CASES_DISABLE',1);
-/*
- User updateable define statements ends here..
- Changing define statements below will make plugin to not work properly.
- * */
-// Site Url
-define('SITE_URL', site_url());
-
-//Plugin Version
-define('AWP_VERSION', '1.2.1.2');
-
-//Plugin folders
-define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
-define('AWP_ASSETS_DIR', AWP_PLUGIN_BASEPATH . '/assets');
-define('AWP_INC_DIR', AWP_PLUGIN_BASEPATH . '/inc');
-define('AWP_PLUGINS_DIR', AWP_LIB_DIR . '/Plugin');
-define('AWP_WIDGETS_DIR', AWP_LIB_DIR . '/widgets');
-
-//plugin template folder
-define('AWP_CONTACTFORM_TEMPLATEPATH',AWP_INC_DIR.'/contact-forms/templates');
-define('AWP_CASES_TEMPLATEPATH',AWP_INC_DIR.'/cases/templates');
-define('AWP_NEWSLETTER_TEMPLATEPATH',AWP_INC_DIR.'/newsletter/templates');
-define('AWP_NEWS_TEMPLATEPATH',AWP_INC_DIR.'/news/templates');
-define('AWP_EVENTS_TEMPLATEPATH',AWP_INC_DIR.'/events/templates');
-define('AWP_TESTIMONIALS_TEMPLATEPATH',AWP_INC_DIR.'/testimonials/templates');
-define('AWP_TESTIMONIALS_FORM_TEMPLATEPATH',AWP_INC_DIR.'/testimonials/templates/frontend');
-define('AWP_JOBSFORM_TEMPLATEPATH',AWP_INC_DIR.'/jobs/templates/jobapplicant');
-define('AWP_JOBSEARCHFORM_TEMPLATEPATH',AWP_INC_DIR.'/jobs/templates/jobsearch');
-define('AWP_JOBDESCRIPTION_TEMPLATEPATH',AWP_INC_DIR.'/jobs/templates/jobdescription');
-define('AWP_JOBLISTS_TEMPLATEPATH',AWP_INC_DIR.'/jobs/templates/joblists');
-
-//Default Template
-define('AWP_EVENTS_DEFAULT_TEMPLATE','default-events.php');
-define('AWP_NEWS_DEFAULT_TEMPLATE','default-news.php');
-define('AWP_TESTIMONIALS_DEFAULT_TEMPLATE','default-testimonials.php');
-define('AWP_NEWSLETTER_WIDGET_DEFAULT_TEMPLATE','widget-default-template-usphone.php');
-//Apptivo API URL's
-//Dont change this unless specified, changing to incorrect values will make plugins to not work properly.
-define('APPTIVO_API_URL','https://api.apptivo.com/');
-define('APPTIVO_BUSINESS_SERVICES', APPTIVO_API_URL.'app/services/v1/BusinessSiteServices?wsdl');
-define('APPTIVO_BUSINESS_INDEX', APPTIVO_API_URL.'ts/services/AppJobWebService?wsdl');
-
-define('APPTIVO_LEAD_SOURCE_API',APPTIVO_API_URL.'app/dao/lead');
-define('APPTIVO_LEAD_API', APPTIVO_API_URL.'app/dao/leads');
-define('APPTIVO_CASES_API', APPTIVO_API_URL. 'app/dao/case');
-define('APPTIVO_NOTES_API', APPTIVO_API_URL.'app/dao/note');
-define('APPTIVO_TESTIMONIALS_STATUS_API', APPTIVO_API_URL. 'app/dao/testimonial');
-define('APPTIVO_TARGETS_API',APPTIVO_API_URL.'app/dao/targets');
-define('APPTIVO_SIGNUP_API',APPTIVO_API_URL.'app/dao/signup');
-
-define('APPTIVO_LEAD_OBJECT_ID','4');
-define('APPTIVO_CASES_OBJECT_ID','59');
+require_once dirname(__FILE__) . '/config.php';
 
 //API Key and Access Keys Settings.
 
@@ -840,16 +778,36 @@ function awp_submit_type($forms='',$form_submitname='',$class='',$before='',$aft
  * @param unknown_type $after
  * @return unknown
  */
-function cases_textfield($forms='',$field='',$countries='',$value_present='',$before='',$after='',$placeholder=false, $tabindex='',$dafaultselect=false,$plugin='',$postValue)
+function cases_textfield($forms='',$field='',$countries='',$value_present='',$before='',$after='',$placeholder=false, $tabindex='',$dafaultselect=false,$plugin='',$postValue,$caseForm)
 {
 	echo $before;
+$getConfig=get_option('awp_casesforms');
+
+for($i=0;$i<count($getConfig);$i++)
+{
+    if($getConfig[$i]['name']==$caseForm)
+    {
+        $selectedCValues=$getConfig[$i]['cases_config'];
+        $selectedCaseFormProperties = $getConfig[$i]['properties'];
+    }
+}
+
 	$fieldid=$field['fieldid'];
+	if(isset($field['showtext'])){
 	$showtext=$field['showtext'];
+	}
+	if(isset($field['validation'])){
 	$validation=$field['validation'];
+	}
+	if(isset($field['required'])){
 	$required=$field['required'];
+	}
+	if(isset($field['type'])){
 	$fieldtype=$field['type'];
+	}
 	$options=$field['options'];
-        $values=$field['value'];
+	if(isset($field['value'])){
+        $values=$field['value'];}
 	$optionvalues=array();
         $selectvalues=array();
     $place_text = '';
@@ -861,14 +819,15 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
 	{
 		$place_text = 'placeholder="'.$showtext.'"';
 	}
+	if(isset($fieldtype)){
 	    if($fieldtype=="select" || $fieldtype=="radio" || $fieldtype=="checkbox" ){
-	    		$optionvalues=split("[\n]",trim($options));/*Split the String line by line.*/
-                        $selectvalues=split("[\n]",trim($values)); /*Split the String line by line. */
+	    		$optionvalues=explode("\n",trim($options));/*Split the String line by line.*/
+                        $selectvalues=explode("\n",trim($values)); /*Split the String line by line. */
 		}
-
+	}
 
 		//Required Class
-		if($required){
+		if(isset($required)){
 			$mandate_property='"mandatory="true"';
 			$validateclass=" required";
 		}
@@ -878,6 +837,7 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
 		}
 
 		//Field Validation Class
+		if(isset($validation)){
 		switch($validation)
 		{
 			case "email":
@@ -893,7 +853,7 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
 				$validateclass .=" phonenumber";
 			break;
 		}
-
+		}
 		//Captcha Class
 		if($fieldid=='captcha')
          {
@@ -902,6 +862,7 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
          else{
          $captcha_class = '';
          }
+         if(isset($fieldtype)){
     switch($fieldtype)
 		{
 			case "text":
@@ -912,35 +873,34 @@ function cases_textfield($forms='',$field='',$countries='',$value_present='',$be
 			break;
 			case "select":
 if(_isCurl())
-{				
-if($fieldid=="priority" || $fieldid=="type")
+{
+if($fieldid=="priority" || $fieldid=="type" || $fieldid=="status")
 {
 if($fieldid=="priority")
 {
-    $js_script="onchange='sendText(".$fieldid.");'";
-    $input_text='<input type="hidden" id="priority_name" name="priority_name" value=""/>';
-    
+    $configValues= $selectedCValues["awp_casePriority_selected"];
+    $input_text='<input type="hidden" id="priority_name" name="priority_name" value="'.htmlspecialchars($selectedCaseFormProperties['case_priority']).'" />';
 }
-if($fieldid=="type")
+elseif($fieldid=="type")
 {
-    $js_script="";
     $input_text="";
-    $js_script="onchange='sendText(".$fieldid.");'";
-    $input_text='<input type="hidden" id="type_name" name="type_name" value=""/>';
-    
+    $configValues= $selectedCValues["awp_caseType_selected"];
+    $input_text='<input type="hidden" id="type_name" name="type_name" value="'.htmlspecialchars($selectedCaseFormProperties['case_type']).'" />';
 }
-					echo '<select '.$js_script.'  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$plugin.'_select'.$validateclass.'"  tabindex="'.$tabindex.'">';
-
+elseif($fieldid=="status")
+{    
+    $input_text="";
+    $configValues= $selectedCValues["awp_caseStatus_selected"];
+    $input_text='<input type="hidden" id="status_name" name="status_name" value="'.htmlspecialchars($selectedCaseFormProperties['case_status']).'" />';
+}
+					echo '<select name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$plugin.'_select'.$validateclass.'"  tabindex="'.$tabindex.'">';
 					if($dafaultselect):
-					    $default_select = '<option value="" > -- Select -- </option>';
 					    echo apply_filters('apptivo_business_'.$plugin.'_'.$fieldid.'_default_option',$default_select);
 					endif;
-
 $j=0;
 					foreach( $optionvalues as $optionvalue )
-					{
+					{ 
 	                                    if(trim($postValue[$fieldid]) == trim($optionvalue)){
-
 	                                       $selected='selected="selected"';
 	                                     }
 	                                     else{
@@ -948,59 +908,60 @@ $j=0;
 	                                     }
 						if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 							{
-                                                    if($js_script!="")
-                                                    {
-                                                        $attr_name='rel="'.$optionvalue.'"';
-                                                    }
-                                                    echo  '<option value="'.$selectvalues[$j].'" '.$selected.' '.$attr_name.'>'.$optionvalue.'</option>';
-						$j++;
-                                                        }
-
-					}
+                                                            $attr_name='rel="'.htmlspecialchars($optionvalue).'"';
+                                                            if($postValue[$fieldid]=="")
+                                                            {
+								echo  '<option '.selected($configValues,$selectvalues[$j],false).' value="'.$selectvalues[$j].'" '.$selected.' '.$attr_name.'>'.trim($optionvalue).'</option>';
+                                                            }
+                                                            else
+                                                            {
+								echo  '<option '.selected($postValue[$fieldid],$selectvalues[$j],false).' value="'.$selectvalues[$j].'" '.$selected.' '.$attr_name.'>'.trim($optionvalue).'</option>';
+                                                            }
+                                                            $j++;
+							}
+						}
 					echo  '</select>';
-                                        echo $input_text;
+					echo $input_text;
 }
-else 
+else
 {
 echo '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$plugin.'_select'.$validateclass.'"  tabindex="'.$tabindex.'">';
-					
+
 					if($dafaultselect):
 					    $default_select = '<option value="" > -- Select -- </option>';
 					    echo apply_filters('apptivo_business_'.$plugin.'_'.$fieldid.'_default_option',$default_select);
 					endif;
-					
-					
+
 					foreach( $optionvalues as $optionvalue )
 					{
-	                                    if(trim($postValue) == trim($optionvalue)){
-	
-	                                       $selected='selected="selected"';
+	                                     if(trim($postValue) == trim($optionvalue)){
+	                                     		$selected='selected="selected"';
 	                                     }
 	                                     else{
 	                                         $selected='';
 	                                     }
 						if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 							{
-						echo  '<option value="'.$optionvalue.'" '.$selected.'>'.$optionvalue.'</option>';
+								echo  '<option value="'.$optionvalue.'" '.$selected.'>'.$optionvalue.'</option>';
 							}
 					}
 					echo  '</select>';
 }
 }
-else 
+else
 {
 echo '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$plugin.'_select'.$validateclass.'"  tabindex="'.$tabindex.'">';
-					
+
 					if($dafaultselect):
 					    $default_select = '<option value="" > -- Select -- </option>';
 					    echo apply_filters('apptivo_business_'.$plugin.'_'.$fieldid.'_default_option',$default_select);
 					endif;
-					
-					
+
+
 					foreach( $optionvalues as $optionvalue )
 					{
 	                                    if(trim($postValue) == trim($optionvalue)){
-	
+
 	                                       $selected='selected="selected"';
 	                                     }
 	                                     else{
@@ -1069,32 +1030,33 @@ echo '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$pl
 			break;
 
 		}
+         }
 		echo $after;
+
 }
 
 function cases_submit_type($forms='',$form_submitname='',$class='',$before='',$after='', $tabindex)
-{
+{		$html="";
 
-      if($forms[submit_button_type] == "submit" ){
-      	if(strlen(trim($forms[submit_button_val])) != 0)
+      if($forms['submit_button_type'] == "submit" ){
+      	if(strlen(trim($forms['submit_button_val'])) != 0)
       	{
-      		$value = $forms[submit_button_val];
+      		$value = $forms['submit_button_val'];
       	}else {
       		$value = 'Submit';
       	}
         $button_value = 'value="'.$value.'"';
       }
       else{
-      	if(strlen(trim($forms[submit_button_val])) == 0)
+      	if(strlen(trim($forms['submit_button_val'])) == 0)
       	{
       		$imgSrc = awp_image('submit_button');
       	}else {
-      		$imgSrc = $forms[submit_button_val];
+      		$imgSrc = $forms['submit_button_val'];
       	}
          $button_value = 'src="'.$imgSrc.'"';
       }
-
-      $html .= '<input type="'.$forms[submit_button_type].'" class="'.$class.'" '.$button_value.' name="'.$form_submitname.'"  id="'.$form_submitname.'"   tabindex="'.$tabindex.'"/>';
+      $html .= '<input type="'.$forms['submit_button_type'].'" class="'.$class.'" '.$button_value.' name="'.$form_submitname.'"  id="'.$form_submitname.'"   tabindex="'.$tabindex.'"/>';
       return $before.$html.$after;
 }
 
@@ -1133,10 +1095,12 @@ function awp_create_textfiled($type='',$fieldid='',$class='',$before='',$after='
 //Mandatory Field.
 function awp_mandatoryfield($field='',$before='',$after='',$mandatory_symbol = '*')
 {
+	if(isset($field['required'])){
 	$required=$field['required'];
 	if($required):
 	 return $before.$mandatory_symbol.$after;
 	endif;
+	}
 }
 //Powered By Apptivo.
 function poweredby_apptivo()
@@ -1147,68 +1111,60 @@ $apptivo_logo = '<a target="_blank" href="http://www.apptivo.com/">
 return $apptivo_logo;
 }
 
+
+
 /*
- * Apptivo REST API CALL
+ * To Get Case Status, Case Type and Case Priority
+ *
  */
 
-function _isCurl(){
-    return function_exists('curl_version');
-}
-
-function getRestAPICall($method, $url, $data = false)
-{
-    $proxysettings = array();
-    $proxysettings = get_option('awp_proxy_settings');
-    
-    if(!_isCurl()){ echo '<b style="color:red;">CURL disabled in your server. please enable through php.ini</b>';  exit; }
-
-    $ch = curl_init();
-
-    curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type: application/x-www-form-urlencoded;charset=utf-8"));
-
-    if($method == "POST")
-    {
-        curl_setopt($ch, CURLOPT_POST, 1);
-        if ($data) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-        }
-    }
-    else{
-        if ($data) $url = sprintf("%s?%s", $url, http_build_query($data));
-    }
-    curl_setopt($ch,CURLOPT_URL, $url);
-
-        if(isset($proxysettings['proxy_enable'])){
-        if(isset($proxysettings['proxy_hostname_portno'])){
-            curl_setopt($ch, CURLOPT_PROXY, $proxysettings['proxy_hostname_portno']);
-        }
-        if(isset($proxysettings['proxy_loginuser_pwd'])){
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxysettings['proxy_loginuser_pwd']);
-        }
-    }
-    
-    curl_setopt($ch, CURLOPT_SSLVERSION, 3);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-    $response = curl_exec($ch);
-    curl_close($ch);
-	$result = json_decode($response);
-    return $result;
-}
-
-function getCaseValues($option)
+function getAllCasesConfigData()
 {
             $params = array (
-                "a"         => "getCaseLookupValues",
-                "lookupType"=> $option,
+                "a"         => "getCasesConfigData",
                 "apiKey"    => APPTIVO_BUSINESS_API_KEY,
                 "accessKey" => APPTIVO_BUSINESS_ACCESS_KEY
                 );
-$response=getRestAPICall("POST",APPTIVO_CASES_API,$params);
-return $response;
+            $response=getRestAPICall("POST",APPTIVO_CASES_API,$params);
+            
+            return $response;
 }
+
+
+/*
+ * To Get Case Auto Generation Number, Case Assignee and Employee
+ *
+ */
+
+function getCaseConfigureData()
+{
+            $params = array (
+                "a"         => "getCaseConfigureData",
+                "apiKey"    => APPTIVO_BUSINESS_API_KEY,
+                "accessKey" => APPTIVO_BUSINESS_ACCESS_KEY
+                );
+            $response=getRestAPICall("POST",APPTIVO_CASES_API,$params);
+            
+            return $response;
+}
+
+
+/*
+ * To Get Contact Status, Contact Type and Contact Priority
+ *
+ */
+
+function getAllContactConfigData()
+{
+            $params = array (
+                "a"         => "getLeadConfigData",
+                "apiKey"    => APPTIVO_BUSINESS_API_KEY,
+                "accessKey" => APPTIVO_BUSINESS_ACCESS_KEY
+                );
+            $response=getRestAPICall("POST",APPTIVO_LEAD_API,$params);
+            return $response;
+}
+
 
 /* Generate Captcha */
 function awp_reCaptcha()
@@ -1217,8 +1173,8 @@ function awp_reCaptcha()
 {
     $option=get_option('apptivo_business_recaptcha_settings');
     $option=json_decode($option);
-if($option->recaptcha_publickey!="" && $option->recaptcha_privatekey!="")
-{    
+if($option->recaptcha_publickey!= "" && $option->recaptcha_privatekey!="")
+{
 echo " <script type='text/javascript'>
 	     var RecaptchaOptions = {
 		    theme : '".$option->recaptcha_theme."',
@@ -1274,11 +1230,11 @@ function checkCaptchaOption()
 {
 	 if(get_option ('apptivo_business_recaptcha_mode')!="yes")
 {
-	echo '<script type="text/javascript">
-	jQuery(document).ready(function($) {
-	jQuery("#captcha_show").attr("disabled", true).prop("checked", false).attr("title","Please Enable Recaptcha in Plugin settings.");
-		});
-	</script>';
+	echo '<input type="hidden" id="awp_captcha_enable" value=""/>';
+}
+else  if(get_option ('apptivo_business_recaptcha_mode')=="yes")
+{
+	echo '<input type="hidden" id="awp_captcha_enable" value="yes"/>';
 }
 }
 
@@ -1327,11 +1283,8 @@ echo '<div class="awp_updated" id="errormessage">
 .awp_updated{background-color: #FFFFE0;border-color: #E6DB55;border-radius: 5px 5px 5px 5px;border-style: solid;border-width: 1px;line-height: 0.9em;}
 </style>'
     ;
-    echo '<script type="text/javascript">
-	jQuery(document).ready(function($) {
-	jQuery(".awp_updated").fadeOut(10000);
-		});
-	</script>';
+    exit;
+//    echo '<script type="text/javascript"> jQuery(document).ready(function($) { jQuery(".awp_updated").fadeOut(10000); }); </script>';
     }
 }
 
@@ -1345,7 +1298,7 @@ echo '<div class="awp_updated" id="errormessage">
  * @param unknown_type $userId
  * @return unknown
  */
-function createTargetList($category,$fname,$lname,$email,$phoneNumber,$comments,$userId=null)
+function createTargetList($category,$fname,$lname,$email,$phoneNumber,$comments,$notesLabel,$userId=null)
 {
    
    $target_category = target_lists_category(trim($category));
@@ -1353,29 +1306,39 @@ function createTargetList($category,$fname,$lname,$email,$phoneNumber,$comments,
    {
    	return $target_category;
    }
-   
+
    $verification = check_blockip();
+      
    if($verification){
    	 return $verification;
    }
-	$appParam = new AWP_appParam('PHONE',$phoneNumber);	
-	$params = array ( 
-                "arg0" => APPTIVO_BUSINESS_API_KEY,
-                "arg1" => APPTIVO_BUSINESS_ACCESS_KEY,
-	            "arg2" => $category,
-	            "arg3" => $fname,
-	            "arg4" => $lname,
-	            "arg5" => $email,
-	            "arg6" => $comments,
-	            "arg7" => $userId,
-		        "arg8" => $appParam
-                 );
-    $response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createTargetWithCommunicationDetailsAndAddToTargetList',$params);
+   
+   $targetParams='{"firstName":"'.$fname.'","phone":"'.$phoneNumber.'","lastName":"'.$lname.'","jobTitle":"","email":"'.$email.'"}';
+   
+	$params = array (
+                "a" => "createTarget",
+                "targetCreate" => $targetParams,
+				"targetListId" => $category,
+                "apiKey"=> APPTIVO_BUSINESS_API_KEY,
+                "accessKey"=> APPTIVO_BUSINESS_ACCESS_KEY
+		);
+		$response=getRestAPICall("POST", APPTIVO_TARGETS_API,$params);
+		
+		if(isset($response) && $response->targetId !=''){
+			$targetId=$response->targetId;
+			if($comments !=''){
+				$awpServiceObj=new AWPAPIServices();
+				$awpServiceObj->createTargetListNotes($comments,$targetId,$notesLabel);
+				
+			}
+		}
+        
     return $response;
+    
 }
 
 /*
- * 
+ *
  * To get Current Browser
  */
 
@@ -1384,10 +1347,10 @@ function get_current_browser()
 if(isset($_SERVER['HTTP_USER_AGENT'])){
     $agent = $_SERVER['HTTP_USER_AGENT'];
 }
-if(strlen(strstr($agent,"Firefox")) > 0 ){ 
+if(strlen(strstr($agent,"Firefox")) > 0 ){
 	$browser = 'firefox';
 }
-else if(strlen(strstr($agent,"Chrome")) > 0 ){ 
+else if(strlen(strstr($agent,"Chrome")) > 0 ){
 
     $browser = 'chrome';
 
@@ -1417,7 +1380,6 @@ function awp_simple_captcha($fieldid,$postValue,$validateclass,$fg_color,$bg_col
 		 echo '<input type="hidden" value="'.$prefix.'" name="awp_simple_captcha_challenge"><img id="captcha_image" src="'.$awp_url ."/". $image. '" alt=""/>&nbsp;&nbsp;&nbsp;<input type="text" name="simple_'.$fieldid.'" id="'.$fieldid.'_id" value="" class="absp_contact_input_text'.$validateclass.'" size="5">';
         
 }
-
 /* CleanUp All unwanted Captcha Images */
 
 add_action( 'template_redirect', 'awp_captcha_cleanup' );
@@ -1439,4 +1401,124 @@ function awp_captcha($fieldid,$postValue,$validateclass){
 			}elseif ($option->awp_captcha_type=='simplecaptcha'){
             awp_simple_captcha($fieldid, $postValue, $validateclass,$fg_color,$bg_color);
 		}
+}
+
+/*
+ * Call occur when fatal error occurs in site.
+ *
+ */
+register_shutdown_function( "absp_fatal_error_handler" );
+
+function absp_fatal_error_handler() {
+  $errfile = "unknown file";
+  $errstr  = "shutdown";
+  $errno   = E_CORE_ERROR;
+  $errline = 0;
+
+  $error = error_get_last();
+
+  if( $error !== NULL) {
+    $errno   = $error["type"];
+    $errfile = $error["file"];
+    $errline = $error["line"];
+    $errstr  = $error["message"];
+  }
+absp_show_error_log($errno, $errfile, $errline, $errstr);
+}
+
+function absp_show_error_log($errorno,$file,$line,$message)
+{
+	absp_currentError($message);
+}
+
+function absp_currentError($message)
+{
+	if(strpos($message, "SOAP-ERROR: Parsing WSDL: Couldn't load")!=false || strpos($message, "Maximum execution time of 30 seconds exceeded")!=false ||  strpos($message, "SoapClient::SoapClient()")!=false)
+{
+	echo awp_messagelist("fatal_error").'
+<style type="text/css">
+.awp_updated{background-color: #FFFFE0;border-color: #E6DB55;border-radius: 5px 5px 5px 5px;border-style: solid;border-width: 1px;line-height: 0.9em;}
+</style>'
+    ;
+    echo '<script type="text/javascript">
+	jQuery(document).ready(function($) {
+	var p;
+	p = jQuery(".awp_updated").detach();
+	jQuery(".wrap").append(p);
+//	jQuery(".awp_updated").fadeOut(10000);
+		});
+	</script>';
+}
+}
+
+/*
+ * Check the option and add or update option.
+ */
+
+function check_option($option_name,$option_value)
+{
+
+	$get= get_option($option_name);
+	if($get=="")
+	{
+		add_option($option_name,$option_value);
+	}
+	else
+	{
+		update_option($option_name, $option_value);
+	}
+}
+
+/*
+ * Apptivo REST API CALL
+ */
+
+function _isCurl(){
+    return function_exists('curl_version');
+}
+
+function getRestAPICall($method, $url, $data = false)
+{
+
+    $proxysettings = array();
+    $proxysettings = get_option('awp_proxy_settings');
+
+    if(!_isCurl()){ echo '<b style="color:red;">CURL disabled in your server. please enable through php.ini</b>';  exit; }
+
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type: application/x-www-form-urlencoded;charset=utf-8"));
+
+    if($method == "POST")
+    {
+        curl_setopt($ch, CURLOPT_POST, 1);
+        if ($data) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+        }
+    }
+    else{
+        if ($data) $url = sprintf("%s?%s", $url, http_build_query($data));
+    }    
+    
+    curl_setopt($ch,CURLOPT_URL, $url);
+
+        if(isset($proxysettings['proxy_enable'])){
+        if(isset($proxysettings['proxy_hostname_portno'])){
+            curl_setopt($ch, CURLOPT_PROXY, $proxysettings['proxy_hostname_portno']);
+        }
+        if(isset($proxysettings['proxy_loginuser_pwd'])){
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxysettings['proxy_loginuser_pwd']);
+        }
+    }
+
+    curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    $result = json_decode($response);
+
+    return $result;
 }

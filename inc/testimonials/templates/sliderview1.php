@@ -48,7 +48,7 @@ margin: 0 !important;padding: 5px!important;text-align:justify;
 }
 #testimonials blockquote p a { text-decoration:none;}
 #testimonials blockquote p img {
-float:left;padding-right:10px;padding-top:0px;margin:0px;
+float:left;padding-right:10px;padding-top:0px;margin:0px;box-shadow:none;
 }
 #testimonials blockquote cite a{ text-decoration:none; }
 #testimonials blockquote cite {

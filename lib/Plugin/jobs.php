@@ -11,6 +11,7 @@ require_once AWP_INC_DIR . '/apptivo_services/jobDetails.php';
 /**
  * Class awp_jobsForms
  */
+
 class AWP_Jobs extends AWP_Base
 {
 	var $_plugin_activated = false;
@@ -78,7 +79,7 @@ class AWP_Jobs extends AWP_Base
 		$formname=trim($name);
 		$content="";
 		$successmsg="";
-		$hrjobsform=$this->get_jobapplicantform_fields($formname);
+		$hrjobsform=$this->get_jobapplicantform_fields($formname);		
 		$status = array('0' => 'Approved', '1' => 'New');
 		$allJobs = getAllHrjobs(999,0,'false',$status)->jobDetails;
 		$allJobs = awp_convertObjToArray($allJobs);
@@ -105,6 +106,12 @@ class AWP_Jobs extends AWP_Base
 			}
 			$successmsg=$this->save_applicantjobs($submitformname,$jobId,$jobNo);
 		}
+		
+		if(strlen(trim($successmsg)) != 0 && $hrjobsform['confmsg_pagemode'] == 'other' ) :
+			$location = get_permalink($hrjobsform['confmsg_pageid']);
+			wp_safe_redirect($location);
+		endif;
+		
 		if($jobidwith_Number)
 		{
 			$jobId = '';
@@ -321,8 +328,15 @@ class AWP_Jobs extends AWP_Base
 			$submittedformvalues['name']=$hrjobsform[name];
 			$customfields="";
 			foreach($hrjobsformfields as $field)
-			{
+			{ 
 				$fieldid=$field['fieldid'];
+				
+				if($fieldid=="company"):
+					$companyName=stripslashes(trim($_POST['company']));
+					if($companyName !=''){
+					$customfields.="<br/><b>".$field['showtext']."</b>:".$companyName;
+					}
+				endif;
 				$pos=strpos($fieldid, "customfield");
 				if($pos===false){
 					if($fieldid=='telephonenumber'){
@@ -355,7 +369,9 @@ class AWP_Jobs extends AWP_Base
 						}else {
 							$customfieldVal = $_POST[$fieldid];
 						}
+						if($customfieldVal != '') :
 						$customfields.="<br/><b>".$field['showtext']."</b>:&nbsp;".stripslashes($customfieldVal);
+						endif;
 					}
 					else
 					{
@@ -371,8 +387,9 @@ class AWP_Jobs extends AWP_Base
 						}else {
 							$customfieldVal = $_POST[$fieldid];
 						}
-							
+						if($customfieldVal != '') :	
 						$customfields .= "<br/><b>".$field['showtext']."</b>:".stripslashes($customfieldVal);
+						endif;
 					}
 				}else {
 					$submittedformvalues[industry]= $_POST[industry];
@@ -403,10 +420,11 @@ class AWP_Jobs extends AWP_Base
 			$noteDetails = $submittedformvalues['notes'];
 			if(!empty($noteDetails)){
 				$parent1details = nl2br($noteDetails);
-				$noteDetails = notes('Custom Fields',$parent1details,$parent1NoteId);
+				$awp_services_obj=new AWPAPIServices();
+				$noteDetails = $awp_services_obj->notes('Custom Fields',$parent1details,$parent1NoteId);
 			}
 			if(!empty($emailId)){
-				$response = createJobApplicant($addressId, $address1, $address2, $applicantId, $applicantNumber, $city, $comments, $country, $countyAndDistrict, $emailId, $expectedDesignation, $expectedSalary, $firstName, $industryId, $jobApplicantId, $jobId,$jobNo, $lastName, $middleName, $noteDetails, $phoneNumber, $postalCode, $provinceAndState, $coverletter, $resumeDetails, $resumeFileName, $resumeId, $skills,$upload_docid);
+				$response = createJobApplicant($addressId, $address1, $address2, $applicantId, $applicantNumber, $city, $comments, $country, $countyAndDistrict, $emailId, $jobTitle, $expectedSalary, $firstName, $industryId, $jobApplicantId, $jobId,$jobNo, $lastName, $middleName, $noteDetails, $phoneNumber, $postalCode, $provinceAndState, $coverletter, $resumeDetails, $resumeFileName, $resumeId, $skills,$upload_docid);
 			}
 			if(isset($response) && $response->statusCode == '1000'){
 				if(!empty($hrjobsform[confmsg])){
@@ -779,10 +797,9 @@ class AWP_Jobs extends AWP_Base
 		} //End of Update Jobs.
 		$jobTypeLists = array('Full Time' => 'Full Time','Part Time' => 'Part Time','Contract' => 'Contract');
 		$jobTypeStatus = array('New' => 'New','Approved' => 'Approved','Closed' => 'Closed','Canceled' => 'Canceled');
-		$allIndustries = getAllIndustries();
-                
-                ?>
-<h2 style="font-size: 23px;font-weight: normal;">Jobs Management </h2>
+		        ?>
+		        <div class="wrap">
+<h2 style="font-size: 23px;font-weight: normal;">Jobs Management </h2> </div>
 <?php checkSoapextension("jobs"); 
       checkCaptchaOption();
 ?>
@@ -870,7 +887,9 @@ Guide.</a></span>
 		<tr>
 			<td><?php _e('Industry','apptivo-businesssite'); ?></td>
 			<td><select id="jobs_industry" name="jobs_industry">
-			<?php foreach($allIndustries as $industries)
+			<?php 
+			$allIndustries = getAllIndustries();
+			foreach($allIndustries as $industries)
 			{
 				?>
 				<option
@@ -971,7 +990,9 @@ Guide.</a></span>
 			<td><?php _e('Industry','apptivo-businesssite');?></td>
 			<td><select id="jobs_industry" name="jobs_industry">
 				<option value="">--Select Industry--</option>
-				<?php foreach($allIndustries as $industries)
+				<?php 
+				$allIndustries = getAllIndustries();
+				foreach($allIndustries as $industries)
 				{
 					?>
 				<option value="<?php echo $industries->industryId;?>"><?php echo $industries->industryName;?></option>
@@ -2544,7 +2565,8 @@ if($_GET['step'] == 2)
 	 */
 	function getAllCountryList()
 	{
-		$countrylist = getAllCountries();
+		$awp_services_obj=new AWPAPIServices();
+		$countrylist = $awp_services_obj->getAllCountries();
 		return $countrylist;
 	}
 
@@ -2636,6 +2658,27 @@ function createJobApplicant($addressId, $addressLine1, $addressLine2, $applicant
                 "arg2" => $jobapplicantdetals
 	);
 	$response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'createNewJobApplicant',$params);
+
+	$noteDetails=$response->return->noteDetails->noteText;
+	$applicantId=$response->return->applicantId;      
+	     if($noteDetails!="" && $applicantId != "")
+					{
+						
+						$noteText=$response->return->noteDetails->noteText;
+						$caseNotes='{"noteText":"'.$noteText.'"}';
+						$param = array (
+                				"a"         => "save",
+                				"objectId"  => APPTIVO_JOBS_OBJECT_ID,
+                				"objRefId"  => "$applicantId",
+                				"noteData"  =>  "$caseNotes",
+                				"apiKey"=> APPTIVO_BUSINESS_API_KEY,
+                				"accessKey"=> APPTIVO_BUSINESS_ACCESS_KEY
+						);
+						
+						$notesResponse= getRestAPICall("POST", APPTIVO_NOTES_API,$param);
+						$noteid=$notesResponse->noteId;
+						
+					}
 	if((isset($response->return->statusCode) && $response->return->statusCode != '1000') || $response =='E_100')
 	{
 		echo awp_messagelist('jobapplicant-display-page');
@@ -2728,7 +2771,7 @@ function jobdescriptionByNumber($jobNo)
  * Apptivo Job Industries.
  */
 function getAllIndustries()
-{
+{ 
 	$params = array ( "arg0" => APPTIVO_BUSINESS_API_KEY, "arg1" => APPTIVO_BUSINESS_ACCESS_KEY );
 	$data_key = APPTIVO_BUSINESS_API_KEY.'-industries';
 	if(class_exists('Memcache'))
@@ -2749,7 +2792,41 @@ function getAllIndustries()
 			$mcache_obj->storedata($data_key,$response);
 		}
 	}else {
+		
 		$response = getsoapCall(APPTIVO_BUSINESS_SERVICES,'getAllIndustries',$params);
 	}
+	
 	return $response->return;
+}
+
+
+/* SelectAll functionality for Job Industry,Job Type in Job Search From Fields */
+
+add_action("admin_footer", "apptivo_business_jobs_search_formfields");
+
+function apptivo_business_jobs_search_formfields() {
+	?>
+<script type="text/javascript">
+    jQuery(document).ready(function(){
+
+		jQuery('#customfield1_show').change(function(){
+			if(jQuery(this).is(":checked")) {
+			      //checked event code
+			      jQuery('#customfield1_options option').attr('selected', 'selected');
+			      return;
+			   }
+			jQuery('#customfield1_options option').removeAttr('selected');
+		});
+		jQuery('#customfield2_show').change(function(){
+			if(jQuery(this).is(":checked")) {
+			      //checked event code
+			      jQuery('#customfield2_options option').attr('selected', 'selected');
+			      return;
+			   }
+			jQuery('#customfield2_options option').removeAttr('selected');
+		});
+        
+    });
+    </script>
+	<?php
 }

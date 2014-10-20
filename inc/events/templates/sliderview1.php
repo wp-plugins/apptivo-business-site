@@ -41,7 +41,7 @@ margin: 0 !important;padding: 5px!important;text-align:justify;
 }
 #awp_events blockquote p a { text-decoration:none;}
 #awp_events blockquote p img {
-float:left;padding-right:10px;padding-top:0px;margin:0px;
+float:left;padding-right:10px;padding-top:0px;margin:0px;box-shadow:none;
 }
 #awp_events blockquote cite a{ text-decoration:none; }
 #awp_events blockquote cite {
