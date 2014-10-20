@@ -51,7 +51,6 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 == Changelog ==
 
 = 1.2.3 =
-* Disabled SSLv3 Protocol support due to POODLE vulnerability
 * Added Lead assignee (employee or team), lead source, rank, status, type for contact forms.
 * Added customer and contact association for cases by creating new or existing customer/contact.
 * Added Case assignee (employee or team), priority, status, type for Cases. 
