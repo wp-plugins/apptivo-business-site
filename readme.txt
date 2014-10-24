@@ -3,7 +3,7 @@ Contributors: apptivo, rmohanasundaram, prabhuganapathy
 Tags: apptivo, contact forms, crm, newsletters, testimonials
 Requires at least: 3.0
 Tested up to: 4.0
-Stable tag: 1.2.3
+Stable tag: 1.2.3.1
 
 Create contact forms, newsletter signups, and customer testimonials, integrated with Apptivo.
 
@@ -49,6 +49,8 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 2. screenshot-2.jpg
 
 == Changelog ==
+= 1.2.3.1 =
+* Added new contact form teamplate with Placeholder.
 
 = 1.2.3 =
 * Added Lead assignee (employee or team), lead source, rank, status, type for contact forms.
