@@ -258,8 +258,7 @@ if (jQuery) {
                                 }else{
                                 	l.percentage = l.percentage + 1;
                                 	jQuery(".uploadifyQueueItem .percentage").html( "  -   "+l.percentage+"%");
-                                	jQuery(".awp_hrjobsform_submit_jaform").attr("disabled", "disabled");
-
+                                    jQuery(".awp_hrjobsform_submit_jaform").attr("disabled", "disabled"); 
                                 }
                             });
                             if (k.data.toDisplay == "percentage") {

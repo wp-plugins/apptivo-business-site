@@ -252,9 +252,11 @@ function awp_paginate($reload, $page, $tpages,$totalitems) {
  */
 function getsoapCall($wsdl,$function,$params)
 {
-	$context = stream_context_create();
+	$context = stream_context_create(array(
+               'ssl'=>array( 'ciphers' => '3DES' )               
+        ));
 	$client = new SoapClient($wsdl, array('stream_context' => $context));
-//  $client = new SoapClient($wsdl);
+
    try {
     	 $response = $client->__soapCall($function, array($params));
     }catch(Exception $e){
@@ -1510,8 +1512,8 @@ function getRestAPICall($method, $url, $data = false)
             curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxysettings['proxy_loginuser_pwd']);
         }
     }
-
-    curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+    curl_setopt( $ch, CURLOPT_SSL_CIPHER_LIST, '3DES' );
+    curl_setopt($ch, CURLOPT_SSLVERSION, 1);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);

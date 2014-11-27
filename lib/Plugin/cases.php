@@ -90,10 +90,6 @@ class AWP_Cases extends AWP_Base
 			add_shortcode('apptivocases',array(&$this,'apptivo_business_casesnew'));
 			add_shortcode( 'apptivo_cases', array( &$this, 'apptivo_business_casesnew' ) );	/* To View Old Plugin form */
 
-			if(get_option ('awp_cases_configdata')=="")
-			{
-				$check	=	caseOptions('save');
-			}
 			$oldForm	= get_option('absp_cases_form_fields');
 			if($oldForm!="")
 			{

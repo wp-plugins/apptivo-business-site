@@ -21,7 +21,7 @@ define("AWP_SAVE_CONTACT",1);
 // Site Url
 define('SITE_URL', site_url());
 //Plugin Version
-define('AWP_VERSION', '1.2.3');
+define('AWP_VERSION', '1.2.4');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
