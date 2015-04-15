@@ -2,8 +2,8 @@
 Contributors: apptivo, rmohanasundaram, prabhuganapathy
 Tags: apptivo, contact forms, crm, newsletters, testimonials
 Requires at least: 3.0
-Tested up to: 4.1
-Stable tag: 1.2.4
+Tested up to: 4.1.1
+Stable tag: 1.2.5
 
 Create contact forms, newsletter signups, and customer testimonials, integrated with Apptivo.
 
@@ -49,6 +49,10 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 2. screenshot-2.jpg
 
 == Changelog ==
+
+= 1.2.5 =
+* Removed SSL Chiper list.
+* Updated new brand icon
 
 = 1.2.4 =
 * Disabled SSLv3 Support.
