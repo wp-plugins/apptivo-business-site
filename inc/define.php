@@ -1512,7 +1512,7 @@ function getRestAPICall($method, $url, $data = false)
             curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxysettings['proxy_loginuser_pwd']);
         }
     }
-    curl_setopt( $ch, CURLOPT_SSL_CIPHER_LIST, '3DES' );
+    //  curl_setopt( $ch, CURLOPT_SSL_CIPHER_LIST, '3DES' );
     curl_setopt($ch, CURLOPT_SSLVERSION, 1);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
