@@ -38,7 +38,7 @@ if( $contactform['css'] != '' )
 	$css='<style type="text/css">'.$contactform['css'].'</style>';
 }
 
-foreach($formfields as $fscript){
+
     echo $jscript='<script type="text/javascript">
 jQuery(document).ready(function(){
  jQuery.validator.addMethod("phoneUS", function(phone_number, element) {
@@ -93,12 +93,13 @@ jQuery("#'.$contactform['name'].'_contactforms").validate({
         telephonenumber: {phoneUS: true}
        },
     submitHandler: function(form) {
+      jQuery("button[type=submit], input[type=submit]").attr("disabled",true);
       form.submit();
     }
 });
 });
 </script>';
-    }
+    
     if(isset($submitformname)){
 if($submitformname==$contactform['name'] && $successmsg!="")
 {
@@ -109,28 +110,51 @@ if($submitformname==$contactform['name'] && $successmsg!="")
         </script>';
 }
     }
-echo '<style type="text/css">
-	.awp_contactform_maindiv_'.$contactform['name'].'{width:'.$form_outer_width.';}
-        span.error_message,.form_section .error {color:red}
-        .absp_success_msg {color: green;font-weight: bold;padding: 10px 0;}
-        #telephonenumber1, #telephonenumber2{width:24%}#telephonenumber3 {width:30%}
-        .form_section {margin-bottom:10px !important}
-    	.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input[type="checkbox"], .awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input[type="radio"]{width:auto;float:left;margin-right: 5px;margin-top:5px;}
-    	.abswpcfm input, .abswpcfm textarea, .abswpcfm select {width:95%;padding:6px;}
-        .abswpcfm input[type="button"], .abswpcfm input[type="reset"], .abswpcfm input[type="submit"], .abswpcfm input[type="image"] {width:auto;margin-top: 15px}
-    	.abswpcfm input[type="image"] {border:none}
-        @media screen and (max-width:900px){
-		.awp_contactform_maindiv_'.$contactform['name'].' .form_left_part {width:100%  ;float:left  ;}
-		.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part{width:100%  ;float:left  ;margin-top:5px;}
-		#recaptcha_widget_div{zoom:0.79;-moz-transform: scale(0.76);}
-		.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input#telephonenumber1, .awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input#telephonenumber2, .awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input#telephonenumber3{width:20%;}
-		}
-		@media screen and (max-width:360px){
-		.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input#telephonenumber1, .awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input#telephonenumber2, .awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input#telephonenumber3{width:20%;}
-		#recaptcha_widget_div{zoom:0.59;-moz-transform: scale(0.56);}
-		}
-      </style>';
-
+echo $stcss = '<style type="text/css">
+.awp_contactform_maindiv_'.$contactform['name'].'{width:'.$form_outer_width.' !important;}
+.absp_success_msg {color: green;font-weight: bold;padding: 10px 0;}    
+.awformmain div,.awformmain label,.awformmain a,.awformmain span,.awformmain input,.awformmain textarea,.awformmain select{-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}
+.awformmain input[type="text"]{min-height:25px}
+.awformmain select.required{color:#000}
+.awformmain {max-width:600px}
+ span.absp_contact_mandatory{color:red}
+.awformmain .captcha .formrgt{float:left !important}
+.awformmain label.error{color:red;width: 100% !important;}
+.awformmain span.absp_mandatory{color: #F00; padding-left:5px}
+.awformmain .formouter{float:left;width:50%}
+.awformmain .formsection {overflow: hidden;padding: 1px;margin: 0 0 10px 0;}
+.awdblclm .formsection,.awformmain .doublecolmn .formsection{width:50%;float:left;padding-right: 10px;}
+.awdblclm .fullsection,.awformmain .formsection.fullsection{width:100% !important}
+.awformmain .fullsection label{width:12.5% !important}
+.awformmain .fullsection .formrgt{width:87.5% !important}
+.awformmain .doublecolmn .fullsection label{width:100% !important}
+.awformmain .doublecolmn .fullsection .formrgt{width:100% !important}
+.awformmain .formsection div{margin: 0 0 5px 0;}
+.awformmain .formsection label{width:35%;float:left;padding-right:10px;padding:5px 0;}
+.awformmain .singlecolmn .formsection label,.doublecolmn .formsection label{width: 100%;float: left;padding-right: 10px;}
+.awformmain .formsection .formrgt {width: 65%;float: left;padding-right: 10px;}
+.awformmain .singlecolmn .formsection .formrgt ,.awformmain .doublecolmn .formsection .formrgt{width: 100%;float: left;padding-right: 10px;}
+.awformmain .formrgt div.formsect{width:100%;float:left}
+.awformmain .formsect label {margin-left:5px;width:75% !important;font-weight:normal !important;padding-top:0px !important}
+.awformmain .fullsection label {width:90% !important;}
+.awformmain .formsect input{margin-top:2px}
+.awformmain .fltrgt{float:right}
+.awformmain input{margin:0px;float:left}
+.awformmain input[type=text],input[type=email],input[type=url],input[type=password],textarea {border: 1px solid;width:100%;  margin: 0;}
+.awformmain select {width:100%;min-height: 27px;margin:0;color:#000;}
+.awformmain .threefield{width:33.3%;float:left}
+.awformmain .pd0_10{padding:0 10px}
+@media (max-width: 768px) {
+.awformmain .formsection {margin: 0 0 10px 0;}
+.awformmain .formsection label{width: 100%;float: left;margin: 0 0 5px 0;padding-bottom:5px}
+.awformmain .formsection .formrgt,.awformmain .formsection {width: 100% !important;float: none;}
+.awformmain input[type=text],input[type=email],input[type=url],input[type=password],textarea,select {width: 100%;}
+.awformmain .formsect label {margin-left: 5px !important;width: 90% !important;}
+}
+@media (max-width: 480px) {
+#recaptcha_widget_div{zoom:0.59;-moz-transform: scale(0.76);}
+}
+</style>';
 echo $css;
 echo $jscript;
 
@@ -162,16 +186,25 @@ do_action ('apptivo_business_contact_'.$contactform['name'].'_before_form'); //B
 
 echo '<form id="'.$contactform['name'].'_contactforms" class="abswpcfm awp_contact_'.$contactform['name'].'" name="'.$contactform['name'].'_contactforms" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
 echo '<input type="hidden" value="'.$contactform['name'].'" name="awp_contactformname" id="awp_contactformname">';
-echo '<div class="awp_contactform_maindiv_'.$contactform['name'].'">';
+echo '<div class="awformmain awp_contactform_maindiv_'.$contactform['name'].'">';
 foreach($formfields as $field)
 {
-	$fieldid=$field['fieldid'];
+	if ( !is_array($field)) { continue; }
+	$fieldid= $field['fieldid']; 
 	$showtext=$field['showtext'];
 	$validation=$field['validation'];
 	$required=$field['required'];
 	$fieldtype=$field['type'];
 	$options=$field['options'];
-	$optionvalues=array();
+        $optionvalues=array();
+
+        if($validation=="string")
+        {
+            $phone_validation="_string";
+        }
+        else {
+            $phone_validation= "";
+        }
 
 	if($required){
 		$mandate_property='"mandatory="true"';
@@ -193,6 +226,10 @@ foreach($formfields as $field)
 		case "number":
 			$validateclass .=" number";
 			break;
+                case "string":
+			$validateclass .=" string";
+			break;
+
 	}
 	if($fieldid=='captcha')
 	{
@@ -201,19 +238,13 @@ foreach($formfields as $field)
 	else{
 		$captcha_class = '';
 	}
-	echo '<div class="form_section">'.
-				'<div class="form_left_part '.$captcha_class.'">'.
-					'<span class="absp_contact_label">';
+	echo '<div class="formsection '.$captcha_class.'"><label><span>';
 	if($required)
 	echo '<span class="absp_contact_mandatory">*</span>';
-
-	echo $showtext.'</span>'.
-                       '</div>'.
-                       '<div class="form_rgt_part">';
+        echo $showtext.'</span></label><div class="formrgt">';
 
 	if($fieldtype=="select" || $fieldtype=="radio" || $fieldtype=="checkbox" ){
 		if(trim($options)!=""){
-
 			$option_values=split("[\n]",trim($options));//Split the String line by line.
 
 			$optionvalues = array();
@@ -224,46 +255,53 @@ foreach($formfields as $field)
 		}
 	}
 	if ($value_present)
-	$postValue = $_REQUEST[$fieldid];
-	else
-	$postValue="";
+	{
+		$postValue = $_REQUEST[$fieldid];
+	}else {
+		$postValue="";
+	}
+	
 	switch($fieldtype)
 	{
 		case "text":
 			if($fieldid != 'telephonenumber')
 			{
-				echo '<input type="text" name="'.$fieldid.'" id="'.$fieldid.'" value="'.$postValue.'"  class="absp_contact_input_text'.$validateclass.'">';
+				echo '<input type="text" name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_contact_input_text'.$validateclass.'">';
 			}
 			else
 			{
-				echo '<input maxlength="3" size="3" type="text" name="'.$fieldid.'1" id="'.$fieldid.'1" value="'.$postValue.'"  class="absp_contact_input_text'.$validateclass.'">';
-				echo '&nbsp;&nbsp;&nbsp;<input maxlength="3" size="3" type="text" name="'.$fieldid.'2" id="'.$fieldid.'2" value="'.$postValue.'"  class="absp_contact_input_text'.$validateclass.'">';
-				echo '&nbsp;&nbsp;&nbsp;<input maxlength="4" size="4" type="text" name="'.$fieldid.'3" id="'.$fieldid.'3" value="'.$postValue.'"  class="absp_contact_input_text'.$validateclass.'">';
+				echo '<div class="threefield"><input maxlength="3" size="3" type="text" name="'.$fieldid.'1" id="'.$fieldid.'1" value=""  class="absp_contact_input_text'.$validateclass.'"></div>';
+				echo '<div class="threefield pd0_10"><input maxlength="3" size="3" type="text" name="'.$fieldid.'2" id="'.$fieldid.'2" value=""  class="absp_contact_input_text'.$validateclass.'"></div>';
+				echo '<div class="threefield"><input maxlength="4" size="4" type="text" name="'.$fieldid.'3" id="'.$fieldid.'3" value=""  class="absp_contact_input_text'.$validateclass.'"></div>';
 			}
 			break;
-			
+				
 		case "textarea":
-			echo '<textarea  name="'.$fieldid.'" id="'.$fieldid.'_id" value=""  class="absp_contact_textarea'.$validateclass.'" size="50"></textarea>';
+			echo   '<textarea  name="'.$fieldid.'" id="'.$fieldid.'_id" value=""  class="absp_contact_textarea'.$validateclass.'" size="50"></textarea>';
 			break;
-			
+				
 		case "select":
+			 
 			if($fieldid == 'country'){
 
-				echo  '<select  name="'.$fieldid.'" id="'.$fieldid.'"  class="absp_contact_select'.$validateclass.'">';
-
+				echo   '<select  name="'.$fieldid.'" id="'.$fieldid.'"  class="absp_contact_select'.$validateclass.'">';
+				 
 				do_action ('apptivo_business_contact_'.$contactform[name].'_'.$fieldid.'_default_option');
 
 				foreach($countries as $country)
 				{
 					$country_Code = ((trim($postValue)) == '')?'US':(trim($postValue));
-					$selected = ( $country_Code == trim($country->countryId ))?'selected="selected"':'';
-					echo '<option value="'.$country->countryId.'" '.$selected.'>'.$country->countryName.'</option>';
+					
+					$selected = ( $selected == trim($country->countryId))?'selected="selected"':'';
+					
+					echo   '<option value="'.$country->countryId.'" '.$selected.'>'.$country->countryName.'</option>';
 				}
-				echo '</select>';
+				echo   '</select>';
 				echo '<input type="hidden" id="country_id" name="country_id" value="'.$countries[0]->countryId.'"/>';
 				echo '<input type="hidden" id="country_name" name="country_name" value="'.$countries[0]->countryName.'"/>';
 
-			}elseif ($fieldid=='leadStatus'){
+			} 
+			elseif ($fieldid=='leadStatus'){
 				$configValues=$formConfig["awp_leadStatus_selected"];
 				echo  '<select  name="'.$fieldid.'" id="'.$fieldid.'"  class="absp_contact_select'.$validateclass.'">';
 				
@@ -313,25 +351,28 @@ foreach($formfields as $field)
 				echo '<input type="hidden" id="rank_id" name="rank_id" value="'.$configValues.'"/>';
 				echo '<input type="hidden" id="rank_name" name="rank_name" value="'.$leadRank->meaning.'"/>';
 			}
-			else{
+			else {
 				 
-				echo '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_contact_select'.$validateclass.'">';
+				echo   '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_contact_select'.$validateclass.'">';
 
 				do_action ('apptivo_business_contact_'.$contactform[name].'_'.$fieldid.'_default_option');
 
 				foreach( $optionvalues as $optionvalue )
 				{
 					$selected = (trim($postValue) == trim($optionvalue))?'selected="selected"':'';
+					
 					if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 					{
-						echo '<option value="'.$optionvalue.'" '.$selected.'>'.$optionvalue.'</option>';
+						echo   '<option value="'.$optionvalue.'" '.$selected.'>'.$optionvalue.'</option>';
 					}
 				}
-				echo '</select>';
+
+				echo   '</select>';
 
 			}
+
 			break;
-			
+				
 		case "radio":
 
 			$i=0;$opt=0;
@@ -342,9 +383,7 @@ foreach($formfields as $field)
 				
 				if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 				{
-					if($i>0)
-					echo '&nbsp;';
-					echo '<input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'" '.$selected.'> <label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><br/>';
+					echo '<div class="formsect"><input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'" '.$selected.'> <label for="'.$fieldid.$opt.'">'.$optionvalue.'</label></div>';
 				}
 				$opt++;
 			}
@@ -366,52 +405,50 @@ foreach($formfields as $field)
 				}
 				if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 				{
-					if($i>0)
-					echo '&nbsp;';
-					echo '<input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_checkbox '.$validateclass.'"  '.$selected.'><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><br/>';
+					echo '<div class="formsect"><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_checkbox '.$validateclass.'"  '.$selected.'><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label></div>';
 					$i++;$opt++;
 				}
 			}
 			echo '</div>';
 			break;
-			
+
 		case "captcha":
-            awp_captcha($fieldid,$postValue,$validateclass);
+			awp_captcha($fieldid,$postValue,$validateclass);
 			break;
+			 
 	}
+	
 	echo '</div>'.'</div>';
 }
-
 if($contactform['subscribe_option']=='yes') :
 $subscribe_to_newsletter = ($contactform['subscribe_to_newsletter_displaytext'] != '')?$contactform['subscribe_to_newsletter_displaytext']:'Subscribe to Newsletter';
-echo '<div class="form_section"><div class="form_left_part">'.
-					'<span>'.$subscribe_to_newsletter.'<span>
-                                 </div>
-                        <div class="form_rgt_part">
-                        <input type="checkbox" name="subscribe" id="subscribe" />
-                        </div></div>';
+
+echo '<div class="formsection"><div class="formsect"><input type="checkbox" name="subscribe" id="subscribe" /><label>'.$subscribe_to_newsletter.'</label></div></div>';
 endif;
+
+
 echo '<input type="hidden" name="awp_contactform_submit"/>';
 if($contactform['submit_button_type']=="submit" &&($contactform['submit_button_val'])!=""){
-	$button_value = 'value="'.$contactform['submit_button_val'].'"';
+	$button_value = 'value="'.$contactform[submit_button_val].'"';
 }
 else{
 	if(strlen(trim($contactform['submit_button_val'])) == 0)
 	{
 		$imgSrc = awp_image('submit_button');
 	}else {
+
 		$imgSrc = $contactform['submit_button_val'];
 	}
 	 
 	$button_value = 'src="'.$imgSrc.'"';
 }
 
-
 do_action ('apptivo_business_contact_'.$contactform['name'].'_before_submit_query');//Before Submit Query
- 
-echo  '<input type="'.$contactform['submit_button_type'].'" class="absp_contact_button_submit awp_contactform_submit_'.$contactform['name'].'" '.$button_value.' name="awp_contactform_submit_'.$contactform['name'].'"  id="awp_contactform_submit_'.$contactform['name'].'" />';
-echo '</div>';
-echo '</form>';
 
+echo '<div class="formsection"><label><span>&nbsp;</span></label>
+      <div class="formrgt"><input type="'.$contactform['submit_button_type'].'" class="absp_contact_button_submit awp_contactform_submit_'.$contactform['name'].'" '.$button_value.' name="awp_contactform_submit_'.$contactform['name'].'"  id="awp_contactform_submit_'.$contactform['name'].'" /></div></div>';
+echo '</div>';
+echo '</form><p>&nbsp;</p>';
 do_action ('apptivo_business_contact_'.$contactform['name'].'_after_form');//After submit Form
+
 ?>

@@ -165,14 +165,16 @@ class AWP_ContactForms extends AWP_Base
 		}
 		wp_safe_redirect($location);
 		endif;
-		if(!empty($contactform['fields']))
+		if(isset($contactform['fields']))
 		{
 			foreach($contactform['fields'] as $field){
+                            if(is_array($field)){
 				if($field['fieldid']=="country")
 				{ 
 					$countrylist = $this->getAllCountryList();
 					break;
 				}
+                            }
 			}
 		}
 	
@@ -181,7 +183,8 @@ class AWP_ContactForms extends AWP_Base
 
 		if(!empty($contactform) && !empty($contactform['fields'])){
 			//Registering Validation Scripts.
-			$this->loadscripts();
+			//$this->loadscripts();
+                        add_action('wp_footer', abwpExternalScripts);
 			include $contactform['templatefile'];
 		}else {
 			echo awp_messagelist('contactform-display-page');
@@ -223,7 +226,7 @@ class AWP_ContactForms extends AWP_Base
 
 			foreach($contactformfields as $field)
 			{
-				$fieldid=$field['fieldid'];
+				$fieldid=  isset($field['fieldid']) ? $field['fieldid'] : '';
 				$pos=strpos($fieldid, "customfield");
 				if($pos===false){
 					if($fieldid=='telephonenumber'){
@@ -478,7 +481,7 @@ class AWP_ContactForms extends AWP_Base
 					if($noteDetails!="" && $leadId!="")
 					{
 						$noteText=$noteDetails->noteText;
-						$saveNotesResponse=$awp_services_obj->saveLeadNotes($leadId,$noteText);
+						$saveNotesResponse=$awp_services_obj->saveNotes(APPTIVO_LEAD_OBJECT_ID,$leadId,$noteText);
 					}
 					if($leadId!="")
 					{
@@ -522,6 +525,7 @@ class AWP_ContactForms extends AWP_Base
 	 * Get contactform and its fields to render in page which is using shortcode
 	 */
 	function get_contactform_fields($formname){
+            
 		$formExists="";
 		$contact_forms=array();
 		$contactform=array();
@@ -1798,8 +1802,9 @@ class AWP_ContactForms extends AWP_Base
 		$found=awp_check_for_shortcode($posts,'[apptivocontactform');
 		if ($found){
 			// load styles and scripts
-			$this->loadscripts();
+			//$this->loadscripts();
 			//$this->loadstyles();
+                    add_action('wp_footer', abwpExternalScripts);
 		}
 		return $posts;
 	}
@@ -1815,10 +1820,9 @@ class AWP_ContactForms extends AWP_Base
 	 * Load the JS files
 	 */
 	function loadscripts() {
-		wp_register_script('jquery_validation',AWP_PLUGIN_BASEURL. '/assets/js/validator-min.js',false,false,true);
-		wp_print_scripts('jquery_validation');
-
+            // add_action('wp_footer', abwpExternalScripts);
 	}
+        
 	function getAllCountryList(){
 		$awp_services_obj=new AWPAPIServices();
 		$countrylist = $awp_services_obj->getAllCountries();
@@ -1846,8 +1850,15 @@ function contactOptions($save)
 		$lead_type=array();
 		$lead_source=array();
 		$lead_rank=array();
-		$contactConfigData	= getAllContactConfigData();
-        if(isset($contactConfigData->leadStatuses)){
+		$contactConfigData = getAllContactConfigData();
+                if($contactConfigData == ''){
+                    echo '<script> 
+                            alert("'.AWP_SERVICE_ERROR_MESSAGE.'");
+                            window.location.href = "'.str_replace('awp_contactforms', 'awp_general', $_SERVER["REQUEST_URI"]).'";'.
+                         '</script>'; 
+                }
+                
+                if(isset($contactConfigData->leadStatuses)){
                     foreach ($contactConfigData->leadStatuses as $leadStatus){
 			if($leadStatus->disabled !='Y'){
 				array_push($lead_status, $leadStatus);

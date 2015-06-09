@@ -418,13 +418,19 @@ class AWP_Jobs extends AWP_Base
 			$upload_docid = $submittedformvalues['upload'];
 			$industryId = $submittedformvalues['industry'];
 			$noteDetails = $submittedformvalues['notes'];
-			if(!empty($noteDetails)){
+            if(!empty($noteDetails)){
 				$parent1details = nl2br($noteDetails);
 				$awp_services_obj=new AWPAPIServices();
-				$noteDetails = $awp_services_obj->notes('Custom Fields',$parent1details,$parent1NoteId);
+                $noteDetails = $awp_services_obj->notes('Custom Fields',$parent1details,$parent1NoteId);
 			}
 			if(!empty($emailId)){
-				$response = createJobApplicant($addressId, $address1, $address2, $applicantId, $applicantNumber, $city, $comments, $country, $countyAndDistrict, $emailId, $jobTitle, $expectedSalary, $firstName, $industryId, $jobApplicantId, $jobId,$jobNo, $lastName, $middleName, $noteDetails, $phoneNumber, $postalCode, $provinceAndState, $coverletter, $resumeDetails, $resumeFileName, $resumeId, $skills,$upload_docid);
+				$response = createJobApplicant($addressId, $address1, $address2, $applicantId, $applicantNumber, $city, $comments, $country, $countyAndDistrict, $emailId, $jobTitle, $expectedSalary, $firstName, $industryId, $jobApplicantId, $jobId,$jobNo, $lastName, $middleName,null, $phoneNumber, $postalCode, $provinceAndState, $coverletter, $resumeDetails, $resumeFileName, $resumeId, $skills,$upload_docid);
+                                $jobApplicantId	= $response->applicantId;
+				if($noteDetails!= "" && $jobApplicantId !="")
+		 		{
+					$noteText=$noteDetails->noteText;
+		 			$createNotesResponse=$awp_services_obj->saveNotes(APPTIVO_JOBS_OBJECT_ID,$jobApplicantId,$noteText);
+		 		}
 			}
 			if(isset($response) && $response->statusCode == '1000'){
 				if(!empty($hrjobsform[confmsg])){

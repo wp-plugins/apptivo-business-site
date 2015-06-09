@@ -10,10 +10,27 @@ if( $newsletterform[css] != '' )
 {
 	echo $css='<style type="text/css">'.$newsletterform[css].' .required{color:#000;font-weight:normal;}</style>';
 }
-else
-{
-echo '<style type="text/css"> .required{color:#000;font-weight:normal;} </style>';
-}
+echo '<style type="text/css">
+        .required{color:#000;font-weight:normal;}
+        .form_section {padding-bottom:10px}
+        .abswpnfm textarea#comments { margin: 0; }
+        #'.$newsletterform['name'].'_newsletter_phone1,#'.$newsletterform['name'].'_newsletter_phone2,#'.$newsletterform['name'].'_newsletter_phone3 {width: 26%;float: left;margin-right: 5%;}
+        span.error_message,label.error {color:red;width:100%;float:left}
+        .absp_error{color:red !important;}
+        .absp_success_msg {color: green;font-weight: bold;padding: 10px 0;}
+	.abswpnfm input, .abswpnfm textarea, .abswpnfm select {width:95%;}
+        .abswpnfm select {padding:6px;}
+        .abswpnfm input[type="button"], .abswpnfm input[type="reset"], .abswpnfm input[type="submit"], .abswpnfm input[type="image"] {width:auto;margin-top: 5px}
+        .abswpnfm input[type="image"] {border:none}
+    	@media screen and (max-width:900px){
+		.awp_newsletter_maindiv_'.$contactform['name'].' .form_left_part {width:100%;float:left;}
+		.awp_newsletter_maindiv_'.$contactform['name'].' .form_rgt_part{width:100%;float:left;margin-top:5px;}
+		#recaptcha_widget_div{zoom:0.79;-moz-transform: scale(0.76);}
+		}
+		@media screen and (max-width:360px){
+		#recaptcha_widget_div{zoom:0.59;-moz-transform: scale(0.56);}
+		}
+      </style>';
 echo $jscript='<script type="text/javascript">
 jQuery(document).ready(function(){
 jQuery("#'.$newsletterform[name].'_newsletter").validate({
@@ -63,7 +80,7 @@ if($submitformname==$newsletterform[name] && $successmsg!=""){
 
 do_action('apptivo_business_newsletter_'.$newsletterform[name].'_before_form');
 echo '<style type="text/css"> .absp_success_msg{color:green;font-weight:bold;padding-bottom:5px;}.absp_error,.error_message{color:red;font-weight:bold;padding-bottom:5px;}</style>';
-echo  '<form id="'.$newsletterform[name].'_newsletter" name="'.$newsletterform[name].'_newsletter" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
+echo  '<form class="abswpnfm" id="'.$newsletterform[name].'_newsletter" name="'.$newsletterform[name].'_newsletter" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
 echo '<input type="hidden" value="'.$newsletterform[name].'" name="awp_newsletterformname" id="awp_newsletterformname">';
 echo '<input type="hidden" value="'.$newsletterform[category].'" name="newsletter_category" id="newsletter_category">';
 echo '<div class="awp_newsletter_maindiv_'.$newsletterform[name].'">';

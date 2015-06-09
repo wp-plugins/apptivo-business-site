@@ -2,8 +2,8 @@
 Contributors: apptivo, rmohanasundaram, prabhuganapathy
 Tags: apptivo, contact forms, crm, newsletters, testimonials
 Requires at least: 3.0
-Tested up to: 4.2
-Stable tag: 1.2.5
+Tested up to: 4.2.2
+Stable tag: 1.2.6
 
 Create contact forms, newsletter signups, and customer testimonials, integrated with Apptivo.
 
@@ -50,6 +50,10 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 
 == Changelog ==
 
+= 1.2.6 =
+* Fixes on contact form, cases form, Newsletter templates and updated with responsive
+* Jobs notes API updated to save notes
+
 = 1.2.5 =
 * Removed SSL Chiper list.
 * Updated new brand icon
@@ -59,7 +63,7 @@ You can find the complete developer's guide here: http://runapptivo.apptivo.com/
 * API connection error with PHP Soap Client
 
 = 1.2.3.1 =
-* Added new contact form teamplate with Placeholder.
+* Added new contact form template with Placeholder.
 
 = 1.2.3 =
 * Added Lead assignee (employee or team), lead source, rank, status, type for contact forms.

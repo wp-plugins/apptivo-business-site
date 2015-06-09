@@ -476,15 +476,21 @@ class AWP_Cases extends AWP_Base
 				if($noteDetails!="" && $caseId !="")
 		 		{
 		 			$noteText=$noteDetails->noteText;
-		 			$createNotesResponse=$awp_services_obj->caseSaveNotes($caseId,$noteText);
+		 			$createNotesResponse=$awp_services_obj->saveNotes(APPTIVO_CASES_OBJECT_ID,$caseId,$noteText);
 		 		}
-		 		$properties = $case_form['properties'];
-		 		$success_message = $properties['confmsg'];
 		 	}
-		 	if($success_message=="")
-		 	{
+                        if($caseId !=''){
+                            $properties = $case_form['properties'];
+		 	    $success_message = $properties['confmsg'];
+                            if($success_message == "")
+                            {
 		 		$success_message="Case Submitted Successfully";
-		 	}
+                            }
+                        }
+                        else{
+                            $success_message="<label class='error'>Please try again later</lable><br />";
+                        }
+		 	
 		 	if(isset($response)){
 		 	 if($response->return->statusCode == 1000)
 		 	 {
@@ -513,7 +519,8 @@ class AWP_Cases extends AWP_Base
 		$cases_properties = $case_form['properties'];
 
 
-		$this->validate_load_script();
+		add_action('wp_footer', abwpExternalScripts);
+                
 		$form_fields=$case_form['fields']; //Cases Fields
 		usort($form_fields, "awp_sort_by_order");
 
@@ -567,8 +574,12 @@ class AWP_Cases extends AWP_Base
 						$status_type[]= $casestatus->meaning;
 						$status_type_value[]=$casestatus->lookupId;
 					}
-					$formnames =implode("\n", $status_type);
-					$formvalues =implode("\n", $status_type_value);
+                                        if(isset($status_type)){
+                                            $formnames =implode("\n", $status_type);
+                                        }
+                                        if(isset($status_type_value)){
+                                            $formvalues =implode("\n", $status_type_value);
+                                        }
 					$FormFields['options'] = $formnames;
 					$FormFields['value']=$formvalues;
 				}
@@ -582,8 +593,12 @@ class AWP_Cases extends AWP_Base
 						$type[]= $casetype->meaning;
 						$type_value[]=$casetype->lookupId;
 					}
-					$formnames =implode("\n", $type);
-					$formvalues =implode("\n", $type_value);
+                                        if(isset($type)){
+                                            $formnames =implode("\n", $type);
+                                        }
+                                        if(isset($type_value)){
+                                            $formvalues =implode("\n", $type_value);
+                                        }
 					$FormFields['options'] = $formnames;
 					$FormFields['value']=$formvalues;
 				}
@@ -595,8 +610,12 @@ class AWP_Cases extends AWP_Base
 						$type[]= $casepriority->meaning;
 						$type_value[]=$casepriority->lookupId;
 					}
-					$formnames =implode("\n", $type);
-					$formvalues =implode("\n", $type_value);
+                                        if(isset($type)){
+                                            $formnames =implode("\n", $type);
+                                        }
+                                        if(isset($type_value)){
+                                            $formvalues =implode("\n", $type_value);
+                                        }					
 					$FormFields['options'] = $formnames;
 					$FormFields['value']=$formvalues;
 					unset($type);
@@ -990,7 +1009,7 @@ class AWP_Cases extends AWP_Base
                                 $case_assignee_name = "";
 				if(_isCurl())
 				{
-					$configDatas	= caseOptions($save=null);
+					$configDatas	= caseOptions($save=null);  
 					// $configDatas	= get_option("awp_cases_configdata");
 					$configDatas	= json_decode($configDatas);
 					if(isset($configDatas->caseAssignee)){
@@ -1663,6 +1682,12 @@ function caseOptions($save)
 		$case_priority=array();
 		$case_type=array();
 		$casesConfigData	= getAllCasesConfigData();
+                if($casesConfigData == ''){
+                    echo '<script> 
+                            alert("'.AWP_SERVICE_ERROR_MESSAGE.'"); 
+                            window.location.href = "'.str_replace('awp_cases', 'awp_general', $_SERVER["REQUEST_URI"]).'";'.
+                         '</script>'; 
+                }
                 if(isset($casesConfigData->caseStatus)){
                     foreach ($casesConfigData->caseStatus as $caseStatus){
 			if($caseStatus->disabled !='Y'){

@@ -112,21 +112,22 @@ Class AWPAPIServices {
         return $response;
     }
 
-    public function saveLeadNotes($leadId, $noteText) {
-
-        $leads = '{"noteText":"' . $noteText . '"}';
+    /* Save Notes to Objects */
+    public function saveNotes($objectId,$objRefId,$noteText) {
+        $noteTextDetails = '{"noteText":"' . $noteText . '"}';
         $param = array(
             "a" => "save",
-            "objectId" => APPTIVO_LEAD_OBJECT_ID,
-            "objRefId" => "$leadId",
-            "noteData" => "$leads",
+            "objectId" => $objectId,
+            "objRefId" => "$objRefId",
+            "noteData" => "$noteTextDetails",
             "apiKey" => APPTIVO_BUSINESS_API_KEY,
             "accessKey" => APPTIVO_BUSINESS_ACCESS_KEY
         );
         $notesResponse = getRestAPICall("POST", APPTIVO_NOTES_API, $param);
         $noteid = $notesResponse->noteId;
+        return $noteid;
     }
-
+    
     /**
      * Save Notes Details TargetList */
     public function createTargetListNotes($comments, $targetId, $notesLabel) {
@@ -192,23 +193,7 @@ Class AWPAPIServices {
         return $response;
     }
 
-    /* Save Notes with Cases Creation */
-
-    function caseSaveNotes($caseId, $noteText) {
-
-        $caseNotes = '{"noteText":"' . $noteText . '"}';
-        $param = array(
-            "a" => "save",
-            "objectId" => APPTIVO_CASES_OBJECT_ID,
-            "objRefId" => "$caseId",
-            "noteData" => "$caseNotes",
-            "apiKey" => APPTIVO_BUSINESS_API_KEY,
-            "accessKey" => APPTIVO_BUSINESS_ACCESS_KEY
-        );
-        $notesResponse = getRestAPICall("POST", APPTIVO_NOTES_API, $param);
-        $noteid = $notesResponse->noteId;
-        return $noteid;
-    }
+    
 
     /*
      * To associate Cases with Contact and Customer

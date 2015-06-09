@@ -21,7 +21,7 @@ define("AWP_SAVE_CONTACT",1);
 // Site Url
 define('SITE_URL', site_url());
 //Plugin Version
-define('AWP_VERSION', '1.2.4');
+define('AWP_VERSION', '1.2.6');
 
 //Plugin folders
 define('AWP_LIB_DIR', AWP_PLUGIN_BASEPATH . '/lib');
@@ -74,3 +74,4 @@ define('APPTIVO_EMPLOYEE_OBJECT_ID','8');
 define('APPTIVO_TEAM_OBJECT_ID','91');
 define('APPTIVO_JOBS_OBJECT_ID','135');
 define('APPTIVO_NOTE_OBJECT_ID','19');
+define('AWP_SERVICE_ERROR_MESSAGE', '\nThere is an issue with your API/Access keys. Please double check them within the general settings page, if you don’t see any issue contact us at support@apptivo.com.');

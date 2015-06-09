@@ -16,6 +16,7 @@ $checkleadRank = "0";
 $form_outer_width=$contact_width_size;
 for($i=0;$i<count($formfields);$i++)
 {
+    if(is_array($formfields[$i])){
 	if($formfields[$i]["fieldid"]=="leadType")
 	 {
 	 	$checkleadType= "1";
@@ -32,46 +33,60 @@ for($i=0;$i<count($formfields);$i++)
 	 {
 	 	$checkleadRank= "1";
 	 }
+    }
 }
 if( $contactform['css'] != '' )
 {
 	echo $css='<style type="text/css">'.$contactform['css'].'</style>';
 }
-echo '<style type="text/css">
-form{margin:0;padding:0;}
-.awp_contactform_maindiv_'.$contactform['name'].'{width:'.$form_outer_width.';}
-span.error_message,.form_section .error {color:red}
-.absp_success_msg {color: green;font-weight: bold;padding: 10px 0;}
-.recaptcha_source{margin:0 !important;}
-.awp_contactform_maindiv_'.$contactform['name'].' input.required{color:#000;font-weight:normal;}
-.awp_contactform_maindiv_'.$contactform['name'].' .form_section{float:left;width:100%;margin-bottom:15px;}
-.awp_contactform_maindiv_'.$contactform['name'].'{float:left;width:100%;}
-.awp_contactform_maindiv_'.$contactform['name'].' .form_left_part {width:40%;float:left;}
-.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part{width:60%;float:left;}
-.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input{width:100%;}
-.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part textarea{width:100%;}
-.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input#telephonenumber1, .awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input#telephonenumber2, .awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input#telephonenumber3{width:20%}
+echo $stcss = '<style type="text/css">
+.awp_contactform_maindiv_'.$contactform['name'].'{width:'.$form_outer_width.' !important;}
+.absp_success_msg {color: green;font-weight: bold;padding: 10px 0;}    
+.awformmain div,.awformmain label,.awformmain a,.awformmain span,.awformmain input,.awformmain textarea,.awformmain select{-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}
+.awformmain input[type="text"]{min-height:25px}
+.awformmain select.required{color:#000}
+ span.absp_contact_mandatory{color:red}
+.awformmain .captcha .formrgt{float:left !important}
+.awformmain label.error{color:red;width: 100% !important;}
+.awformmain span.absp_mandatory{color: #F00; padding-left:5px}
+.awformmain .formouter{float:left;width:50%}
+.awformmain .formsection {overflow: hidden;padding: 1px;margin: 0 0 10px 0;}
+.awdblclm .formsection,.awformmain .doublecolmn .formsection{width:50%;float:left;padding-right: 10px;}
+.awdblclm .fullsection,.awformmain .formsection.fullsection{width:100% !important}
+.awformmain .fullsection label{width:12.5% !important}
+.awformmain .fullsection .formrgt{width:87.5% !important}
+.awformmain .fullsecsub .formrgt,.awformmain .fullsecsub .formrgt input{float:right;margin-right: 10px;}
+.awformmain .doublecolmn .fullsection label{width:100% !important}
+.awformmain .doublecolmn .fullsection .formrgt{width:100% !important}
+.awformmain .formsection div{margin: 0 0 5px 0;}
+.awformmain .formsection label{width:35%;float:left;padding-right:10px;}
+.awformmain .awsinglecolmn .formsection label,.doublecolmn .formsection label{width: 100%;float: left;padding-right: 10px;}
+.formsection .formrgt {width: 65%;float: left;padding-right: 10px;}
+.awsinglecolmn .formsection .formrgt ,.awformmain .doublecolmn .formsection .formrgt{width: 100%;float: left;padding-right: 10px;}
+.awformmain .formsection label {padding:5px 0;}
+.awformmain .formrgt div.formsect{width:100%;float:left}
+.awformmain .formsect label {margin-left:5px;width:75% !important;font-weight:normal !important;padding-top:0px !important}
+.awformmain .fullsection label {width:90% !important;}
+.awformmain .formsect input{margin-top:2px}
+.awformmain .fltrgt{float:right}
+.awformmain input{margin:0px;float:left}
+.awformmain input[type=text],input[type=email],input[type=url],input[type=password],textarea {border: 1px solid;width:100%;  margin: 0;}
+.awformmain select {width:100%;min-height: 27px;margin:0;color:#000;}
+.awformmain .threefield{width:33.3%;float:left}
+.awformmain .pd0_10{padding:0 10px}
+#recaptcha_widget_div{zoom:0.59;-moz-transform: scale(0.80);}
+@media (max-width: 768px) {
+.awformmain .formsection {margin: 0 0 10px 0;}
+.awformmain .formsection label{width: 100%;float: left;margin: 0 0 5px 0;padding-bottom:5px}
+.awformmain .formsection .formrgt,.awformmain .formsection {width: 100% !important;float: none;}
+.awformmain input[type=text],input[type=email],input[type=url],input[type=password],textarea,select {width: 100%;}
+.awformmain .formsect label {margin-left: 5px !important;width: 90% !important;}
+}
+@media (max-width: 480px) {
 #recaptcha_widget_div{zoom:0.59;-moz-transform: scale(0.56);}
-.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input[type="checkbox"], .awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input[type="radio"]{width:auto ;float:left;margin:5px 0 0;}
-.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part select{padding:6px;width:100%;}
-.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part label{line-height:13px;word-wrap: break-word;}
-.awp_contactform_maindiv_'.$contactform['name'].' input[type="submit"]{margin-left:0px !important;float:right;clear:both;}
-.awp_recaptcha_error .error{line-height:2px !important;}
-.abswpcfm input[type="button"], .abswpcfm input[type="reset"], .abswpcfm input[type="submit"], .abswpcfm input[type="image"] {width:auto;margin-top: 15px}
-.abswpcfm input[type="image"] {border:none;float:right;}
-@media screen and (max-width:900px){
-.awp_contactform_maindiv_'.$contactform['name'].' .form_left_part {width:100%;float:left;}
-.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part{width:100%;float:left;margin-top:5px;}
-}
-@media screen and (max-width:900px){
-.awp_contactform_maindiv_'.$contactform['name'].' .form_left_part {width:100%;float:left;}
-.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part{width:100%;float:left;margin-top:5px;}
-}
-@media screen and (max-width:360px){
-.awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input#telephonenumber1, .awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input#telephonenumber2, .awp_contactform_maindiv_'.$contactform['name'].' .form_rgt_part input#telephonenumber3{width:30% !important}
 }
 </style>';
-foreach($formfields as $fscript){
+
    echo $jscript='<script type="text/javascript">
 jQuery(document).ready(function(){
 
@@ -129,12 +144,13 @@ jQuery("#'.$contactform['name'].'_contactforms").validate({
         telephonenumber: { phoneUS: true}
        },
     submitHandler: function(form) {
+      jQuery("button[type=submit], input[type=submit]").attr("disabled",true);
       form.submit();
     }
 });
 });
 </script>';
-    }
+   
     if(isset($submitformname)){
 if($submitformname==$contactform['name'] && $successmsg!="")
 {
@@ -175,11 +191,12 @@ do_action ('apptivo_business_contact_'.$contactform['name'].'_before_form'); //B
 
 echo  '<form class="abswpcfm" id="'.$contactform['name'].'_contactforms" name="'.$contactform['name'].'_contactforms" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
 echo '<input type="hidden" value="'.$contactform['name'].'" name="awp_contactformname" id="awp_contactformname">';
-echo '<div class="awp_contactform_maindiv_'.$contactform['name'].'">';
+echo '<div class="awformmain awdblclm awp_contactform_maindiv_'.$contactform['name'].'">';
 foreach($formfields as $field)
 {
-	if($count%2==0) $style='style="width: 48%;float:right;"';
-	else $style='style="width: 48%;float:left;clear:both;"';
+	if($count%2==0) $style='awpcfmrgt';
+	else $style='awpcfmlft';
+        
 	$fieldid=$field['fieldid'];
 	$showtext=$field['showtext'];
 	$validation=$field['validation'];
@@ -217,19 +234,24 @@ foreach($formfields as $field)
 			$validateclass .=" number";
 			break;
 	}
-
-	echo '<div class="form_section" '.$style.'>';
+        
+        if($fieldid == 'captcha')
+	{
+		$captcha_class = 'captcha';
+	}
+	else{
+		$captcha_class = '';
+	}
+	echo '<div class="formsection '.$captcha_class.'">';
+        
 	if($showtext!="")
 	{
-		echo '<div class="form_left_part">'.
-					'<span class="absp_contact_label">';
+		echo '<label><span>';
 		if($required)
 		echo '<span class="absp_contact_mandatory">*</span>';
-
-		echo $showtext.'</span>'.
-                       '</div>';
+		echo $showtext.'</span></label>';
 	}
-	echo '<div class="form_rgt_part">';
+	echo '<div class="formrgt">';
 
 	if($fieldtype=="select" || $fieldtype=="radio" || $fieldtype=="checkbox" ){
 		if(trim($options)!=""){
@@ -344,9 +366,7 @@ foreach($formfields as $field)
 				$selected = (trim($postValue) == trim($optionvalue))?'checked="checked"':'';
 				if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 				{
-					if($i>0)
-					echo '&nbsp;';
-					echo '<input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'" '.$selected.'> <label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><br/>';
+					echo '<div class="formsect"><input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_radio '.$validateclass.'" '.$selected.'> <label for="'.$fieldid.$opt.'">'.$optionvalue.'</label></div>';
 				}
 				$opt++;
 			}
@@ -365,9 +385,7 @@ foreach($formfields as $field)
 				}
 				if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 				{
-					if($i>0)
-					echo '&nbsp;';
-					echo '<input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_checkbox '.$validateclass.'"  '.$selected.'><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><br/>';
+					echo '<div class="formsect"><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_contact_input_checkbox '.$validateclass.'"  '.$selected.'><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label></div>';
 					$i++;$opt++;
 				}
 			}
@@ -376,17 +394,12 @@ foreach($formfields as $field)
                        awp_captcha($fieldid,$postValue,$validateclass);
 			break;
 	}
-	echo '</div>'.'</div>';
+	echo '</div>'.'</div>';      
 	$count++;
 }
 if($contactform['subscribe_option']=='yes') :
 $subscribe_to_newsletter = ($contactform['subscribe_to_newsletter_displaytext'] != '')?$contactform['subscribe_to_newsletter_displaytext']:'Subscribe to Newsletter';
-echo '<div class="form_section"><div class="form_left_part">'.
-					'<span>'.$subscribe_to_newsletter.'<span>
-                                 </div>
-                        <div class="form_rgt_part">
-                        <input type="checkbox" name="subscribe" id="subscribe" />
-                        </div></div>';
+echo '<div class="form_section fullsection"><div class="formsect"><input type="checkbox" name="subscribe" id="subscribe" /><label>'.$subscribe_to_newsletter.'</label></div></div>';
 endif;
 echo '<input type="hidden" name="awp_contactform_submit"/>';
 if($contactform['submit_button_type']=="submit" &&($contactform['submit_button_val'])!=""){
@@ -405,9 +418,12 @@ else{
 
 do_action ('apptivo_business_contact_'.$contactform['name'].'_before_submit_query');//Before Submit Query
  
-echo  '<input type="'.$contactform['submit_button_type'].'" class="absp_contact_button_submit awp_contactform_submit_'.$contactform['name'].'" '.$button_value.' name="awp_contactform_submit_'.$contactform['name'].'"  id="awp_contactform_submit_'.$contactform['name'].'" />';
+
+echo '<div class="form_section fullsection fullsecsub"><div class="formrgt"><input type="'.$contactform['submit_button_type'].'" class="absp_contact_button_submit awp_contactform_submit_'.$contactform['name'].'" '.$button_value.' name="awp_contactform_submit_'.$contactform['name'].'"  id="awp_contactform_submit_'.$contactform['name'].'" /></div></div>';
+
 echo '</div>';
-echo '</form>';
+
+echo '</form><p>&nbsp;</p><br/>';
 
 do_action ('apptivo_business_contact_'.$contactform['name'].'_after_form');//After submit Form
 ?>

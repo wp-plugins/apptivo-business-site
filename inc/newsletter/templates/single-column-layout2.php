@@ -10,10 +10,30 @@ if( $newsletterform[css] != '' )
 {
 	echo $css='<style type="text/css">'.$newsletterform[css].' .required{color:#000;font-weight:normal;}</style>';
 }
-else
-{
-echo '<style type="text/css"> .required{color:#000;font-weight:normal;} </style>';
-}
+
+echo '<style type="text/css">
+        span.error_message,label.error, .absp_error{color:red}
+        .absp_success_msg {color: green;font-weight: bold;padding: 10px 0;}
+	.awp_newsletter_maindiv_'.$newsletterform['name'].',label.error{float:left;width:100%;} 
+	.awp_newsletter_maindiv_'.$newsletterform['name'].' .form_section{padding-bottom:15px;float:left;width:100%;}
+    	.awp_newsletter_maindiv_'.$newsletterform['name'].' .form_section .form_left_part{width:30%;float:left;line-height:22px;}
+        .awp_newsletter_maindiv_'.$newsletterform['name'].' .form_section .form_rgt_part{width:70%;float:left;line-height:22px;}
+        .abswpnfm input, .abswpnfm textarea, .abswpnfm select {width:95%;}
+         .abswpnfm select {padding:6px;}
+        .abswpnfm input[type="button"], .abswpnfm input[type="reset"], .abswpnfm input[type="submit"], .abswpnfm input[type="image"] {width:auto;margin-top: 5px}
+        .abswpnfm input[type="image"] {border:none}
+         @media screen and (max-width:900px){
+                .awp_newsletter_maindiv_'.$newsletterform['name'].' .awp_contactform_submit_'.$newsletterform['name'].'{margin-left: 0%;}
+		.awp_newsletter_maindiv_'.$newsletterform['name'].' .form_left_part {width:100% !important;float:left !important;}
+		.awp_newsletter_maindiv_'.$newsletterform['name'].' .form_rgt_part{width:100% !important;float:left !important;margin-top:5px;}
+		#recaptcha_widget_div{zoom:0.79;-moz-transform: scale(0.76);}
+                .emtydv{display:none;}
+		}
+		@media screen and (max-width:360px){
+		#recaptcha_widget_div{zoom:0.59;-moz-transform: scale(0.56);}
+		}
+       </style>';
+
 
 echo $jscript='<script type="text/javascript">
 jQuery(document).ready(function(){
@@ -34,23 +54,7 @@ jQuery("#'.$newsletterform[name].'_newsletter").validate({
 document.getElementById("success_'.$newsletterform[name].'").scrollIntoView();
 });
 </script>';
-echo '<style type="text/css">
-   .awp_newsletter_maindiv_'.$newsletterform[name].' .form_section{
-    padding-bottom:10px;
-    }
-    .awp_newsletter_maindiv_'.$newsletterform[name].' .form_section .form_left_part{
-        width:30%;
-        float:left;
-        line-height:22px;
-        }
-       
-         .awp_newsletter_maindiv_'.$newsletterform[name].' .awp_newsletterform_submit_'.$newsletterform[name].'{
-         margin-left: 193px;
-        }
-        .form_rgt_part textarea {
-        width:180px;
-        }
-      </style>';
+
 if($submitformname==$newsletterform[name] && $successmsg!=""){
 	echo '<script type="text/javascript">
 	jQuery(document).ready(function(){
@@ -62,7 +66,7 @@ if($submitformname==$newsletterform[name] && $successmsg!=""){
 
 do_action('apptivo_business_newsletter_'.$newsletterform[name].'_before_form'); //Before Form
 echo '<style type="text/css"> .absp_success_msg{color:green;font-weight:bold;padding-bottom:5px;}.absp_error,.error_message{color:red;font-weight:bold;padding-bottom:5px;}</style>';
-echo  '<form id="'.$newsletterform[name].'_newsletter" name="'.$newsletterform[name].'_newsletter" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
+echo  '<form class="abswpnfm" id="'.$newsletterform[name].'_newsletter" name="'.$newsletterform[name].'_newsletter" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
 echo '<input type="hidden" value="'.$newsletterform[name].'" name="awp_newsletterformname" id="awp_newsletterformname">';
 echo '<input type="hidden" value="'.$newsletterform[category].'" name="newsletter_category" id="newsletter_category">';
 echo '<div class="awp_newsletter_maindiv_'.$newsletterform[name].'">';
@@ -171,7 +175,9 @@ else{
 
 do_action('apptivo_business_newsletter_'.$newsletterform[name].'_before_submit_query');//Before Submit Query
 
-echo  '<input type="'.$newsletterform[submit_button_type].'" class="absp_newsletter_button_submit awp_newsletterform_submit_'.$newsletterform[name].'" '.$button_value.' name="awp_newsletterform_submit_'.$newsletterform[name].'"  id="awp_contactform_submit_'.$newsletterform[name].'" />';
+echo '<div class="form_section"><div class="form_left_part emtydv">&nbsp;</div>
+      <div class="form_rgt_part"><input type="'.$newsletterform[submit_button_type].'" class="absp_newsletter_button_submit awp_newsletterform_submit_'.$newsletterform[name].'" '.$button_value.' name="awp_newsletterform_submit_'.$newsletterform[name].'"  id="awp_contactform_submit_'.$newsletterform[name].'" /></div></div>';
+
 echo '</div>';
 echo '</form>';
 

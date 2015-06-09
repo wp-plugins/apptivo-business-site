@@ -252,11 +252,7 @@ function awp_paginate($reload, $page, $tpages,$totalitems) {
  */
 function getsoapCall($wsdl,$function,$params)
 {
-	$context = stream_context_create(array(
-               'ssl'=>array( 'ciphers' => '3DES' )               
-        ));
-	$client = new SoapClient($wsdl, array('stream_context' => $context));
-
+   $client = new SoapClient($wsdl);
    try {
     	 $response = $client->__soapCall($function, array($params));
     }catch(Exception $e){
@@ -991,9 +987,8 @@ echo '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$pl
                                      }
                       if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 						{
-					if($i>0)
-						echo '&nbsp;';
-					echo '<input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_'.$plugin.'_input_radio '.$validateclass.'" '.$selected.'  tabindex="'.$tabindex.'"><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><br/>';
+					
+					echo '<div class="formsect"><input type="radio" name="'.$fieldid.'" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_'.$plugin.'_input_radio '.$validateclass.'" '.$selected.'  tabindex="'.$tabindex.'"><label for="'.$fieldid.$opt.'">'.$optionvalue.'</label></div>';
 						}
 						$opt++;
 				}
@@ -1014,9 +1009,7 @@ echo '<select  name="'.$fieldid.'" id="'.$fieldid.'" value=""  class="absp_'.$pl
                    }
 					if(!empty($optionvalue) && strlen(trim($optionvalue)) != 0)
 					{
-					if($i>0)
-					echo '&nbsp';
-					echo '<input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_'.$plugin.'_input_checkbox '.$validateclass.'"  '.$selected.'  tabindex="'.$tabindex.'"> <label for="'.$fieldid.$opt.'">'.$optionvalue.'</label><br/>';
+					echo '<div class="formsect"><input type="checkbox" name="'.$fieldid.'[]" id="'.$fieldid.$opt.'" value="'.$optionvalue.'"  class="absp_'.$plugin.'_input_checkbox '.$validateclass.'"  '.$selected.'  tabindex="'.$tabindex.'"> <label for="'.$fieldid.$opt.'">'.$optionvalue.'</label></div>';
 					$i++;
 					}
 					$opt++;
@@ -1078,7 +1071,7 @@ function awp_create_labelfield($showtext='',$customtext='',$class='',$before='',
     if($showtext == '' || strlen(trim($showtext)) == 0) :
     	$showtext = $customtext;
     endif;
-	return $before.'<label for="'.$fieldid.'" class="'.$class.'">'.$showtext.'</label>'.$after;
+	return $before.'<span for="'.$fieldid.'" class="'.$class.'">'.$showtext.'</span>'.$after;
 
 }
 
@@ -1379,7 +1372,7 @@ function awp_simple_captcha($fieldid,$postValue,$validateclass,$fg_color,$bg_col
          $image=$captcha_instance->generate_image($prefix, $word );
          $awp_upload_url=wp_upload_dir();
          $awp_url=path_join( $awp_upload_url['baseurl'], 'awp_captcha' );
-		 echo '<input type="hidden" value="'.$prefix.'" name="awp_simple_captcha_challenge"><img id="captcha_image" src="'.$awp_url ."/". $image. '" alt=""/>&nbsp;&nbsp;&nbsp;<input type="text" name="simple_'.$fieldid.'" id="'.$fieldid.'_id" value="" class="absp_contact_input_text'.$validateclass.'" size="5">';
+	 echo '<input type="hidden" value="'.$prefix.'" name="awp_simple_captcha_challenge"><img id="captcha_image" src="'.$awp_url ."/". $image. '" alt=""/>&nbsp;&nbsp;&nbsp;<input type="text" name="simple_'.$fieldid.'" id="'.$fieldid.'_id" value="" class="absp_contact_input_text'.$validateclass.'" size="5">';
         
 }
 /* CleanUp All unwanted Captcha Images */
@@ -1391,18 +1384,17 @@ function awp_captcha_cleanup(){
          $captcha_instance->cleanup(60);
 
 }
-function awp_captcha($fieldid,$postValue,$validateclass){
+function awp_captcha($fieldid, $postValue, $validateclass) {
 
-			$option=get_option('apptivo_business_recaptcha_settings') ;
-			$option=json_decode($option);
-			$fg_color=$option->awp_fg_color;
-			$bg_color=$option->awp_bg_color;
-			if($option->awp_captcha_type=='recaptcha')
-			{
-            awp_reCaptcha();
-			}elseif ($option->awp_captcha_type=='simplecaptcha'){
-            awp_simple_captcha($fieldid, $postValue, $validateclass,$fg_color,$bg_color);
-		}
+    $option = get_option('apptivo_business_recaptcha_settings');
+    $option = json_decode($option);
+    $fg_color = $option->awp_fg_color;
+    $bg_color = $option->awp_bg_color;
+    if ($option->awp_captcha_type == 'recaptcha') {
+        awp_reCaptcha();
+    } elseif ($option->awp_captcha_type == 'simplecaptcha') {
+        awp_simple_captcha($fieldid, $postValue, $validateclass, $fg_color, $bg_color);
+    }
 }
 
 /*
@@ -1474,53 +1466,59 @@ function check_option($option_name,$option_value)
 /*
  * Apptivo REST API CALL
  */
+if (!function_exists('_isCurl')) {
 
-function _isCurl(){
-    return function_exists('curl_version');
+    function _isCurl() {
+        return function_exists('curl_version');
+    }
+
 }
 
-function getRestAPICall($method, $url, $data = false)
-{
+if (!function_exists('getRestAPICall')) {
 
-    $proxysettings = array();
-    $proxysettings = get_option('awp_proxy_settings');
+    function getRestAPICall($method, $url, $data = false) {
 
-    if(!_isCurl()){ echo '<b style="color:red;">CURL disabled in your server. please enable through php.ini</b>';  exit; }
+        $proxysettings = array();
+        $proxysettings = get_option('awp_proxy_settings');
 
-    $ch = curl_init();
-
-    curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type: application/x-www-form-urlencoded;charset=utf-8"));
-
-    if($method == "POST")
-    {
-        curl_setopt($ch, CURLOPT_POST, 1);
-        if ($data) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+        if (!_isCurl()) {
+            echo '<b style="color:red;">CURL disabled in your server. please enable through php.ini</b>';
+            exit;
         }
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type: application/x-www-form-urlencoded;charset=utf-8"));
+
+        if ($method == "POST") {
+            curl_setopt($ch, CURLOPT_POST, 1);
+            if ($data) {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            }
+        } else {
+            if ($data)
+                $url = sprintf("%s?%s", $url, http_build_query($data));
+        }
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        if (isset($proxysettings['proxy_enable'])) {
+            if (isset($proxysettings['proxy_hostname_portno'])) {
+                curl_setopt($ch, CURLOPT_PROXY, $proxysettings['proxy_hostname_portno']);
+            }
+            if (isset($proxysettings['proxy_loginuser_pwd'])) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxysettings['proxy_loginuser_pwd']);
+            }
+        }
+        //  curl_setopt( $ch, CURLOPT_SSL_CIPHER_LIST, '3DES' );
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        $result = json_decode($response);
+        return $result;
     }
-    else{
-        if ($data) $url = sprintf("%s?%s", $url, http_build_query($data));
-    }    
-    
-    curl_setopt($ch,CURLOPT_URL, $url);
-
-        if(isset($proxysettings['proxy_enable'])){
-        if(isset($proxysettings['proxy_hostname_portno'])){
-            curl_setopt($ch, CURLOPT_PROXY, $proxysettings['proxy_hostname_portno']);
-        }
-        if(isset($proxysettings['proxy_loginuser_pwd'])){
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxysettings['proxy_loginuser_pwd']);
-        }
-    }
-    //  curl_setopt( $ch, CURLOPT_SSL_CIPHER_LIST, '3DES' );
-    curl_setopt($ch, CURLOPT_SSLVERSION, 1);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-    $response = curl_exec($ch);
-    curl_close($ch);
-    $result = json_decode($response);
-
-    return $result;
 }
